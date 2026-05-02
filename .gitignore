@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local scratch / explorations (not for publishing)
+/public/explorations/
+/src/app/defi-icons/
