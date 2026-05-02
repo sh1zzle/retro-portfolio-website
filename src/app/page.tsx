@@ -1,20 +1,14 @@
 "use client";
 
-import { useEffect, useState, type ComponentType, type SVGProps } from "react";
+import { useEffect, useState, type ComponentType, type CSSProperties, type SVGProps } from "react";
 import {
-  User,
-  Sparkles,
-  Coins,
   Building2,
   FileText,
   Mail,
   Code2,
-  Coffee,
-  Trash2,
   Terminal,
   Hash,
   Asterisk,
-  Slash,
   Search,
   Settings,
   Bold,
@@ -48,12 +42,14 @@ const LinkedinMark: LucideLike = (props) => (
   </svg>
 );
 
-/* ---------------- Tabs ---------------- */
-const TABS: { key: TabKey; label: string }[] = [
-  { key: "welcome", label: "welcome" },
-  { key: "projects", label: "projects" },
-  { key: "experience", label: "experience" },
-  { key: "contact", label: "contact" },
+/* ---------------- Tabs (iOS-style bottom bar) ---------------- */
+/* Icons are PNGs from /public/icons. Drop replacement art at the same
+   path to swap. Defaults reuse existing assets so nothing 404s. */
+const TABS: { key: TabKey; label: string; icon: string }[] = [
+  { key: "welcome", label: "About", icon: "/icons/resume.png" },
+  { key: "projects", label: "Projects", icon: "/icons/skills.png" },
+  { key: "experience", label: "Experience", icon: "/icons/coffee.png" },
+  { key: "contact", label: "Contact", icon: "/icons/contact.png" },
 ];
 
 /* ---------------- Desktop icons ----------------
@@ -64,6 +60,10 @@ type DesktopIconDef = {
   key: string;
   label: string;
   imageSrc?: string;
+  /** Multiplier for the rendered image. Use >1 for PNGs with heavy
+      transparent padding so the artwork reads at the same visual size
+      as tightly-cropped neighbours. Default 1. */
+  imageScale?: number;
   Icon?: LucideLike;
   bg?: string;
   fg?: string;
@@ -73,20 +73,20 @@ type DesktopIconDef = {
 };
 
 const LEFT_ICONS: DesktopIconDef[] = [
-  { key: "about", imageSrc: "/icons/about.svg", label: "about.mdx", tab: "welcome" },
-  { key: "equilibria", Icon: Sparkles, label: "equilibria", bg: "#c5e0c4", fg: "#1f5f2a", tab: "projects" },
-  { key: "defi", Icon: Coins, label: "defi-app", bg: "#f4d09a", fg: "#7a3f0a", tab: "projects" },
-  { key: "facilitron", Icon: Building2, label: "facilitron", bg: "#b8c4d6", fg: "#1e3556", tab: "experience" },
-  { key: "resume", imageSrc: "/icons/resume.png", label: "résumé.pdf", href: "/resume.pdf", external: true },
-  { key: "contact", imageSrc: "/icons/contact.png", label: "contact.dat", tab: "contact" },
+  { key: "about", imageScale: 1.3, imageSrc: "/icons/about-me.png", label: "about-me", tab: "welcome" },
+  { key: "equilibria", imageSrc: "/icons/equilibria.png", imageScale: 1.5, label: "equilibria", tab: "projects" },
+  { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "defi-app", tab: "projects" },
+  { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "facilitron", tab: "experience" },
+  { key: "resume", imageSrc: "/icons/resume.png", imageScale: 1.7, label: "resume.pdf", href: "/resume.pdf", external: true },
+  { key: "contact", imageScale: 1.1, imageSrc: "/icons/contact.png", label: "contact.dat", tab: "contact" },
 ];
 
 const RIGHT_ICONS: DesktopIconDef[] = [
-  { key: "github", imageSrc: "/icons/github.png", label: "github", href: profile.github, external: true },
-  { key: "linkedin", imageSrc: "/icons/linkedin.png", label: "linkedin", href: profile.linkedin, external: true },
-  { key: "skills", imageSrc: "/icons/skills.png", label: "skills.txt", tab: "welcome" },
-  { key: "coffee", imageSrc: "/icons/coffee.png", label: "coffee chat", href: `mailto:${profile.email}`, external: true },
-  { key: "trash", imageSrc: "/icons/trash.png", label: "trash" },
+  { key: "github",imageScale: 1.2, imageSrc: "/icons/github.png", label: "github", href: profile.github, external: true },
+  { key: "linkedin", imageScale: 1.2,imageSrc: "/icons/linkedin.png", label: "linkedin", href: profile.linkedin, external: true },
+  { key: "skills",imageScale: 1.2, imageSrc: "/icons/skills.png", label: "skills.txt", tab: "welcome" },
+  { key: "coffee", imageSrc: "/icons/coffee.png", label: "love coffee", imageScale: 1.2, href: `mailto:${profile.email}`, external: true },
+  { key: "trash", imageScale: 1.2, imageSrc: "/icons/trash.png", label: "trash" },
 ];
 
 /* ---------------- Background decorations ----------------
@@ -166,20 +166,49 @@ export default function PortfolioOS() {
 
       {/* Window — fixed height with internal scroll */}
       <div className="ph-window relative z-0 w-full max-w-3xl h-[88vh] max-h-[820px] min-h-[560px] flex flex-col overflow-hidden">
-          {/* Title bar */}
-          <div className="ph-titlebar flex items-center px-3 py-2 gap-3 shrink-0">
-            <img src="/icons/portfolio.svg" alt="" aria-hidden width={22} height={22} />
+          {/* Title bar — macOS traffic-light style */}
+          <div className="mac-titlebar shrink-0">
+            <div className="mac-traffic" aria-label="Window controls">
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-label="Close"
+                className="mac-dot mac-close"
+              >
+                <svg viewBox="0 0 8 8" aria-hidden>
+                  <path d="M1.5 1.5 L6.5 6.5 M6.5 1.5 L1.5 6.5" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-label="Minimize"
+                className="mac-dot mac-min"
+              >
+                <svg viewBox="0 0 8 8" aria-hidden>
+                  <path d="M1.5 4 L6.5 4" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-label="Zoom"
+                className="mac-dot mac-zoom"
+              >
+                <svg viewBox="0 0 8 8" aria-hidden>
+                  <path d="M2 1.5 L6.5 1.5 L6.5 6 Z M6 6.5 L1.5 6.5 L1.5 2 Z" />
+                </svg>
+              </button>
+            </div>
             <button
-              className="text-sm font-semibold text-[#1a1a1a] flex items-center gap-1.5 hover:bg-[#f0f0f0] rounded px-1.5 py-0.5"
+              className="mac-title"
               aria-label="File menu"
             >
-              {currentTitle(tab)}
-              <ChevronDown size={14} className="text-[#9b9b9b]" />
+              <img src="/icons/portfolio.svg" alt="" aria-hidden width={16} height={16} />
+              <span>{currentTitle(tab)}</span>
+              <ChevronDown size={12} className="text-[#9b9b9b]" />
             </button>
-            <div className="flex-1" />
-            <WinDot label="−" />
-            <WinDot label="▢" />
-            <WinDot label="✕" />
+            <div className="mac-titlebar-spacer" aria-hidden />
           </div>
 
           {/* Toolbar */}
@@ -217,16 +246,20 @@ export default function PortfolioOS() {
           </div>
 
           {/* Scrollable body */}
-          <div className="ph-body flex-1 overflow-y-auto px-6 md:px-10 pt-10 pb-8">
+          <div
+            className={`ph-body flex-1 overflow-y-auto px-6 md:px-10 pt-10 pb-8 ${
+              tab === "projects" ? "theme-ide" : ""
+            }`}
+          >
             {tab === "welcome" && <WelcomeTab />}
             {tab === "projects" && <ProjectsTab />}
             {tab === "experience" && <ExperienceTab />}
             {tab === "contact" && <ContactTab />}
           </div>
 
-          {/* Tabs (pinned) */}
-          <div className="px-6 md:px-10 border-t border-[#e5e5e5] shrink-0">
-            <nav role="tablist" aria-label="Sections" className="flex gap-1 -mb-px overflow-x-auto">
+          {/* Tabs (iOS-style bottom bar, pinned) */}
+          <div className="ios-tabbar shrink-0">
+            <nav role="tablist" aria-label="Sections" className="ios-tabbar-nav">
               {TABS.map((t) => (
                 <button
                   key={t.key}
@@ -234,9 +267,19 @@ export default function PortfolioOS() {
                   aria-selected={tab === t.key}
                   data-active={tab === t.key}
                   onClick={() => setTab(t.key)}
-                  className="ph-tab"
+                  className="ios-tab"
                 >
-                  {t.label}
+                  <span className="ios-tab-icon-wrap">
+                    <img
+                      src={t.icon}
+                      alt=""
+                      aria-hidden
+                      width={28}
+                      height={28}
+                      className="ios-tab-icon"
+                    />
+                  </span>
+                  <span className="ios-tab-label">{t.label}</span>
                 </button>
               ))}
             </nav>
@@ -268,17 +311,6 @@ function currentTitle(tab: TabKey) {
   }
 }
 
-function WinDot({ label }: { label: string }) {
-  return (
-    <button
-      tabIndex={-1}
-      aria-hidden
-      className="w-7 h-7 flex items-center justify-center rounded text-[#6b6b6b] hover:bg-[#f0f0f0] hover:text-[#1a1a1a] text-sm"
-    >
-      {label}
-    </button>
-  );
-}
 
 function DesktopIcon({
   icon,
@@ -293,6 +325,7 @@ function DesktopIcon({
 
   let Visual: React.ReactNode;
   if (icon.imageSrc) {
+    const scale = icon.imageScale ?? 1;
     Visual = (
       <img
         src={icon.imageSrc}
@@ -301,6 +334,7 @@ function DesktopIcon({
         width={56}
         height={56}
         className="desktop-icon-img"
+        style={scale !== 1 ? { transform: `scale(${scale})` } : undefined}
       />
     );
   } else if (icon.Icon) {
@@ -340,6 +374,47 @@ function DesktopIcon({
   );
 }
 
+/* ---------------- Dev avatar typing animation ----------------
+   Build the slot sequence and per-slot delays so the markup matches
+   the CSS keyframes. Tweak the constants here; the CSS reads its
+   total loop duration from `AVATAR_LOOP_SECONDS` via inline style.
+*/
+/* These constants must match the keyframe windows in globals.css.
+   31 typing × 0.25s = 7.75s total loop.
+   Typing window = 0.25 / 7.75 ≈ 3.23%   (CSS: 0%, 4% / 5%, 100%)
+   Yawn   window unused — yawns disabled below */
+const TYPING_SLOT_SECONDS = 0.25;
+const YAWN_SLOT_SECONDS = 1.0; // 4× a typing slot — clearly held pause
+
+type AvatarSlot = { n: string; type: "typing" | "yawn"; delay: number };
+
+function buildAvatarSequence(): { slots: AvatarSlot[]; totalSeconds: number } {
+  const slots: AvatarSlot[] = [];
+  let t = 0;
+  const pushTyping = (n: string) => {
+    slots.push({ n, type: "typing", delay: t });
+    t += TYPING_SLOT_SECONDS;
+  };
+  // Re-enable when adding yawn frames back into the sequence.
+  // const pushYawn = (n: string) => {
+  //   slots.push({ n, type: "yawn", delay: t });
+  //   t += YAWN_SLOT_SECONDS;
+  // };
+
+  // 10 typing cycles of (1, 2, 2.5) then a single closer on avatar 3.
+  for (let i = 0; i < 10; i++) {
+    pushTyping("1");
+    pushTyping("2");
+    pushTyping("2.5");
+  }
+  pushTyping("3");
+
+  return { slots, totalSeconds: t };
+}
+
+const { slots: AVATAR_SEQUENCE, totalSeconds: AVATAR_LOOP_SECONDS } =
+  buildAvatarSequence();
+
 /* ---------------- Tabs ---------------- */
 
 function WelcomeTab() {
@@ -359,23 +434,49 @@ function WelcomeTab() {
         </span>
       </div>
 
-      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
-        The new way to build software.
-      </h1>
+      <div className="welcome-hero">
+        <div className="welcome-hero-text">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
+            The new way to build software.
+          </h1>
 
-      <p className="mt-4 text-base md:text-lg text-[#3f3f3f] leading-relaxed max-w-2xl">
-        {profile.blurb}
-      </p>
-      <p className="mt-3 text-base md:text-lg text-[#3f3f3f] leading-relaxed max-w-2xl">
-        {profile.longBio}
-      </p>
+          <p className="mt-4 text-base md:text-lg text-[#3f3f3f] leading-relaxed">
+            {profile.blurb}
+          </p>
+          <p className="mt-3 text-base md:text-lg text-[#3f3f3f] leading-relaxed">
+            {profile.longBio}
+          </p>
+        </div>
+
+        <div
+          className="dev-avatar"
+          aria-label="Animated illustration of me typing at my computer"
+          role="img"
+          style={{ "--avatar-loop": `${AVATAR_LOOP_SECONDS}s` } as CSSProperties}
+        >
+          {/* Sequence: (1,2,3 × 4) → yawn-4 → (1,2,3 × 4) → yawn-5 → loop.
+              Yawn frames hold ~3× longer than typing frames so they read
+              as a deliberate pause rather than another quick beat. */}
+          {AVATAR_SEQUENCE.map((slot, i) => (
+            <img
+              key={i}
+              src={`/my-dev-avatar/my-dev-avatar-${slot.n}.png`}
+              alt=""
+              aria-hidden
+              className={`dev-avatar-frame dev-avatar-frame--${slot.type}`}
+              style={{ animationDelay: `${slot.delay.toFixed(3)}s` }}
+              loading="eager"
+            />
+          ))}
+        </div>
+      </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
         <a href={`mailto:${profile.email}`} className="btn-primary">
           <Mail size={16} strokeWidth={2.5} /> Get in touch
         </a>
         <a href="/resume.pdf" className="btn-secondary">
-          <FileText size={16} strokeWidth={2.5} /> View résumé
+          <FileText size={16} strokeWidth={2.5} /> View resume
         </a>
       </div>
 
@@ -422,59 +523,101 @@ function WelcomeTab() {
 function ProjectsTab() {
   return (
     <div>
-      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
-        Selected work.
-      </h1>
-      <p className="mt-3 text-[#3f3f3f] max-w-2xl">
-        A handful of things I've built lately. Each one taught me something.
+      {/* IDE-style breadcrumb + branch + run pill */}
+      <div className="ide-breadcrumb">
+        <span>src</span>
+        <span>›</span>
+        <span>projects</span>
+        <span>›</span>
+        <b>{projects[0].slug}.mdx</b>
+        <span className="branch">main · clean</span>
+        <button type="button" className="ide-runbtn ml-2" aria-label="Run">
+          ▶ Run
+        </button>
+      </div>
+
+      <h1 className="ide-h1">Selected work</h1>
+      <p className="ide-sub">
+        A handful of things I&apos;ve built lately. Each one taught me something.
       </p>
 
-      <ul className="mt-8 space-y-6">
+      {/* File-tab strip — one tab per project file */}
+      <div className="ide-tabbar mt-2">
         {projects.map((p, i) => (
-          <li
+          <span
             key={p.slug}
-            className="rounded-lg border border-[#e5e5e5] p-5 hover:border-[#1a1a1a] transition"
+            className="ide-tab"
+            data-active={i === 0 ? "true" : "false"}
           >
-            <div className="flex items-start gap-4">
-              <div
-                className="h-12 w-12 rounded-md border-[1.5px] border-[#1a1a1a] flex items-center justify-center"
-                style={{
-                  background: p.slug === "equilibria" ? "#c5e0c4" : "#f4d09a",
-                  boxShadow: "2px 2px 0 #1a1a1a",
-                }}
-              >
-                {p.slug === "equilibria" ? (
-                  <Sparkles size={22} strokeWidth={2.25} style={{ color: "#1f5f2a" }} />
-                ) : (
-                  <Coins size={22} strokeWidth={2.25} style={{ color: "#7a3f0a" }} />
-                )}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                  <h3 className="text-xl font-bold">
-                    <span className="text-[#9b9b9b] mr-2 text-base">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {p.name}
-                  </h3>
-                  <span className="status-tag">{p.status}</span>
-                </div>
-                <p className="mt-1 text-[#3f3f3f]">{p.tagline}</p>
-                <p className="mt-3 text-[#4b4b4b] leading-relaxed">
-                  {p.description}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {p.stack.map((s) => (
-                    <span key={s} className="code-chip">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </li>
+            <span className="dot" /> {p.slug}.mdx
+          </span>
         ))}
-      </ul>
+      </div>
+
+      {projects.map((p) => (
+        <div key={p.slug} className="ide-file">
+          <div className="ide-line">
+            <span className="ide-rule">---</span>
+          </div>
+          <div className="ide-line">
+            <span>
+              <span className="ide-key">slug</span>
+              <span className="ide-rule">: </span>
+              <span className="ide-str">&quot;{p.slug}&quot;</span>
+            </span>
+          </div>
+          <div className="ide-line">
+            <span>
+              <span className="ide-key">name</span>
+              <span className="ide-rule">: </span>
+              <span className="ide-str">&quot;{p.name}&quot;</span>
+            </span>
+          </div>
+          <div className="ide-line">
+            <span>
+              <span className="ide-key">status</span>
+              <span className="ide-rule">: </span>
+              <span className="ide-str">&quot;{p.status}&quot;</span>
+            </span>
+          </div>
+          <div className="ide-line">
+            <span className="ide-rule">---</span>
+          </div>
+          <div className="ide-line blank">
+            <span>&nbsp;</span>
+          </div>
+          <div className="ide-line">
+            <h3 className="ide-file-h">
+              {p.name}
+              <span className="status-tag">{p.status}</span>
+            </h3>
+          </div>
+          <div className="ide-line blank">
+            <span>&nbsp;</span>
+          </div>
+          <div className="ide-line">
+            <p className="ide-comment">{p.tagline}</p>
+          </div>
+          <div className="ide-line blank">
+            <span>&nbsp;</span>
+          </div>
+          <div className="ide-line">
+            <p className="ide-prose">{p.description}</p>
+          </div>
+          <div className="ide-line blank">
+            <span>&nbsp;</span>
+          </div>
+          <div className="ide-line">
+            <div className="ide-stack">
+              {p.stack.map((s) => (
+                <span key={s} className="ide-chip">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -485,7 +628,7 @@ function ExperienceTab() {
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
         Experience.
       </h1>
-      <p className="mt-3 text-[#3f3f3f]">Where I've been working lately.</p>
+      <p className="mt-3 text-[#3f3f3f]">Where I&apos;ve been working lately.</p>
 
       <ul className="mt-8 space-y-6">
         {experience.map((job) => (
@@ -523,7 +666,7 @@ function ContactTab() {
   return (
     <div>
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
-        Let's talk.
+        Let&apos;s talk.
       </h1>
       <p className="mt-3 text-[#3f3f3f] max-w-2xl">
         Best place to reach me. Pick whichever works.

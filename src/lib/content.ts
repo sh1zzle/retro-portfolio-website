@@ -1,7 +1,7 @@
 export const profile = {
-  name: "Your Name",
+  name: "Shiezza Lauron",
   role: "Full Stack Developer",
-  location: "Based in [City]",
+  location: "Based in Chiang Mai",
   blurb:
     "Full stack developer at Facilitron. I build mobile and web apps end-to-end — from Postgres schemas to React Native UIs.",
   longBio:
