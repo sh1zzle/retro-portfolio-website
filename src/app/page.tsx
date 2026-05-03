@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useState, type ComponentType, type CSSProperties, type SVGProps } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+  type CSSProperties,
+  type SVGProps,
+} from "react";
 import {
   Building2,
   FileText,
@@ -9,21 +17,14 @@ import {
   Terminal,
   Hash,
   Asterisk,
-  Search,
-  Settings,
   Bold,
   Italic,
   Underline,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Link as LinkIcon,
-  MessageSquare,
   Undo2,
   Redo2,
   ChevronDown,
 } from "lucide-react";
-import { profile, projects, experience } from "@/lib/content";
+import { profile, projects, experience, skills, heroStack } from "@/lib/content";
 
 type TabKey = "welcome" | "projects" | "experience" | "contact";
 
@@ -77,7 +78,7 @@ const LEFT_ICONS: DesktopIconDef[] = [
   { key: "equilibria", imageSrc: "/icons/equilibria.png", imageScale: 1.5, label: "equilibria", tab: "projects" },
   { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "defi-app", tab: "projects" },
   { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "facilitron", tab: "experience" },
-  { key: "resume", imageSrc: "/icons/resume.png", imageScale: 1.7, label: "resume.pdf", href: "/resume.pdf", external: true },
+  { key: "resume", imageSrc: "/icons/resume.png", imageScale: 1.7, label: "resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", external: true },
   { key: "contact", imageScale: 1.1, imageSrc: "/icons/contact.png", label: "contact.dat", tab: "contact" },
 ];
 
@@ -85,8 +86,8 @@ const RIGHT_ICONS: DesktopIconDef[] = [
   { key: "github",imageScale: 1.2, imageSrc: "/icons/github.png", label: "github", href: profile.github, external: true },
   { key: "linkedin", imageScale: 1.2,imageSrc: "/icons/linkedin.png", label: "linkedin", href: profile.linkedin, external: true },
   { key: "skills",imageScale: 1.2, imageSrc: "/icons/skills.png", label: "skills.txt", tab: "welcome" },
-  { key: "coffee", imageSrc: "/icons/coffee.png", label: "love coffee", imageScale: 1.2, href: `mailto:${profile.email}`, external: true },
-  { key: "trash", imageScale: 1.2, imageSrc: "/icons/trash.png", label: "trash" },
+  { key: "coffee", imageSrc: "/icons/coffee.png", label: "love coffee", imageScale: 1.2, href: `mailto:${profile.email}` },
+  { key: "trash", imageScale: 1.2, imageSrc: "/icons/trash.png", label: "Bin" },
 ];
 
 /* ---------------- Background decorations ----------------
@@ -102,16 +103,84 @@ type BgDecoration = {
   size: number;
   rotate: number;
 };
+/* Spread across all four quadrants of the viewport so the cream desktop
+   reads as patterned even on narrow screens (where the desktop icons are
+   hidden by `hidden lg:flex`). The window and icon columns have higher
+   stacking than the decorations so they paint over wherever they overlap. */
 const BG_DECORATIONS: BgDecoration[] = [
-  { Icon: Code2, top: "4%", left: "30%", size: 64, rotate: -12 },
-  { Icon: Terminal, top: "7%", right: "28%", size: 56, rotate: 8 },
-  { Icon: Hash, bottom: "6%", left: "28%", size: 52, rotate: -4 },
-  { Icon: Asterisk, bottom: "9%", right: "30%", size: 56, rotate: 14 },
+  // Top band
+  { Icon: Code2,    top: "5%",  left: "8%",   size: 52, rotate: -12 },
+  { Icon: Terminal, top: "3%",  left: "32%",  size: 56, rotate: 8 },
+  { Icon: Hash,     top: "9%",  left: "56%",  size: 48, rotate: -6 },
+  { Icon: Asterisk, top: "4%",  right: "8%",  size: 60, rotate: 14 },
+
+  // Mid band (covered by window on lg+, visible on smaller screens)
+  { Icon: Hash,     top: "32%", left: "10%",  size: 44, rotate: 18 },
+  { Icon: Code2,    top: "44%", right: "9%",  size: 56, rotate: -22 },
+  { Icon: Asterisk, top: "55%", left: "6%",   size: 48, rotate: -8 },
+  { Icon: Terminal, top: "58%", right: "11%", size: 44, rotate: 6 },
+
+  // Bottom band
+  { Icon: Hash,     bottom: "8%",  left: "9%",   size: 52, rotate: -4 },
+  { Icon: Code2,    bottom: "4%",  left: "33%",  size: 48, rotate: 16 },
+  { Icon: Asterisk, bottom: "10%", left: "57%",  size: 56, rotate: -14 },
+  { Icon: Terminal, bottom: "5%",  right: "9%",  size: 52, rotate: 12 },
 ];
 
 export default function PortfolioOS() {
   const [tab, setTab] = useState<TabKey>("welcome");
   const [time, setTime] = useState<string>("");
+
+  /* Coffee-bean rain trigger fired by the "love coffee" desktop icon.
+     Auto-clears after 8s; clicking again restarts the timer. */
+  const [isRaining, setIsRaining] = useState(false);
+  const rainTimerRef = useRef<number | null>(null);
+
+  /* "Cheering" state — swaps the dev-avatar typing loop for the yeepee
+     pose when the Hire-me button is clicked. Auto-clears after 5s. */
+  const [isCheering, setIsCheering] = useState(false);
+  const cheerTimerRef = useRef<number | null>(null);
+  const triggerCheer = () => {
+    setIsCheering(true);
+    if (cheerTimerRef.current !== null) {
+      window.clearTimeout(cheerTimerRef.current);
+    }
+    cheerTimerRef.current = window.setTimeout(() => {
+      setIsCheering(false);
+      cheerTimerRef.current = null;
+    }, 5000);
+  };
+  useEffect(() => {
+    return () => {
+      if (cheerTimerRef.current !== null) {
+        window.clearTimeout(cheerTimerRef.current);
+      }
+    };
+  }, []);
+
+  /* Toolbar Zoom — cycles small / normal / large for the body content
+     so the "Zoom" button is no longer dead chrome. */
+  const ZOOM_LEVELS = [0.9, 1.0, 1.1] as const;
+  const [zoomIdx, setZoomIdx] = useState<number>(1); // start at 1.0
+  const zoom = ZOOM_LEVELS[zoomIdx];
+  const cycleZoom = () => setZoomIdx((i) => (i + 1) % ZOOM_LEVELS.length);
+  const triggerRain = () => {
+    setIsRaining(true);
+    if (rainTimerRef.current !== null) {
+      window.clearTimeout(rainTimerRef.current);
+    }
+    rainTimerRef.current = window.setTimeout(() => {
+      setIsRaining(false);
+      rainTimerRef.current = null;
+    }, 8000);
+  };
+  useEffect(() => {
+    return () => {
+      if (rainTimerRef.current !== null) {
+        window.clearTimeout(rainTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const tick = () => {
@@ -144,13 +213,24 @@ export default function PortfolioOS() {
         />
       ))}
 
+      {/* Coffee-bean easter egg. Rendered before the window in DOM, with no
+         z-index, so the window paints over it — beans only show in the
+         desktop area around the window. */}
+      {isRaining && <BeanRain />}
+
       {/* Left desktop icons */}
       <aside
         aria-label="Left side desktop"
         className="hidden lg:flex flex-col gap-3 absolute left-4 top-6 z-10"
       >
         {LEFT_ICONS.map((i) => (
-          <DesktopIcon key={i.key} icon={i} activeTab={tab} onSelectTab={setTab} />
+          <DesktopIcon
+            key={i.key}
+            icon={i}
+            activeTab={tab}
+            onSelectTab={setTab}
+            onAction={i.key === "coffee" ? triggerRain : undefined}
+          />
         ))}
       </aside>
 
@@ -160,44 +240,65 @@ export default function PortfolioOS() {
         className="hidden lg:flex flex-col gap-3 absolute right-4 top-6 z-10"
       >
         {RIGHT_ICONS.map((i) => (
-          <DesktopIcon key={i.key} icon={i} activeTab={tab} onSelectTab={setTab} />
+          <DesktopIcon
+            key={i.key}
+            icon={i}
+            activeTab={tab}
+            onSelectTab={setTab}
+            onAction={i.key === "coffee" ? triggerRain : undefined}
+          />
         ))}
       </aside>
 
       {/* Window — fixed height with internal scroll */}
       <div className="ph-window relative z-0 w-full max-w-3xl h-[88vh] max-h-[820px] min-h-[560px] flex flex-col overflow-hidden">
-          {/* Title bar — macOS traffic-light style */}
+          {/* Title bar — macOS traffic-light style, hand-illustrated */}
           <div className="mac-titlebar shrink-0">
             <div className="mac-traffic" aria-label="Window controls">
               <button
                 type="button"
                 tabIndex={-1}
                 aria-label="Close"
-                className="mac-dot mac-close"
+                title="close (but please don't)"
+                className="mac-dot"
               >
-                <svg viewBox="0 0 8 8" aria-hidden>
-                  <path d="M1.5 1.5 L6.5 6.5 M6.5 1.5 L1.5 6.5" />
-                </svg>
+                <img
+                  src="/icons/macClose.png"
+                  alt=""
+                  aria-hidden
+                  width={20}
+                  height={20}
+                />
               </button>
               <button
                 type="button"
                 tabIndex={-1}
                 aria-label="Minimize"
-                className="mac-dot mac-min"
+                title="minimize · I'll wait"
+                className="mac-dot"
               >
-                <svg viewBox="0 0 8 8" aria-hidden>
-                  <path d="M1.5 4 L6.5 4" />
-                </svg>
+                <img
+                  src="/icons/macMin.png"
+                  alt=""
+                  aria-hidden
+                  width={20}
+                  height={20}
+                />
               </button>
               <button
                 type="button"
                 tabIndex={-1}
-                aria-label="Zoom"
-                className="mac-dot mac-zoom"
+                aria-label="Resize"
+                title="full screen · for the immersive bio experience"
+                className="mac-dot"
               >
-                <svg viewBox="0 0 8 8" aria-hidden>
-                  <path d="M2 1.5 L6.5 1.5 L6.5 6 Z M6 6.5 L1.5 6.5 L1.5 2 Z" />
-                </svg>
+                <img
+                  src="/icons/macResize.png"
+                  alt=""
+                  aria-hidden
+                  width={20}
+                  height={20}
+                />
               </button>
             </div>
             <button
@@ -211,14 +312,21 @@ export default function PortfolioOS() {
             <div className="mac-titlebar-spacer" aria-hidden />
           </div>
 
-          {/* Toolbar */}
+          {/* Toolbar — trimmed to only the controls that earn their keep:
+              Undo/Redo and B/I/U are decorative editor-feel; Zoom and Font
+              are functional/expandable; Hire-me is the real CTA. */}
           <div className="ph-toolbar flex items-center px-2.5 py-1.5 gap-0.5 overflow-x-auto shrink-0">
             <span className="tool-btn"><Undo2 size={14} /></span>
             <span className="tool-btn"><Redo2 size={14} /></span>
             <span className="tool-divider" />
-            <span className="tool-btn">
-              Zoom <ChevronDown size={12} />
-            </span>
+            <button
+              type="button"
+              className="tool-btn cursor-pointer"
+              onClick={cycleZoom}
+              title={`Zoom ${Math.round(zoom * 100)}% · click to cycle`}
+            >
+              Zoom {Math.round(zoom * 100)}% <ChevronDown size={12} />
+            </button>
             <span className="tool-divider" />
             <span className="tool-btn"><Bold size={14} /></span>
             <span className="tool-btn"><Italic size={14} /></span>
@@ -227,31 +335,27 @@ export default function PortfolioOS() {
             <span className="tool-btn">
               Font <ChevronDown size={12} />
             </span>
-            <span className="tool-divider" />
-            <span className="tool-btn"><AlignLeft size={14} /></span>
-            <span className="tool-btn"><AlignCenter size={14} /></span>
-            <span className="tool-btn"><AlignRight size={14} /></span>
-            <span className="tool-divider" />
-            <span className="tool-btn"><LinkIcon size={14} /></span>
-            <span className="tool-btn"><MessageSquare size={14} /></span>
             <div className="flex-1" />
-            <span className="tool-btn"><Search size={14} /></span>
-            <span className="tool-btn"><Settings size={14} /></span>
             <a
               href={`mailto:${profile.email}`}
-              className="btn-primary btn-sm ml-1"
+              className="btn-primary btn-sm ml-1 hire-me-btn"
+              onClick={triggerCheer}
             >
-              Hire me - free
+              <span className="hire-me-dot" aria-hidden /> Hire me
             </a>
           </div>
 
-          {/* Scrollable body */}
+          {/* Scrollable body. Zoom uses the CSS `zoom` property (now
+              standardized) so it scales layout + fonts + padding all
+              proportionally — `font-size` alone doesn't because most
+              children use rem-based sizes that don't cascade. */}
           <div
             className={`ph-body flex-1 overflow-y-auto px-6 md:px-10 pt-10 pb-8 ${
               tab === "projects" ? "theme-ide" : ""
             }`}
+            style={{ zoom }}
           >
-            {tab === "welcome" && <WelcomeTab />}
+            {tab === "welcome" && <WelcomeTab cheering={isCheering} />}
             {tab === "projects" && <ProjectsTab />}
             {tab === "experience" && <ExperienceTab />}
             {tab === "contact" && <ContactTab />}
@@ -286,12 +390,15 @@ export default function PortfolioOS() {
           </div>
 
           {/* Status bar */}
-          <div className="status-bar flex items-center justify-between px-3 py-1.5 text-xs shrink-0">
-            <span className="flex items-center gap-2">
+          <div className="status-bar flex items-center justify-between px-3 py-1.5 text-xs shrink-0 gap-3">
+            <span className="flex items-center gap-2 min-w-0">
               <span className="text-[#10b981]">●</span>
-              ready · {tab}
+              <span className="truncate">
+                ready · {tab}
+                <span className="hidden sm:inline"> · {profile.status}</span>
+              </span>
             </span>
-            <span>{time || "--:--"}</span>
+            <span className="shrink-0">{time || "--:--"}</span>
           </div>
         </div>
     </main>
@@ -316,10 +423,15 @@ function DesktopIcon({
   icon,
   activeTab,
   onSelectTab,
+  onAction,
 }: {
   icon: DesktopIconDef;
   activeTab: TabKey;
   onSelectTab: (t: TabKey) => void;
+  /** Side-effect run alongside the icon's normal click behaviour
+      (href navigation or tab switch). Used by the coffee icon to fire
+      the bean-rain easter egg. */
+  onAction?: () => void;
 }) {
   const isActive = !!icon.tab && icon.tab === activeTab;
 
@@ -355,6 +467,7 @@ function DesktopIcon({
         target={icon.external ? "_blank" : undefined}
         rel={icon.external ? "noopener noreferrer" : undefined}
         className="desktop-icon"
+        onClick={onAction}
       >
         {Visual}
         <span className="desktop-icon-label">{icon.label}</span>
@@ -364,7 +477,10 @@ function DesktopIcon({
 
   return (
     <button
-      onClick={() => icon.tab && onSelectTab(icon.tab)}
+      onClick={() => {
+        onAction?.();
+        if (icon.tab) onSelectTab(icon.tab);
+      }}
       className="desktop-icon"
       data-active={isActive}
     >
@@ -374,124 +490,271 @@ function DesktopIcon({
   );
 }
 
-/* ---------------- Dev avatar typing animation ----------------
-   Build the slot sequence and per-slot delays so the markup matches
-   the CSS keyframes. Tweak the constants here; the CSS reads its
-   total loop duration from `AVATAR_LOOP_SECONDS` via inline style.
+/* ---------------- Coffee-bean rain easter egg ----------------
+   Rendered into the desktop area when "love coffee" is clicked. Each
+   bean is positioned absolutely with randomized horizontal start, fall
+   duration, delay, scale, drift and rotation. The component is mounted
+   for ~8s then unmounted by the parent.
 */
-/* These constants must match the keyframe windows in globals.css.
-   31 typing × 0.25s = 7.75s total loop.
-   Typing window = 0.25 / 7.75 ≈ 3.23%   (CSS: 0%, 4% / 5%, 100%)
-   Yawn   window unused — yawns disabled below */
-const TYPING_SLOT_SECONDS = 0.25;
-const YAWN_SLOT_SECONDS = 1.0; // 4× a typing slot — clearly held pause
+type Bean = {
+  id: number;
+  left: number;       // 0–100 (% of container width)
+  duration: number;   // seconds — vertical traversal
+  delay: number;      // seconds before first appearance
+  scale: number;      // 0.4–1.4
+  drift: number;      // -120 to 120 (px sideways travel)
+  rotateEnd: number;  // total rotation degrees over the fall
+  rotateDir: 1 | -1;  // spin direction
+};
 
-type AvatarSlot = { n: string; type: "typing" | "yawn"; delay: number };
-
-function buildAvatarSequence(): { slots: AvatarSlot[]; totalSeconds: number } {
-  const slots: AvatarSlot[] = [];
-  let t = 0;
-  const pushTyping = (n: string) => {
-    slots.push({ n, type: "typing", delay: t });
-    t += TYPING_SLOT_SECONDS;
-  };
-  // Re-enable when adding yawn frames back into the sequence.
-  // const pushYawn = (n: string) => {
-  //   slots.push({ n, type: "yawn", delay: t });
-  //   t += YAWN_SLOT_SECONDS;
-  // };
-
-  // 10 typing cycles of (1, 2, 2.5) then a single closer on avatar 3.
-  for (let i = 0; i < 10; i++) {
-    pushTyping("1");
-    pushTyping("2");
-    pushTyping("2.5");
+function makeBeans(count: number): Bean[] {
+  const beans: Bean[] = [];
+  for (let i = 0; i < count; i++) {
+    beans.push({
+      id: i,
+      left: Math.random() * 100,
+      duration: 3 + Math.random() * 3.5,        // 3–6.5s
+      delay: -Math.random() * 4,                // negative -> some beans
+                                                // mid-fall on mount
+      scale: 0.45 + Math.random() * 0.95,       // 0.45–1.4
+      drift: (Math.random() - 0.5) * 220,       // ±110px
+      rotateEnd: 360 + Math.random() * 720,     // 1–3 full rotations
+      rotateDir: Math.random() < 0.5 ? 1 : -1,
+    });
   }
-  pushTyping("3");
-
-  return { slots, totalSeconds: t };
+  return beans;
 }
 
-const { slots: AVATAR_SEQUENCE, totalSeconds: AVATAR_LOOP_SECONDS } =
-  buildAvatarSequence();
+function BeanRain() {
+  // Beans are generated once per mount so they don't re-randomize on
+  // every render of the parent.
+  const beans = useMemo(() => makeBeans(60), []);
+  return (
+    <div className="bean-rain" aria-hidden>
+      {beans.map((b) => (
+        <span
+          key={b.id}
+          className="bean-rain-cell"
+          style={{
+            left: `${b.left}%`,
+            animationDuration: `${b.duration.toFixed(2)}s`,
+            animationDelay: `${b.delay.toFixed(2)}s`,
+            ["--bean-drift" as string]: `${b.drift.toFixed(0)}px`,
+            ["--bean-rotate" as string]: `${(b.rotateEnd * b.rotateDir).toFixed(0)}deg`,
+            ["--bean-scale" as string]: b.scale.toFixed(2),
+          } as CSSProperties}
+        >
+          <img
+            src="/icons/cofee-bean.png"
+            alt=""
+            className="bean-rain-img"
+            draggable={false}
+          />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- Dev avatar typing animation ----------------
+   Drives a single visible <img> through a scripted sequence:
+     [1, 2, 2.5] × 7   then the next closer in CLOSER_SEQUENCE
+   Closers rotate in fixed order, looping back when the list ends.
+   All frames are mounted to the DOM so the browser caches/decodes them
+   once and frame swaps don't flash.
+*/
+/* Per-frame durations — typing is the fast cadence; expression frames
+   (3, 4, 5) hold longer so closers don't feel rushed past. */
+const TYPING_MS = 250;
+const EXPRESSION_MS = 800;
+const TYPING_PATTERN = ["1", "2", "2.5"] as const;
+const TYPING_BLOCK_LENGTH = TYPING_PATTERN.length * 7; // 21 typing slots
+const ALL_FRAMES = ["1", "2", "2.5", "3", "4", "5"] as const;
+const EXPRESSION_FRAMES = new Set(["3", "4", "5"]);
+
+/* Closers cycle in fixed order through this list — block 1 ends with the
+   first entry, block 2 with the second, … then wraps back to the start.
+   Add or reorder entries to change the rotation. */
+const CLOSER_SEQUENCE: ReadonlyArray<readonly string[]> = [
+  ["3"],
+  ["5"],
+  ["4", "5"],
+];
+
+function useDevAvatarFrame(): string {
+  const [n, setN] = useState<string>(TYPING_PATTERN[0]);
+
+  useEffect(() => {
+    let pos = 0;
+    let closerIndex = 0;
+    let closer: readonly string[] = CLOSER_SEQUENCE[closerIndex];
+    let timeoutId: number | null = null;
+    let cancelled = false;
+
+    const tick = () => {
+      if (cancelled) return;
+      pos += 1;
+      let frame: string;
+      if (pos < TYPING_BLOCK_LENGTH) {
+        frame = TYPING_PATTERN[pos % TYPING_PATTERN.length];
+      } else if (pos < TYPING_BLOCK_LENGTH + closer.length) {
+        frame = closer[pos - TYPING_BLOCK_LENGTH];
+      } else {
+        // Block finished — restart on a typing frame and advance to the
+        // next closer in the rotation.
+        pos = 0;
+        closerIndex = (closerIndex + 1) % CLOSER_SEQUENCE.length;
+        closer = CLOSER_SEQUENCE[closerIndex];
+        frame = TYPING_PATTERN[0];
+      }
+      setN(frame);
+      const delay = EXPRESSION_FRAMES.has(frame) ? EXPRESSION_MS : TYPING_MS;
+      timeoutId = window.setTimeout(tick, delay);
+    };
+
+    // First frame ("1") is already shown via initial state — schedule the
+    // next swap after a typing-length hold so frame 1 reads at full speed.
+    timeoutId = window.setTimeout(tick, TYPING_MS);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  return n;
+}
+
+function DevAvatar({ cheering = false }: { cheering?: boolean }) {
+  const active = useDevAvatarFrame();
+  return (
+    <div
+      className="dev-avatar"
+      aria-label={
+        cheering
+          ? "Cheering illustration — celebrating the Hire-me click"
+          : "Animated illustration of me typing at my computer"
+      }
+      role="img"
+    >
+      {/* All 6 typing frames + the cheering frame are mounted so they
+          decode once and swaps are instant — no decode flash. While
+          `cheering` is true, every typing frame is forced inactive and
+          the yeepee frame takes over. */}
+      {ALL_FRAMES.map((k) => (
+        <img
+          key={k}
+          src={`/my-dev-avatar/my-dev-avatar-${k}.png`}
+          alt=""
+          aria-hidden
+          className="dev-avatar-frame"
+          data-active={!cheering && k === active}
+          loading="eager"
+        />
+      ))}
+      <img
+        key="yeepee"
+        src="/my-dev-avatar/yeepee.png"
+        alt=""
+        aria-hidden
+        className="dev-avatar-frame"
+        data-active={cheering}
+        loading="eager"
+      />
+    </div>
+  );
+}
 
 /* ---------------- Tabs ---------------- */
 
-function WelcomeTab() {
+function WelcomeTab({ cheering = false }: { cheering?: boolean }) {
   return (
     <div>
-      <div className="flex items-center gap-3 mb-4">
-        <div className="h-9 w-9 rounded-md bg-[#1a1a1a] text-[#f49a3a] flex items-center justify-center font-bold text-sm">
-          {profile.name
-            .split(" ")
-            .map((s) => s[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase()}
-        </div>
-        <span className="text-xl font-extrabold tracking-tight">
-          {profile.name}
-        </span>
-      </div>
-
+      {/* Hero: tagline + why + bio on the left, animated avatar on the
+          right. CTAs sit inside the hero column so they're visible above
+          the scroll line on desktop. */}
       <div className="welcome-hero">
         <div className="welcome-hero-text">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
-            The new way to build software.
-          </h1>
-
-          <p className="mt-4 text-base md:text-lg text-[#3f3f3f] leading-relaxed">
-            {profile.blurb}
-          </p>
-          <p className="mt-3 text-base md:text-lg text-[#3f3f3f] leading-relaxed">
-            {profile.longBio}
-          </p>
-        </div>
-
-        <div
-          className="dev-avatar"
-          aria-label="Animated illustration of me typing at my computer"
-          role="img"
-          style={{ "--avatar-loop": `${AVATAR_LOOP_SECONDS}s` } as CSSProperties}
-        >
-          {/* Sequence: (1,2,3 × 4) → yawn-4 → (1,2,3 × 4) → yawn-5 → loop.
-              Yawn frames hold ~3× longer than typing frames so they read
-              as a deliberate pause rather than another quick beat. */}
-          {AVATAR_SEQUENCE.map((slot, i) => (
+          <p className="text-xs uppercase tracking-[0.18em] text-[#8a7457] mb-2 flex items-center gap-1.5">
             <img
-              key={i}
-              src={`/my-dev-avatar/my-dev-avatar-${slot.n}.png`}
+              src="/icons/location.png"
               alt=""
               aria-hidden
-              className={`dev-avatar-frame dev-avatar-frame--${slot.type}`}
-              style={{ animationDelay: `${slot.delay.toFixed(3)}s` }}
-              loading="eager"
+              width={14}
+              height={14}
+              className="inline-block shrink-0"
             />
-          ))}
+            {profile.location}
+          </p>
+
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
+            {profile.tagline}
+          </h1>
+          <p className="mt-2 text-base md:text-lg text-[#3f3f3f] leading-snug font-medium">
+            Building from scratch to shipping — for the{" "}
+            <span className="text-[#b56d1a]">fun</span> of learning.
+          </p>
+
+          <p className="mt-5 text-base md:text-lg text-[#1a1a1a] font-medium leading-relaxed">
+            {profile.why}
+          </p>
+          <p className="mt-2 text-sm md:text-base text-[#4b4b4b] leading-relaxed">
+            {profile.bio}
+          </p>
+
+          {/* Currently-building one-liner — saves recruiters a tab switch. */}
+          <div className="mt-4 text-sm text-[#3f3f3f]">
+            Currently building{" "}
+            <strong className="text-[#1a1a1a]">
+              {profile.currentlyBuilding.name}
+            </strong>{" "}
+            — {profile.currentlyBuilding.note}
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a href={`mailto:${profile.email}`} className="btn-primary">
+              <Mail size={16} strokeWidth={2.5} /> Get in touch
+            </a>
+            <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
+              <FileText size={16} strokeWidth={2.5} /> Download resume
+            </a>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#4b4b4b]">
+            <a href={profile.github} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
+              <GithubMark width={14} height={14} /> github
+            </a>
+            <span className="text-[#c8c0b0]">·</span>
+            <a href={profile.linkedin} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
+              <LinkedinMark width={14} height={14} /> linkedin
+            </a>
+            <span className="text-[#c8c0b0]">·</span>
+            <a href={`mailto:${profile.email}`} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
+              <Mail size={14} /> email
+            </a>
+          </div>
         </div>
+
+        <DevAvatar cheering={cheering} />
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <a href={`mailto:${profile.email}`} className="btn-primary">
-          <Mail size={16} strokeWidth={2.5} /> Get in touch
-        </a>
-        <a href="/resume.pdf" className="btn-secondary">
-          <FileText size={16} strokeWidth={2.5} /> View resume
-        </a>
-      </div>
-
-      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#4b4b4b]">
-        <a href={profile.github} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
-          <GithubMark width={14} height={14} /> github
-        </a>
-        <span className="text-[#c8c0b0]">·</span>
-        <a href={profile.linkedin} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
-          <LinkedinMark width={14} height={14} /> linkedin
-        </a>
-        <span className="text-[#c8c0b0]">·</span>
-        <a href={`mailto:${profile.email}`} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
-          <Mail size={14} /> email
-        </a>
+      {/* Compact stack — three rows of chips so the framework names are
+          present without dominating the prose. */}
+      <div className="mt-8 space-y-2">
+        {heroStack.map((g) => (
+          <div key={g.label} className="flex items-baseline gap-2 flex-wrap">
+            <span className="text-xs uppercase tracking-[0.14em] text-[#9b8a6f] w-14 shrink-0">
+              {g.label}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {g.items.map((s) => (
+                <span key={s} className="code-chip">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="mt-10">
@@ -515,6 +778,26 @@ function WelcomeTab() {
             <span className="text-[#6b6b6b]">— full stack</span>
           </li>
         </ul>
+      </div>
+
+      <div className="mt-10">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
+          Skills
+        </h2>
+        <div className="space-y-3">
+          {skills.map((g) => (
+            <div key={g.label}>
+              <p className="text-xs text-[#9b9b9b] mb-1.5">{g.label}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {g.items.map((s) => (
+                  <span key={s} className="code-chip">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -647,6 +930,27 @@ function ExperienceTab() {
                 </div>
                 <p className="text-sm text-[#6b6b6b] mt-0.5">{job.role}</p>
                 <p className="mt-3 text-[#3f3f3f] leading-relaxed">{job.summary}</p>
+
+                {job.highlights && job.highlights.length > 0 && (
+                  <ul className="mt-4 space-y-2 text-sm text-[#3f3f3f] leading-relaxed">
+                    {job.highlights.map((h, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="text-[#f49a3a] mt-[2px] shrink-0">▸</span>
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {job.stack && job.stack.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {job.stack.map((s) => (
+                      <span key={s} className="code-chip">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </li>
@@ -657,11 +961,19 @@ function ExperienceTab() {
 }
 
 function ContactTab() {
-  const lines: { label: string; value: string; href: string; Icon: LucideLike }[] = [
+  type ContactLine = {
+    label: string;
+    value: string;
+    href?: string;
+    Icon: LucideLike;
+  };
+  const lines: ContactLine[] = [
     { label: "email", value: profile.email, href: `mailto:${profile.email}`, Icon: Mail },
     { label: "github", value: profile.github, href: profile.github, Icon: GithubMark },
     { label: "linkedin", value: profile.linkedin, href: profile.linkedin, Icon: LinkedinMark },
-    { label: "résumé", value: "/resume.pdf", href: "/resume.pdf", Icon: FileText },
+    { label: "résumé", value: "/Shiezza-Lauron-Resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", Icon: FileText },
+    { label: "tz", value: profile.timezone, Icon: Hash },
+    { label: "hours", value: profile.availability, Icon: Hash },
   ];
   return (
     <div>
@@ -669,7 +981,8 @@ function ContactTab() {
         Let&apos;s talk.
       </h1>
       <p className="mt-3 text-[#3f3f3f] max-w-2xl">
-        Best place to reach me. Pick whichever works.
+        Best place to reach me. Pick whichever works — I usually reply
+        within a day.
       </p>
 
       <div className="mt-8 flex flex-wrap gap-3">
@@ -678,6 +991,9 @@ function ContactTab() {
         </a>
         <a href={profile.linkedin} className="btn-secondary">
           <LinkedinMark width={16} height={16} /> Connect on LinkedIn
+        </a>
+        <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
+          <FileText size={16} strokeWidth={2.5} /> Download resume
         </a>
       </div>
 
@@ -692,12 +1008,16 @@ function ContactTab() {
                 <l.Icon width={12} height={12} /> {l.label}
               </span>
               <span className="text-[#9b9b9b]">::</span>
-              <a
-                href={l.href}
-                className="text-[#1a1a1a] hover:bg-[#f49a3a] px-1 -mx-1 rounded"
-              >
-                {l.value}
-              </a>
+              {l.href ? (
+                <a
+                  href={l.href}
+                  className="text-[#1a1a1a] hover:bg-[#f49a3a] px-1 -mx-1 rounded"
+                >
+                  {l.value}
+                </a>
+              ) : (
+                <span className="text-[#1a1a1a]">{l.value}</span>
+              )}
             </li>
           ))}
         </ul>

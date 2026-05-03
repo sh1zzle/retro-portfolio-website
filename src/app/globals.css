@@ -30,9 +30,12 @@ body {
       rgba(232, 192, 192, 0.1) 0%,
       transparent 55%
     ),
+    /* Dot grid — bumped from rgba(…,0.05) 1px to 0.13 + 1.6px so the
+       texture actually reads on the cream background instead of looking
+       like flat color. */
     radial-gradient(
       circle at 1px 1px,
-      rgba(26, 26, 26, 0.05) 1px,
+      rgba(26, 26, 26, 0.13) 1.6px,
       transparent 0
     );
   background-size: 100% 100%, 100% 100%, 100% 100%, 22px 22px;
@@ -44,6 +47,71 @@ body {
   user-select: none;
   color: #1a1a1a;
   opacity: 0.07;
+}
+
+/* =====================================================================
+   Coffee-bean rain easter egg
+   Triggered by clicking the "love coffee" desktop icon. Rendered as a
+   sibling of the window with default stacking, so the window paints over
+   it — beans only appear in the cream desktop bands around the window.
+   Container fades in/out so the trigger isn't a hard pop. Each .cell has
+   randomized inline `--bean-drift / --bean-rotate / --bean-scale` set
+   from JS, consumed by the `bean-fall` keyframe.
+   ===================================================================== */
+.bean-rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  animation: bean-rain-fade 0.4s ease-out;
+  contain: layout paint style;
+}
+@keyframes bean-rain-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.bean-rain-cell {
+  position: absolute;
+  top: -12vh;
+  width: 36px;
+  height: 36px;
+  display: block;
+  animation: bean-fall linear infinite;
+  /* Defaults if JS doesn't set them. */
+  --bean-drift: 0px;
+  --bean-rotate: 720deg;
+  --bean-scale: 1;
+  will-change: transform;
+}
+.bean-rain-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 0 rgba(60, 30, 0, 0.18));
+  user-select: none;
+  pointer-events: none;
+}
+@keyframes bean-fall {
+  from {
+    transform:
+      translate3d(0, -12vh, 0)
+      rotate(0deg)
+      scale(var(--bean-scale));
+  }
+  to {
+    transform:
+      translate3d(var(--bean-drift), 115vh, 0)
+      rotate(var(--bean-rotate))
+      scale(var(--bean-scale));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Show a few static beans rather than the falling animation. */
+  .bean-rain-cell {
+    animation: none;
+    top: 50%;
+    transform: translate3d(var(--bean-drift), 0, 0) rotate(var(--bean-rotate)) scale(var(--bean-scale));
+  }
 }
 
 /* ---------- Window (PostHog MDX-editor style, beefier shadow) ---------- */
@@ -79,44 +147,31 @@ body {
   justify-self: start;
 }
 .mac-dot {
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   display: grid;
   place-items: center;
-  cursor: pointer;
-  padding: 0;
-  transition: filter 0.12s ease;
+  transition: transform 0.1s ease;
 }
 .mac-dot:hover {
-  filter: brightness(0.92);
+  transform: scale(1.08);
 }
-.mac-dot svg {
-  width: 7px;
-  height: 7px;
-  opacity: 0;
-  transition: opacity 0.12s ease;
-  fill: none;
-  stroke: rgba(0, 0, 0, 0.55);
-  stroke-width: 1.2;
-  stroke-linecap: round;
+.mac-dot:active {
+  transform: scale(0.94);
 }
-.mac-traffic:hover .mac-dot svg {
-  opacity: 1;
-}
-.mac-zoom svg {
-  fill: rgba(0, 0, 0, 0.55);
-  stroke: none;
-}
-.mac-close {
-  background: #ff5f57;
-}
-.mac-min {
-  background: #febc2e;
-}
-.mac-zoom {
-  background: #28c840;
+.mac-dot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  /* Slight drop-shadow so the hand-drawn outline reads on the cream titlebar
+     without looking pasted-on. */
+  filter: drop-shadow(1px 1px 0 rgba(26, 26, 26, 0.12));
 }
 
 .mac-title {
@@ -138,9 +193,9 @@ body {
   background: rgba(26, 26, 26, 0.05);
 }
 .mac-titlebar-spacer {
-  /* Mirror left controls width (≈ 3 × 13 + 2 × 8 gap) so the title stays
-     visually centered against the icon column on the left. */
-  width: 55px;
+  /* Mirror left controls width (3 × 20 + 2 × 8 gap = 76px) so the title
+     stays visually centered against the icon column on the left. */
+  width: 76px;
   justify-self: end;
 }
 
@@ -226,6 +281,61 @@ body {
   box-shadow: 0.5px 0.5px 0 var(--btn-shadow);
 }
 
+/* Download-style button — thicker yellow outline, white fill, dark text.
+   Modeled on the "Install with AI" reference: outlined CTA that reads
+   as a secondary action without competing visually with the primary
+   "Get in touch" orange button. */
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  padding: 0.6rem 1.05rem;
+  border-radius: 8px;
+  border: 2px solid #d99a2a;
+  background: #fffaf0;
+  color: #1a1a1a;
+  box-shadow: 3px 3px 0 #c98a1a;
+  transition: transform 0.06s ease, box-shadow 0.06s ease,
+    background-color 0.12s ease;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn-download:hover {
+  background: #fff4dd;
+}
+.btn-download:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #c98a1a;
+}
+
+/* Tiny pulsing green dot on the toolbar Hire-me button to signal
+   "open to work" without taking up extra horizontal space. */
+.hire-me-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.hire-me-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2bb673;
+  box-shadow: 0 0 0 2px rgba(43, 182, 115, 0.25);
+  animation: hire-me-pulse 1.8s ease-in-out infinite;
+}
+@keyframes hire-me-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(43, 182, 115, 0.25); }
+  50%      { box-shadow: 0 0 0 5px rgba(43, 182, 115, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hire-me-dot { animation: none; }
+}
+
 /* ---------- Toolbar ---------- */
 .tool-btn {
   display: inline-flex;
@@ -268,6 +378,12 @@ body {
   background: rgba(244, 154, 58, 0.1);
   border-color: rgba(26, 26, 26, 0.18);
   transform: translateY(-1px);
+}
+/* Press feedback that matches the iOS bottom-tab buttons —
+   small inward scale gives the icon a "tactile" feel. */
+.desktop-icon:active {
+  transform: scale(0.96);
+  transition-duration: 0.06s;
 }
 .desktop-icon[data-active="true"] {
   background: rgba(244, 154, 58, 0.18);
@@ -371,6 +487,10 @@ body {
     height: 180px;
     align-self: flex-start;
     margin-top: 4px;
+    /* Stick the avatar near the top of the scrollable body so the
+       character stays present as the reader scrolls past the bio. */
+    position: sticky;
+    top: 4px;
   }
 }
 .dev-avatar-frame {
@@ -384,43 +504,17 @@ body {
   opacity: 0;
   pointer-events: none;
   user-select: none;
-  /* Each frame's animation-delay is set inline from JS so the slot order
-     and timing live in one place (page.tsx → buildAvatarSequence). The
-     loop duration comes from --avatar-loop on the .dev-avatar wrapper. */
+  /* All frames are mounted; the JS hook flips data-active on the one
+     that should show. The swap is instant — both <img>s are already
+     decoded so the new one paints in the same frame as the old one
+     hides, no white flash. */
 }
-/* Two keyframe windows so yawn frames hold longer than typing ones.
-   Current loop = 7.75s (31 typing × 0.25s, no yawns).
-     typing window = 0.25 / 7.75 ≈ 3.23%
-     yawn   window unused while yawns are disabled in the sequence
-
-   The overlap between "visible" and "hidden" is intentional: each frame
-   stays opaque a hair past its slot end so the next frame (later in DOM
-   order, painted on top) is up before this one disappears. Without that
-   overlap the browser flashes the white wrapper between frames at slot
-   boundaries.
-*/
-.dev-avatar-frame--typing {
-  animation: dev-avatar-typing var(--avatar-loop, 7.75s) steps(1, end) infinite;
-}
-.dev-avatar-frame--yawn {
-  animation: dev-avatar-yawn var(--avatar-loop, 7.75s) steps(1, end) infinite;
-}
-@keyframes dev-avatar-typing {
-  /* slot ≈ 3.23% of loop; visible window extends to 5% so it overlaps
-     ~1.77% (~137ms at 7.75s loop) into the next slot. */
-  0%, 4% { opacity: 1; }
-  5%, 100% { opacity: 0; }
-}
-@keyframes dev-avatar-yawn {
-  /* slot = 12.5% of an 8s loop; visible window extends to 14%. */
-  0%, 13% { opacity: 1; }
-  14%, 100% { opacity: 0; }
+.dev-avatar-frame[data-active="true"] {
+  opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {
-  .dev-avatar-frame--typing,
-  .dev-avatar-frame--yawn {
-    animation: none;
-  }
+  /* No animation — just keep frame 1 visible. */
+  .dev-avatar-frame { opacity: 0; }
   .dev-avatar-frame:nth-child(1) { opacity: 1; }
 }
 
@@ -748,6 +842,15 @@ body {
   content: "\"";
   color: #b8a890;
 }
+
+
+
+
+
+
+
+
+
 
 
 
