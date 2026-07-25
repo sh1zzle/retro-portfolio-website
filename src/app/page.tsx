@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -23,10 +24,21 @@ import {
   Undo2,
   Redo2,
   ChevronDown,
+  Smartphone,
+  Globe,
+  Server,
+  Sparkles,
 } from "lucide-react";
-import { profile, projects, experience, skills, heroStack } from "@/lib/content";
+import {
+  profile,
+  projects,
+  experience,
+  skills,
+  heroStack,
+  services,
+} from "@/lib/content";
 
-type TabKey = "welcome" | "projects" | "experience" | "contact";
+type TabKey = "welcome" | "projects" | "experience" | "contact" | "skills";
 
 type LucideLike = ComponentType<SVGProps<SVGSVGElement> & { size?: number | string }>;
 
@@ -85,7 +97,7 @@ const LEFT_ICONS: DesktopIconDef[] = [
 const RIGHT_ICONS: DesktopIconDef[] = [
   { key: "github",imageScale: 1.2, imageSrc: "/icons/github.png", label: "github", href: profile.github, external: true },
   { key: "linkedin", imageScale: 1.2,imageSrc: "/icons/linkedin.png", label: "linkedin", href: profile.linkedin, external: true },
-  { key: "skills",imageScale: 1.2, imageSrc: "/icons/skills.png", label: "skills.txt", tab: "welcome" },
+  { key: "skills",imageScale: 1.2, imageSrc: "/icons/skills.png", label: "skills.txt", tab: "skills" },
   { key: "coffee", imageSrc: "/icons/coffee.png", label: "love coffee", imageScale: 1.2, href: `mailto:${profile.email}` },
   { key: "trash", imageScale: 1.2, imageSrc: "/icons/trash.png", label: "Bin" },
 ];
@@ -105,7 +117,7 @@ type BgDecoration = {
 };
 /* Spread across all four quadrants of the viewport so the cream desktop
    reads as patterned even on narrow screens (where the desktop icons are
-   hidden by `hidden lg:flex`). The window and icon columns have higher
+   hidden by `hidden md:flex`). The window and icon columns have higher
    stacking than the decorations so they paint over wherever they overlap. */
 const BG_DECORATIONS: BgDecoration[] = [
   // Top band
@@ -195,7 +207,7 @@ export default function PortfolioOS() {
   }, []);
 
   return (
-    <main className="os-desktop relative overflow-hidden min-h-dvh flex items-center justify-center px-4 py-6 md:py-10 lg:px-44">
+    <main className="os-desktop relative overflow-hidden min-h-dvh flex flex-col items-center justify-center gap-4 px-4 py-6 md:py-10 md:px-30 lg:px-40 xl:px-48">
       {/* Decorative scattered code symbols */}
       {BG_DECORATIONS.map(({ Icon, top, bottom, left, right, size, rotate }, i) => (
         <Icon
@@ -221,7 +233,7 @@ export default function PortfolioOS() {
       {/* Left desktop icons */}
       <aside
         aria-label="Left side desktop"
-        className="hidden lg:flex flex-col gap-3 absolute left-4 top-6 z-10"
+        className="hidden md:flex flex-col justify-evenly gap-3 absolute left-4 xl:left-6 top-8 bottom-8 z-10"
       >
         {LEFT_ICONS.map((i) => (
           <DesktopIcon
@@ -237,7 +249,7 @@ export default function PortfolioOS() {
       {/* Right desktop icons */}
       <aside
         aria-label="Right side desktop"
-        className="hidden lg:flex flex-col gap-3 absolute right-4 top-6 z-10"
+        className="hidden md:flex flex-col justify-evenly gap-3 absolute right-4 xl:right-6 top-8 bottom-8 z-10"
       >
         {RIGHT_ICONS.map((i) => (
           <DesktopIcon
@@ -250,8 +262,22 @@ export default function PortfolioOS() {
         ))}
       </aside>
 
+      {/* Top icon row — narrow screens only, where the side columns
+          don't fit next to the window */}
+      <div className="flex md:hidden flex-wrap justify-evenly gap-1 w-full z-10">
+        {LEFT_ICONS.map((i) => (
+          <DesktopIcon
+            key={i.key}
+            icon={i}
+            activeTab={tab}
+            onSelectTab={setTab}
+            onAction={i.key === "coffee" ? triggerRain : undefined}
+          />
+        ))}
+      </div>
+
       {/* Window — fixed height with internal scroll */}
-      <div className="ph-window relative z-0 w-full max-w-3xl h-[88vh] max-h-[820px] min-h-[560px] flex flex-col overflow-hidden">
+      <div className="ph-window relative z-0 w-full max-w-3xl xl:max-w-5xl 2xl:max-w-6xl h-[88vh] max-h-205 xl:max-h-287.5 min-h-140 flex flex-col overflow-hidden">
           {/* Title bar — macOS traffic-light style, hand-illustrated */}
           <div className="mac-titlebar shrink-0">
             <div className="mac-traffic" aria-label="Window controls">
@@ -355,10 +381,16 @@ export default function PortfolioOS() {
             }`}
             style={{ zoom }}
           >
-            {tab === "welcome" && <WelcomeTab cheering={isCheering} />}
+            {tab === "welcome" && (
+              <WelcomeTab
+                cheering={isCheering}
+                onOpenSkills={() => setTab("skills")}
+              />
+            )}
             {tab === "projects" && <ProjectsTab />}
             {tab === "experience" && <ExperienceTab />}
             {tab === "contact" && <ContactTab />}
+            {tab === "skills" && <SkillsFileTab />}
           </div>
 
           {/* Tabs (iOS-style bottom bar, pinned) */}
@@ -401,6 +433,19 @@ export default function PortfolioOS() {
             <span className="shrink-0">{time || "--:--"}</span>
           </div>
         </div>
+
+      {/* Bottom icon row — narrow screens only */}
+      <div className="flex md:hidden flex-wrap justify-evenly gap-1 w-full z-10">
+        {RIGHT_ICONS.map((i) => (
+          <DesktopIcon
+            key={i.key}
+            icon={i}
+            activeTab={tab}
+            onSelectTab={setTab}
+            onAction={i.key === "coffee" ? triggerRain : undefined}
+          />
+        ))}
+      </div>
     </main>
   );
 }
@@ -415,6 +460,8 @@ function currentTitle(tab: TabKey) {
       return "experience.log";
     case "contact":
       return "contact.dat";
+    case "skills":
+      return "skills.txt";
   }
 }
 
@@ -443,8 +490,8 @@ function DesktopIcon({
         src={icon.imageSrc}
         alt=""
         aria-hidden
-        width={56}
-        height={56}
+        width={72}
+        height={72}
         className="desktop-icon-img"
         style={scale !== 1 ? { transform: `scale(${scale})` } : undefined}
       />
@@ -567,10 +614,27 @@ function BeanRain() {
    (3, 4, 5) hold longer so closers don't feel rushed past. */
 const TYPING_MS = 250;
 const EXPRESSION_MS = 800;
-const TYPING_PATTERN = ["1", "2", "2.5"] as const;
+const TYPING_PATTERN = ["1.5", "2", "2.5"] as const;
 const TYPING_BLOCK_LENGTH = TYPING_PATTERN.length * 7; // 21 typing slots
-const ALL_FRAMES = ["1", "2", "2.5", "3", "4", "5"] as const;
+const ALL_FRAMES = ["1.5", "2", "2.5", "3", "4", "5"] as const;
 const EXPRESSION_FRAMES = new Set(["3", "4", "5"]);
+
+/* Per-frame display scale to keep the character's apparent size uniform
+   across the cycle. Native PNG sizes vary (450×450 vs 500×500) and the
+   character fills each canvas differently. Frames with the character
+   filling more of the canvas (1.5, 3, 4 at 450×450) get scaled down so
+   they don't look bigger than the 500×500 frames at the same display
+   box. Tune individual values until the character size doesn't visibly
+   jump between frames. The proper long-term fix is re-exporting all
+   frames at the same canvas size + character placement. */
+const FRAME_SCALE: Record<string, number> = {
+  "1.5": 1.00,
+  "2":   1.00,
+  "2.5": 1.00,
+  "3":   1.00,
+  "4":   1.00,
+  "5":   1.00,
+};
 
 /* Closers cycle in fixed order through this list — block 1 ends with the
    first entry, block 2 with the second, … then wraps back to the start.
@@ -637,21 +701,30 @@ function DevAvatar({ cheering = false }: { cheering?: boolean }) {
       }
       role="img"
     >
-      {/* All 6 typing frames + the cheering frame are mounted so they
+      {/* All typing frames + the cheering frame are mounted so they
           decode once and swaps are instant — no decode flash. While
           `cheering` is true, every typing frame is forced inactive and
-          the yeepee frame takes over. */}
-      {ALL_FRAMES.map((k) => (
-        <img
-          key={k}
-          src={`/my-dev-avatar/my-dev-avatar-${k}.png`}
-          alt=""
-          aria-hidden
-          className="dev-avatar-frame"
-          data-active={!cheering && k === active}
-          loading="eager"
-        />
-      ))}
+          the yeepee frame takes over. Per-frame scale comes from the
+          FRAME_SCALE table so each frame can be tuned independently. */}
+      {ALL_FRAMES.map((k) => {
+        const scale = FRAME_SCALE[k] ?? 1;
+        return (
+          <img
+            key={k}
+            src={`/my-dev-avatar/my-dev-avatar-${k}.png`}
+            alt=""
+            aria-hidden
+            className="dev-avatar-frame"
+            data-active={!cheering && k === active}
+            style={
+              scale !== 1
+                ? { transform: `scale(${scale})`, transformOrigin: "center bottom" }
+                : undefined
+            }
+            loading="eager"
+          />
+        );
+      })}
       <img
         key="yeepee"
         src="/my-dev-avatar/yeepee.png"
@@ -661,13 +734,32 @@ function DevAvatar({ cheering = false }: { cheering?: boolean }) {
         data-active={cheering}
         loading="eager"
       />
+      {cheering && (
+        <span className="dev-avatar-cheer-text" aria-hidden>
+          yayyy!
+        </span>
+      )}
     </div>
   );
 }
 
 /* ---------------- Tabs ---------------- */
 
-function WelcomeTab({ cheering = false }: { cheering?: boolean }) {
+/* Icon per service-card key; content.ts stays free of React imports. */
+const SERVICE_ICONS: Record<string, LucideLike> = {
+  mobile: Smartphone,
+  web: Globe,
+  backend: Server,
+  ai: Sparkles,
+};
+
+function WelcomeTab({
+  cheering = false,
+  onOpenSkills,
+}: {
+  cheering?: boolean;
+  onOpenSkills: () => void;
+}) {
   return (
     <div>
       {/* Hero: tagline + why + bio on the left, animated avatar on the
@@ -702,15 +794,6 @@ function WelcomeTab({ cheering = false }: { cheering?: boolean }) {
             {profile.bio}
           </p>
 
-          {/* Currently-building one-liner — saves recruiters a tab switch. */}
-          <div className="mt-4 text-sm text-[#3f3f3f]">
-            Currently building{" "}
-            <strong className="text-[#1a1a1a]">
-              {profile.currentlyBuilding.name}
-            </strong>{" "}
-            — {profile.currentlyBuilding.note}
-          </div>
-
           <div className="mt-5 flex flex-wrap gap-3">
             <a href={`mailto:${profile.email}`} className="btn-primary">
               <Mail size={16} strokeWidth={2.5} /> Get in touch
@@ -721,15 +804,28 @@ function WelcomeTab({ cheering = false }: { cheering?: boolean }) {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#4b4b4b]">
-            <a href={profile.github} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
+            <a
+              href={profile.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline"
+            >
               <GithubMark width={14} height={14} /> github
             </a>
             <span className="text-[#c8c0b0]">·</span>
-            <a href={profile.linkedin} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
+            <a
+              href={profile.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline"
+            >
               <LinkedinMark width={14} height={14} /> linkedin
             </a>
             <span className="text-[#c8c0b0]">·</span>
-            <a href={`mailto:${profile.email}`} className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline">
+            <a
+              href={`mailto:${profile.email}`}
+              className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline"
+            >
               <Mail size={14} /> email
             </a>
           </div>
@@ -780,24 +876,147 @@ function WelcomeTab({ cheering = false }: { cheering?: boolean }) {
         </ul>
       </div>
 
+      {/* Client-facing capabilities — outcomes first, tech names demoted
+          to a couple of supporting chips. The full inventory lives in
+          the skills.txt view. */}
       <div className="mt-10">
         <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
-          Skills
+          What I can build for you
         </h2>
-        <div className="space-y-3">
-          {skills.map((g) => (
-            <div key={g.label}>
-              <p className="text-xs text-[#9b9b9b] mb-1.5">{g.label}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {g.items.map((s) => (
-                  <span key={s} className="code-chip">
-                    {s}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {services.map((s) => {
+            const Icon = SERVICE_ICONS[s.key] ?? Code2;
+            return (
+              <div key={s.key} className="service-card">
+                <div className="flex items-center gap-2.5">
+                  <span className="service-card-icon">
+                    <Icon size={18} strokeWidth={2.25} />
                   </span>
-                ))}
+                  <h3 className="font-bold">{s.title}</h3>
+                </div>
+                <p className="mt-2 text-sm text-[#3f3f3f] leading-relaxed">
+                  {s.blurb}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {s.chips.map((c) => (
+                    <span key={c} className="code-chip">
+                      {c}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+        <button
+          type="button"
+          onClick={onOpenSkills}
+          className="mt-4 text-sm text-[#6b6b6b] underline underline-offset-2 hover:text-[#1a1a1a] cursor-pointer"
+        >
+          fellow developer? the full stack is in skills.txt →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* Single-row chip list. Shows as many chips as fit on one line and
+   folds the overflow behind a "+N" chip; clicking expands the full
+   set (with a "less" chip to collapse again). The fit count comes
+   from an invisible clone of the full list, re-measured on resize so
+   it tracks the window width (and the editor-zoom control). */
+function ChipRow({ items }: { items: string[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const [fitCount, setFitCount] = useState(items.length);
+  const measureRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    const el = measureRef.current;
+    if (!el) return;
+    const measure = () => {
+      const chips = Array.from(el.children) as HTMLElement[];
+      if (chips.length === 0) return;
+      const firstTop = chips[0].offsetTop;
+      setFitCount(chips.filter((c) => c.offsetTop === firstTop).length);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [items]);
+
+  const allFit = fitCount >= items.length;
+  /* Drop one fitting chip when collapsed so the "+N" chip has room on
+     the same row. */
+  const visible =
+    expanded || allFit ? items : items.slice(0, Math.max(1, fitCount - 1));
+  const hiddenCount = items.length - visible.length;
+
+  return (
+    <div className="relative">
+      {/* Invisible full-list clone, used only for measurement */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        className="flex flex-wrap gap-1.5 absolute inset-x-0 top-0 invisible pointer-events-none"
+      >
+        {items.map((s) => (
+          <span key={s} className="code-chip">
+            {s}
+          </span>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {visible.map((s) => (
+          <span key={s} className="code-chip">
+            {s}
+          </span>
+        ))}
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="code-chip chip-toggle"
+            aria-label={`Show ${hiddenCount} more`}
+          >
+            +{hiddenCount}
+          </button>
+        )}
+        {expanded && !allFit && (
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            className="code-chip chip-toggle"
+          >
+            less
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* skills.txt — the full technical inventory, opened from the desktop
+   icon or the "fellow developer?" link on About. Deliberately not in
+   the bottom tab bar: clients get the outcome cards, developers who
+   go looking get the depth. */
+function SkillsFileTab() {
+  return (
+    <div>
+      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
+        skills.txt
+      </h1>
+      <p className="mt-3 text-[#3f3f3f]">
+        The full technical inventory — for fellow developers doing due
+        diligence.
+      </p>
+      <div className="mt-8 space-y-3">
+        {skills.map((g) => (
+          <div key={g.label}>
+            <p className="text-xs text-[#9b9b9b] mb-1.5">{g.label}</p>
+            <ChipRow items={g.items} />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -863,6 +1082,22 @@ function ProjectsTab() {
               <span className="ide-str">&quot;{p.status}&quot;</span>
             </span>
           </div>
+          {p.href && (
+            <div className="ide-line">
+              <span>
+                <span className="ide-key">url</span>
+                <span className="ide-rule">: </span>
+                <a
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ide-str underline underline-offset-2 hover:text-[#1a1a1a]"
+                >
+                  &quot;{p.href.replace(/^https?:\/\//, "")}&quot;
+                </a>
+              </span>
+            </div>
+          )}
           <div className="ide-line">
             <span className="ide-rule">---</span>
           </div>
@@ -898,6 +1133,11 @@ function ProjectsTab() {
                 </span>
               ))}
             </div>
+          </div>
+          {/* Trailing newline — keeps the pills off the card's bottom
+              edge and reads like a file ending with a blank line. */}
+          <div className="ide-line blank">
+            <span>&nbsp;</span>
           </div>
         </div>
       ))}
