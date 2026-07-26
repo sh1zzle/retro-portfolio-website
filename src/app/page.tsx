@@ -36,6 +36,8 @@ import {
   skills,
   heroStack,
   services,
+  shortGigs,
+  howIWork,
 } from "@/lib/content";
 
 type TabKey = "welcome" | "projects" | "experience" | "contact" | "skills";
@@ -88,7 +90,7 @@ type DesktopIconDef = {
 const LEFT_ICONS: DesktopIconDef[] = [
   { key: "about", imageScale: 1.3, imageSrc: "/icons/about-me.png", label: "about-me", tab: "welcome" },
   { key: "equilibria", imageSrc: "/icons/equilibria.png", imageScale: 1.5, label: "equilibria", tab: "projects" },
-  { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "defi-app", tab: "projects" },
+  { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "recall", tab: "projects" },
   { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "facilitron", tab: "experience" },
   { key: "resume", imageSrc: "/icons/resume.png", imageScale: 1.7, label: "resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", external: true },
   { key: "contact", imageScale: 1.1, imageSrc: "/icons/contact.png", label: "contact.dat", tab: "contact" },
@@ -148,7 +150,7 @@ export default function PortfolioOS() {
   const [isRaining, setIsRaining] = useState(false);
   const rainTimerRef = useRef<number | null>(null);
 
-  /* "Cheering" state — swaps the dev-avatar typing loop for the yeepee
+  /* "Cheering" state. Swaps the dev-avatar typing loop for the yeepee
      pose when the Hire-me button is clicked. Auto-clears after 5s. */
   const [isCheering, setIsCheering] = useState(false);
   const cheerTimerRef = useRef<number | null>(null);
@@ -170,7 +172,7 @@ export default function PortfolioOS() {
     };
   }, []);
 
-  /* Toolbar Zoom — cycles small / normal / large for the body content
+  /* Toolbar Zoom. Cycles small / normal / large for the body content
      so the "Zoom" button is no longer dead chrome. */
   const ZOOM_LEVELS = [0.9, 1.0, 1.1] as const;
   const [zoomIdx, setZoomIdx] = useState<number>(1); // start at 1.0
@@ -226,7 +228,7 @@ export default function PortfolioOS() {
       ))}
 
       {/* Coffee-bean easter egg. Rendered before the window in DOM, with no
-         z-index, so the window paints over it — beans only show in the
+         z-index, so the window paints over it, so beans only show in the
          desktop area around the window. */}
       {isRaining && <BeanRain />}
 
@@ -262,7 +264,7 @@ export default function PortfolioOS() {
         ))}
       </aside>
 
-      {/* Top icon row — narrow screens only, where the side columns
+      {/* Top icon row, narrow screens only, where the side columns
           don't fit next to the window */}
       <div className="flex md:hidden flex-wrap justify-evenly gap-1 w-full z-10">
         {LEFT_ICONS.map((i) => (
@@ -276,9 +278,9 @@ export default function PortfolioOS() {
         ))}
       </div>
 
-      {/* Window — fixed height with internal scroll */}
+      {/* Window: fixed height with internal scroll */}
       <div className="ph-window relative z-0 w-full max-w-3xl xl:max-w-5xl 2xl:max-w-6xl h-[88vh] max-h-205 xl:max-h-287.5 min-h-140 flex flex-col overflow-hidden">
-          {/* Title bar — macOS traffic-light style, hand-illustrated */}
+          {/* Title bar: macOS traffic-light style, hand-illustrated */}
           <div className="mac-titlebar shrink-0">
             <div className="mac-traffic" aria-label="Window controls">
               <button
@@ -338,7 +340,7 @@ export default function PortfolioOS() {
             <div className="mac-titlebar-spacer" aria-hidden />
           </div>
 
-          {/* Toolbar — trimmed to only the controls that earn their keep:
+          {/* Toolbar, trimmed to only the controls that earn their keep:
               Undo/Redo and B/I/U are decorative editor-feel; Zoom and Font
               are functional/expandable; Hire-me is the real CTA. */}
           <div className="ph-toolbar flex items-center px-2.5 py-1.5 gap-0.5 overflow-x-auto shrink-0">
@@ -373,7 +375,7 @@ export default function PortfolioOS() {
 
           {/* Scrollable body. Zoom uses the CSS `zoom` property (now
               standardized) so it scales layout + fonts + padding all
-              proportionally — `font-size` alone doesn't because most
+              proportionally, because `font-size` alone doesn't as most
               children use rem-based sizes that don't cascade. */}
           <div
             className={`ph-body flex-1 overflow-y-auto px-6 md:px-10 pt-10 pb-8 ${
@@ -410,8 +412,8 @@ export default function PortfolioOS() {
                       src={t.icon}
                       alt=""
                       aria-hidden
-                      width={28}
-                      height={28}
+                      width={40}
+                      height={40}
                       className="ios-tab-icon"
                     />
                   </span>
@@ -434,7 +436,7 @@ export default function PortfolioOS() {
           </div>
         </div>
 
-      {/* Bottom icon row — narrow screens only */}
+      {/* Bottom icon row, narrow screens only */}
       <div className="flex md:hidden flex-wrap justify-evenly gap-1 w-full z-10">
         {RIGHT_ICONS.map((i) => (
           <DesktopIcon
@@ -546,7 +548,7 @@ function DesktopIcon({
 type Bean = {
   id: number;
   left: number;       // 0–100 (% of container width)
-  duration: number;   // seconds — vertical traversal
+  duration: number;   // seconds of vertical traversal
   delay: number;      // seconds before first appearance
   scale: number;      // 0.4–1.4
   drift: number;      // -120 to 120 (px sideways travel)
@@ -610,7 +612,7 @@ function BeanRain() {
    All frames are mounted to the DOM so the browser caches/decodes them
    once and frame swaps don't flash.
 */
-/* Per-frame durations — typing is the fast cadence; expression frames
+/* Per-frame durations. Typing is the fast cadence; expression frames
    (3, 4, 5) hold longer so closers don't feel rushed past. */
 const TYPING_MS = 250;
 const EXPRESSION_MS = 800;
@@ -636,7 +638,7 @@ const FRAME_SCALE: Record<string, number> = {
   "5":   1.00,
 };
 
-/* Closers cycle in fixed order through this list — block 1 ends with the
+/* Closers cycle in fixed order through this list. Block 1 ends with the
    first entry, block 2 with the second, … then wraps back to the start.
    Add or reorder entries to change the rotation. */
 const CLOSER_SEQUENCE: ReadonlyArray<readonly string[]> = [
@@ -664,7 +666,7 @@ function useDevAvatarFrame(): string {
       } else if (pos < TYPING_BLOCK_LENGTH + closer.length) {
         frame = closer[pos - TYPING_BLOCK_LENGTH];
       } else {
-        // Block finished — restart on a typing frame and advance to the
+        // Block finished. Restart on a typing frame and advance to the
         // next closer in the rotation.
         pos = 0;
         closerIndex = (closerIndex + 1) % CLOSER_SEQUENCE.length;
@@ -676,7 +678,7 @@ function useDevAvatarFrame(): string {
       timeoutId = window.setTimeout(tick, delay);
     };
 
-    // First frame ("1") is already shown via initial state — schedule the
+    // First frame ("1") is already shown via initial state, so schedule the
     // next swap after a typing-length hold so frame 1 reads at full speed.
     timeoutId = window.setTimeout(tick, TYPING_MS);
 
@@ -696,13 +698,13 @@ function DevAvatar({ cheering = false }: { cheering?: boolean }) {
       className="dev-avatar"
       aria-label={
         cheering
-          ? "Cheering illustration — celebrating the Hire-me click"
+          ? "Cheering illustration, celebrating the Hire-me click"
           : "Animated illustration of me typing at my computer"
       }
       role="img"
     >
       {/* All typing frames + the cheering frame are mounted so they
-          decode once and swaps are instant — no decode flash. While
+          decode once and swaps are instant, with no decode flash. While
           `cheering` is true, every typing frame is forced inactive and
           the yeepee frame takes over. Per-frame scale comes from the
           FRAME_SCALE table so each frame can be tuned independently. */}
@@ -783,7 +785,7 @@ function WelcomeTab({
             {profile.tagline}
           </h1>
           <p className="mt-2 text-base md:text-lg text-[#3f3f3f] leading-snug font-medium">
-            Building from scratch to shipping — for the{" "}
+            Building from scratch to shipping, for the{" "}
             <span className="text-[#b56d1a]">fun</span> of learning.
           </p>
 
@@ -834,7 +836,7 @@ function WelcomeTab({
         <DevAvatar cheering={cheering} />
       </div>
 
-      {/* Compact stack — three rows of chips so the framework names are
+      {/* Compact stack: three rows of chips so the framework names are
           present without dominating the prose. */}
       <div className="mt-8 space-y-2">
         {heroStack.map((g) => (
@@ -861,22 +863,22 @@ function WelcomeTab({
           <li className="flex items-center gap-3">
             <span className="code-chip">building</span>
             <strong>Equilibria</strong>{" "}
-            <span className="text-[#6b6b6b]">— habit-tracking health app</span>
+            <span className="text-[#6b6b6b]">· habit-tracking health app</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="code-chip">exploring</span>
             <strong>DeFi</strong>{" "}
-            <span className="text-[#6b6b6b]">— on-chain mechanics</span>
+            <span className="text-[#6b6b6b]">· on-chain mechanics</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="code-chip">working</span>
             <strong>Facilitron</strong>{" "}
-            <span className="text-[#6b6b6b]">— full stack</span>
+            <span className="text-[#6b6b6b]">· full stack</span>
           </li>
         </ul>
       </div>
 
-      {/* Client-facing capabilities — outcomes first, tech names demoted
+      {/* Client-facing capabilities: outcomes first, tech names demoted
           to a couple of supporting chips. The full inventory lives in
           the skills.txt view. */}
       <div className="mt-10">
@@ -996,7 +998,7 @@ function ChipRow({ items }: { items: string[] }) {
   );
 }
 
-/* skills.txt — the full technical inventory, opened from the desktop
+/* skills.txt: the full technical inventory, opened from the desktop
    icon or the "fellow developer?" link on About. Deliberately not in
    the bottom tab bar: clients get the outcome cards, developers who
    go looking get the depth. */
@@ -1007,7 +1009,7 @@ function SkillsFileTab() {
         skills.txt
       </h1>
       <p className="mt-3 text-[#3f3f3f]">
-        The full technical inventory — for fellow developers doing due
+        The full technical inventory, for fellow developers doing due
         diligence.
       </p>
       <div className="mt-8 space-y-3">
@@ -1043,7 +1045,7 @@ function ProjectsTab() {
         A handful of things I&apos;ve built lately. Each one taught me something.
       </p>
 
-      {/* File-tab strip — one tab per project file */}
+      {/* File-tab strip: one tab per project file */}
       <div className="ide-tabbar mt-2">
         {projects.map((p, i) => (
           <span
@@ -1134,7 +1136,7 @@ function ProjectsTab() {
               ))}
             </div>
           </div>
-          {/* Trailing newline — keeps the pills off the card's bottom
+          {/* Trailing newline. Keeps the pills off the card's bottom
               edge and reads like a file ending with a blank line. */}
           <div className="ide-line blank">
             <span>&nbsp;</span>
@@ -1151,9 +1153,32 @@ function ExperienceTab() {
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
         Experience.
       </h1>
-      <p className="mt-3 text-[#3f3f3f]">Where I&apos;ve been working lately.</p>
+      <p className="mt-3 text-[#3f3f3f]">
+        Five years of shipping. The products, and what I built in each.
+      </p>
 
-      <ul className="mt-8 space-y-6">
+      {/* Engagement shape first. A track record answers "can he do it",
+          this answers "what is it like to hire him". */}
+      <div className="mt-8">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
+          How I work
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {howIWork.map((n) => (
+            <div
+              key={n.title}
+              className="rounded-lg border border-[#e5e5e5] px-4 py-3"
+            >
+              <h3 className="text-sm font-bold">{n.title}</h3>
+              <p className="mt-1 text-sm text-[#3f3f3f] leading-relaxed">
+                {n.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <ul className="mt-10 space-y-6">
         {experience.map((job) => (
           <li key={job.company} className="rounded-lg border border-[#e5e5e5] p-5">
             <div className="flex items-start gap-4">
@@ -1196,6 +1221,33 @@ function ExperienceTab() {
           </li>
         ))}
       </ul>
+
+      {/* Short engagements: compact strip so brief gigs read as breadth,
+          not churn. Full cards above are reserved for the longer stories. */}
+      <div className="mt-10">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
+          Also shipped for
+        </h2>
+        <ul className="space-y-2">
+          {shortGigs.map((g) => (
+            <li
+              key={g.company}
+              className="rounded-lg border border-[#e5e5e5] px-4 py-3"
+            >
+              <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                <span className="text-sm">
+                  <strong>{g.company}</strong>{" "}
+                  <span className="text-[#6b6b6b]">· {g.role}</span>
+                </span>
+                <span className="text-xs text-[#6b6b6b]">{g.period}</span>
+              </div>
+              <p className="mt-1 text-sm text-[#3f3f3f] leading-relaxed">
+                {g.note}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
@@ -1211,9 +1263,8 @@ function ContactTab() {
     { label: "email", value: profile.email, href: `mailto:${profile.email}`, Icon: Mail },
     { label: "github", value: profile.github, href: profile.github, Icon: GithubMark },
     { label: "linkedin", value: profile.linkedin, href: profile.linkedin, Icon: LinkedinMark },
-    { label: "résumé", value: "/Shiezza-Lauron-Resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", Icon: FileText },
-    { label: "tz", value: profile.timezone, Icon: Hash },
-    { label: "hours", value: profile.availability, Icon: Hash },
+    { label: "resume", value: "/Shiezza-Lauron-Resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", Icon: FileText },
+    { label: "timezone", value: profile.timezone, Icon: Hash },
   ];
   return (
     <div>
@@ -1221,7 +1272,7 @@ function ContactTab() {
         Let&apos;s talk.
       </h1>
       <p className="mt-3 text-[#3f3f3f] max-w-2xl">
-        Best place to reach me. Pick whichever works — I usually reply
+        Best place to reach me. Pick whichever works. I usually reply
         within a day.
       </p>
 

@@ -9,7 +9,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 /* Cartoon-poster font for the "yayyy!" cheer callout. Single weight,
-   tiny payload — only used for the celebration moment. */
+   tiny payload, only used for the celebration moment. */
 const bungee = Bungee({
   variable: "--font-bungee",
   subsets: ["latin"],
@@ -17,20 +17,20 @@ const bungee = Bungee({
 });
 
 export const metadata: Metadata = {
-  title: "Shiezza Lauron — Full Stack Developer",
+  title: "Shiezza Lauron · Full Stack Developer",
   description:
-    "Full stack web and mobile developer — React Native, Next.js, and .NET. Five years shipping production apps. Open to work.",
+    "Full stack web and mobile developer working in React Native, Next.js, and .NET. Five years shipping production apps. Open to work.",
   openGraph: {
-    title: "Shiezza Lauron — Full Stack Developer",
+    title: "Shiezza Lauron · Full Stack Developer",
     description:
-      "Full stack web and mobile developer — React Native, Next.js, and .NET. Open to work.",
+      "Full stack web and mobile developer working in React Native, Next.js, and .NET. Open to work.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shiezza Lauron — Full Stack Developer",
+    title: "Shiezza Lauron · Full Stack Developer",
     description:
-      "Full stack web and mobile developer — React Native, Next.js, and .NET. Open to work.",
+      "Full stack web and mobile developer working in React Native, Next.js, and .NET. Open to work.",
   },
 };
 

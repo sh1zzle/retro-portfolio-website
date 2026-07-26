@@ -2,23 +2,24 @@ export const profile = {
   name: "Shiezza Lauron",
   role: "Full Stack Web and Mobile Developer",
   location: "Chiang Mai, Thailand",
-  /* Headline statement — leads with personality, not job title.
+  /* Headline statement. Leads with personality, not job title.
      Split into two lines so the H1 can be a single punchy sentence
      and the subhead carries the rest as supporting copy. */
   tagline: "Curious by default.",
   taglineSub:
-    "Building from scratch to shipping — for the fun of learning.",
+    "Building from scratch to shipping, for the fun of learning.",
   /* The "why" lands first in the bio so visitors get a point of view
      before the tech-stack name-soup. */
   why:
     "I care about clean data models, UIs that survive flaky networks, and shipping things that actually work.",
-  /* The "what" — short, punchy. Tech details live in the stack chips below. */
+  /* The "what". Short, punchy. Tech details live in the stack chips below. */
   bio:
-    "Five years building web and mobile apps. Currently working at Facilitron, a facility-management platform — React Native apps and a .NET 9 API.",
+    "Five years building web and mobile apps. Currently working at Facilitron, a facility-management platform, on React Native apps and a .NET 9 API.",
   /* Tiny availability/status line shown in the window status bar. */
   status: "open to work · responds within a day",
-  /* Used by the contact.dat block — surfaces timezone + working hours so
-     someone reaching out knows when to expect a reply. */
+  /* Shown in the contact.dat block so someone reaching out knows which
+     timezone they are writing into. `availability` is currently unused:
+     the working-hours line was cut from contact.dat. */
   timezone: "Asia/Bangkok (UTC+7)",
   availability: "Mon–Fri · 09:00–18:00 ICT",
   email: "shiezza.devpresso@gmail.com",
@@ -26,7 +27,7 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/shizzie/",
 };
 
-/* Compact stack for the welcome tab — three category chip rows.
+/* Compact stack for the welcome tab: three category chip rows.
    The full per-discipline list still lives in `skills` below. */
 export const heroStack: { label: string; items: string[] }[] = [
   { label: "Web", items: ["Next.js", "Tailwind", "Vercel"] },
@@ -38,7 +39,7 @@ export const heroStack: { label: string; items: string[] }[] = [
 ];
 
 /* Client-facing capability cards for the About tab. Written for a
-   non-technical reader — each card sells an outcome, with only a couple
+   non-technical reader. Each card sells an outcome, with only a couple
    of recognizable tech names as supporting chips. The full technical
    inventory stays in `skills` below and renders under skills.txt. */
 export type Service = {
@@ -53,14 +54,14 @@ export const services: Service[] = [
     key: "mobile",
     title: "Mobile apps",
     blurb:
-      "iPhone and Android from one codebase, idea to App Store — including apps that keep working offline in the field.",
+      "iPhone and Android from one codebase, idea to App Store, including apps that keep working offline in the field.",
     chips: ["React Native", "Expo"],
   },
   {
     key: "web",
     title: "Web apps & sites",
     blurb:
-      "Fast, modern websites and dashboards — from a landing page to a full product your customers log into.",
+      "Fast, modern websites and dashboards, from a landing page to a full product your customers log into.",
     chips: ["Next.js", "React"],
   },
   {
@@ -74,48 +75,45 @@ export const services: Service[] = [
     key: "ai",
     title: "AI features",
     blurb:
-      "Practical AI inside your product — chat, summaries, and smart automation that saves your team hours.",
+      "Practical AI inside your product: chat, summaries, and smart automation that saves your team hours.",
     chips: ["Claude", "Anthropic API"],
   },
 ];
 
 export type SkillGroup = { label: string; items: string[] };
 
+/* Version numbers are deliberately omitted because they rot fast and read as
+   padding. Exceptions: ".NET 9" and "New Architecture", which signal
+   current-generation work. */
 export const skills: SkillGroup[] = [
   { label: "Languages", items: ["TypeScript", "JavaScript", "C# (.NET)", "SQL"] },
-  { label: "Frontend", items: ["React 18/19", "Next.js", "Vite", "Tailwind"] },
+  { label: "Frontend", items: ["React", "Next.js", "Vite", "Tailwind"] },
   /* Within each group, the leading items are the ones surfaced when the
-     chip row is collapsed to a single line — keep the most important
+     chip row is collapsed to a single line, so keep the most important
      first. */
   {
     label: "Mobile",
     items: [
       "React Native",
-      "Expo SDK 54/55",
+      "Expo",
       "Expo Router",
-      "React Navigation",
-      "Reanimated",
-      "Unistyles",
-      "React Native Paper",
-      "MMKV",
-      "EAS Build / Submit / Update",
       "New Architecture (Fabric/TurboModules)",
-      "Detox",
+      "EAS Build / Update",
+      "Reanimated",
     ],
   },
   {
     label: "Backend",
-    items: ["Fastify", "ASP.NET Core (.NET 9)", "Vercel Functions", "Node 20"],
+    items: ["Fastify", "ASP.NET Core (.NET 9)", "Vercel Functions", "Node.js"],
   },
   {
     label: "Data",
     items: [
-      "PostgreSQL 17",
+      "PostgreSQL",
       "Azure SQL",
       "Drizzle ORM",
       "EF Core",
       "Dapper",
-      "Supabase",
       "Zod",
     ],
   },
@@ -124,7 +122,6 @@ export const skills: SkillGroup[] = [
     items: [
       "TanStack Query",
       "Zustand",
-      "AsyncStorage",
       "Optimistic updates",
       "Sync queues",
     ],
@@ -133,8 +130,7 @@ export const skills: SkillGroup[] = [
     label: "Auth & Real-time",
     items: [
       "Custom JWT",
-      "Apple Sign-In",
-      "Google Sign-In",
+      "Apple / Google Sign-In",
       "Refresh-token rotation",
       "SignalR (Azure)",
       "Push (FCM via Expo)",
@@ -144,7 +140,6 @@ export const skills: SkillGroup[] = [
     label: "AI",
     items: [
       "Anthropic API",
-      "Claude Sonnet 4.5",
       "tool_use / structured output",
       "LM Studio (local)",
     ],
@@ -157,9 +152,7 @@ export const skills: SkillGroup[] = [
       "Fly.io",
       "Neon",
       "Docker",
-      "AWS SES",
       "Turborepo",
-      "Yarn 4 workspaces",
       "Bitbucket Pipelines",
     ],
   },
@@ -186,7 +179,7 @@ export const projects: Project[] = [
     tagline:
       "A personal training app that knows your program, your numbers, and your history.",
     description:
-      "Mobile-first workout tracker — training programs, session logging, per-exercise history, stats charts, and an anatomical muscle map. Works offline via a mutation queue that syncs when you're back, ships six switchable themes, installs as a PWA, and has a native iOS app in Expo. Next.js 16 App Router with server actions, Neon Postgres + Drizzle, Better Auth.",
+      "Mobile-first workout tracker with training programs, session logging, per-exercise history, stats charts, and an anatomical muscle map. Works offline via a mutation queue that syncs when you're back, ships six switchable themes, installs as a PWA, and has a native iOS app in Expo. Next.js 16 App Router with server actions, Neon Postgres + Drizzle, Better Auth.",
     stack: [
       "Next.js 16",
       "TypeScript",
@@ -208,7 +201,7 @@ export const projects: Project[] = [
     name: "Equilibria",
     tagline: "A habit-building health app across four pillars of wellness.",
     description:
-      "Mobile-first habit tracker across four pillars of wellness — physical activity, nutrition, sleep, stress. Custom JWT with Apple + Google Sign-In, Fastify API on Fly.io (Singapore), managed Postgres on Neon (migrated off Fly Postgres after a 256MB OOM ceiling). English + Spanish via i18next, RN New Architecture (Fabric/TurboModules) enabled, Turborepo monorepo. Currently in TestFlight.",
+      "Mobile-first habit tracker across four pillars of wellness: physical activity, nutrition, sleep, stress. Custom JWT with Apple + Google Sign-In, Fastify API on Fly.io (Singapore), managed Postgres on Neon (migrated off Fly Postgres after a 256MB OOM ceiling). English + Spanish via i18next, RN New Architecture (Fabric/TurboModules) enabled, Turborepo monorepo. Currently in TestFlight.",
     stack: [
       "React Native",
       "Expo SDK 54",
@@ -228,12 +221,12 @@ export const projects: Project[] = [
     status: "In TestFlight",
   },
   {
-    slug: "defi-app",
-    name: "DeFi Learning Path",
+    slug: "recall",
+    name: "Recall",
     tagline:
-      "A structured DeFi curriculum app with AI-assisted glossary and quiz generation.",
+      "A spaced-repetition learning tracker that derives mastery from quiz performance, not self-reported checkboxes. Currently loaded with a DeFi curriculum.",
     description:
-      "Single-user full-stack app pairing a static curriculum with persisted progress, an Anthropic-powered glossary, and AI-generated quizzes using Claude tool_use for schema-validated output. Provider is pluggable — Anthropic in production, LM Studio locally for offline iteration.",
+      "Single-user full-stack app pairing a static curriculum with persisted progress, an Anthropic-powered glossary, and AI-generated quizzes using Claude tool_use for schema-validated output. Provider is pluggable, with Anthropic in production and LM Studio locally for offline iteration.",
     stack: [
       "React 18",
       "Vite",
@@ -241,10 +234,11 @@ export const projects: Project[] = [
       "PostgreSQL",
       "Vercel Functions",
       "Anthropic API",
-      "Claude Sonnet 4.5",
+      "Claude",
       "tool_use",
     ],
     status: "In progress",
+    href: "https://defi-app-eosin.vercel.app",
   },
 ];
 
@@ -261,17 +255,19 @@ export const experience: Job[] = [
   {
     company: "Facilitron",
     role: "Full Stack Developer",
-    period: "Present",
+    period: "May 2025 – Present",
     summary:
       "Building two production React Native apps (Works and FIT) for facility-management workflows, plus the shared .NET 9 backend on Azure SQL.",
     highlights: [
-      "Works app — five role-based navigation stacks, offline-first sync queue, real-time SignalR updates, push notifications, Detox E2E.",
-      "FIT app — offline-first field inspections with optimistic mutations, EAS Build pipeline across dev / staging / prod.",
-      "API — feature-based .NET 9 backend with EF Core + Dapper, real-time via Azure SignalR, batch PDF and Excel reporting.",
+      "Works app: five role-based navigation stacks, offline-first sync queue, real-time SignalR updates, and push notifications, all from one codebase shipping to iOS, Android, and web.",
+      "FIT app: offline-first field inspections with optimistic mutations, EAS Build across dev / staging / prod, shipping to iOS, Android, web, and Windows (React Native Windows).",
+      "API: feature-based .NET 9 backend with EF Core + Dapper, real-time via Azure SignalR, batch PDF and Excel reporting.",
     ],
     stack: [
       "React Native",
       "Expo",
+      "Expo Web",
+      "React Native Windows",
       "TypeScript",
       "TanStack Query",
       "Zustand",
@@ -285,9 +281,14 @@ export const experience: Job[] = [
   {
     company: "Dash",
     role: "Freelance Full Stack Developer",
-    period: "2025 – Present",
+    period: "2025",
     summary:
-      "Dash (dashnote.io) is a privacy-first, offline-first note-taking app for macOS, web, and iOS. Everything is stored locally with AES-256 encryption — no accounts, no cloud sync, no telemetry. Rich block editor with 15+ block types, wiki-style page linking, self-destructing notes, a duress password mode, and Touch ID unlock.",
+      "Brought in on Dash Notes 1.5 (dashnote.io) after the release stalled in App Store review, and got it approved and live by root-causing the iOS-only defects blocking it, from a paywall nobody could pay through to silent crashes on launch. Dash is a privacy-first notes app for macOS, web, and iOS: everything encrypted on-device with AES-256, no accounts, no cloud sync, no telemetry.",
+    highlights: [
+      "Worked the release through round after round of App Store review to approval, each one a distinct iOS-only defect root-caused and fixed in turn, plus one App Store Connect submission-mechanics trap.",
+      "Restored iOS subscriptions when the paywall hung forever and no customer could complete a purchase: the RevenueCat Capacitor plugin proxy fabricates a .then, so promises resolved with it never settle. Boxed the proxy and gated SDK init.",
+      "Stopped the app terminating silently on launch (missing camera usage descriptions), brought the local-AI features back within reach inside the WebView, and fixed a Deno-deployed sync relay that was dropping CORS preflight headers.",
+    ],
     stack: [
       "Next.js",
       "React 18",
@@ -305,7 +306,10 @@ export const experience: Job[] = [
     role: "Freelance Full Stack Developer",
     period: "2025",
     summary:
-      "LinkJolt is an affiliate-marketing SaaS platform that lets SaaS companies run affiliate programs with both traditional link-based tracking and coupon-based attribution — affiliate dashboards, campaign invitations, Stripe and Paddle billing integrations, and mass payouts.",
+      "Cut the request load behind LinkJolt's affiliate dashboards, the screens its customers live in all day. LinkJolt is an affiliate-marketing SaaS covering link-based and coupon-based attribution, campaign invitations, Stripe and Paddle billing, and mass payouts.",
+    highlights: [
+      "Traced the platform's excessive API traffic to redundant and duplicated requests firing on every dashboard view, then eliminated them, cutting round-trips per page load and database work per user.",
+    ],
     stack: [
       "Next.js",
       "TypeScript",
@@ -317,5 +321,89 @@ export const experience: Job[] = [
       "Paddle",
       "PostHog",
     ],
+  },
+  {
+    company: "CSA 360 Software",
+    role: "Freelance Full Stack Developer",
+    period: "Jul 2022 – Feb 2025",
+    summary:
+      "Owned the GPS-verified guard-tour module and shipped operational screens across CSA360, then kept it all running in production for two and a half years. CSA360 is a security-operations platform for guard companies, covering officer scheduling, patrol tracking, incident reporting, visitor management, and real-time dispatch, on web plus iOS and Android.",
+    highlights: [
+      "Built the guard-tour module end to end: the GPS-verified patrol tracking that proves a guard actually walked the route, on the schedule the contract promised.",
+      "Shipped operational pages across the product: filterable tables, list/detail views, and search for day-to-day security-team workflows.",
+      "Ran the Jira-driven bug queue on a live platform, the unglamorous reliability work that keeps security operations running.",
+    ],
+    stack: [
+      "React",
+      "React Native",
+      "React-Bootstrap",
+      "PHP",
+      "MySQL",
+      "Twilio",
+      "AWS",
+    ],
+  },
+  {
+    company: "TWIGOH",
+    role: "Freelance Front End Developer",
+    period: "Aug 2020 – 2022",
+    summary:
+      "Two years of front-end work at an early-stage startup, a unified social marketplace where users discover products and services through trusted reviews from friends, family, and influencers.",
+  },
+];
+
+/* Answers the questions a buyer has that a job history can't: how the
+   work is run, where the speed comes from, and what stops it shipping
+   broken. Sits above the timeline so the method frames the track
+   record. Mirrors the plan / build / audit pipeline I actually run. */
+export type WorkingNote = { title: string; body: string };
+
+export const howIWork: WorkingNote[] = [
+  {
+    title: "Plan before code",
+    body: "Every change starts as a written plan with scope and impact spelled out. Corrections are cheap there and expensive once it is built.",
+  },
+  {
+    title: "AI on the grunt work",
+    body: "A custom agent pipeline handles spec extraction, scaffolding, and audits. The repetitive work compresses, so the hours go into architecture and judgment.",
+  },
+  {
+    title: "Built to your conventions",
+    body: "New code follows the patterns already in your repo, down to field names and component styles. Anyone on the team can pick it up and keep going.",
+  },
+  {
+    title: "Nothing ships unaudited",
+    body: "Every build clears an automated gate before it counts as done: lint and typecheck clean, behavior verified against the spec.",
+  },
+];
+
+/* Short freelance engagements, rendered as a compact "Also shipped for"
+   strip on the Experience tab rather than full cards, so brief gigs read
+   as breadth instead of churn. */
+export type ShortGig = {
+  company: string;
+  role: string;
+  period: string;
+  note: string;
+};
+
+export const shortGigs: ShortGig[] = [
+  {
+    company: "EdCafe",
+    role: "Front End Developer",
+    period: "2025",
+    note: "Interactive web apps with AI-powered features; front- and back-end architecture work.",
+  },
+  {
+    company: "Baptist Faith",
+    role: "Front End Mobile Developer",
+    period: "2024",
+    note: "Mobile app serving 10,000+ Bible-based audio and video files across music, bible, and preaching.",
+  },
+  {
+    company: "Lyra",
+    role: "Front End Mobile Developer",
+    period: "2024",
+    note: "Stability, UI/UX polish, and bug fixes for a caregiver-focused mobile app.",
   },
 ];

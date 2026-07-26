@@ -30,7 +30,7 @@ body {
       rgba(232, 192, 192, 0.1) 0%,
       transparent 55%
     ),
-    /* Dot grid — bumped from rgba(…,0.05) 1px to 0.13 + 1.6px so the
+    /* Dot grid, bumped from rgba(…,0.05) 1px to 0.13 + 1.6px so the
        texture actually reads on the cream background instead of looking
        like flat color. */
     radial-gradient(
@@ -53,7 +53,7 @@ body {
    Coffee-bean rain easter egg
    Triggered by clicking the "love coffee" desktop icon. Rendered as a
    sibling of the window with default stacking, so the window paints over
-   it — beans only appear in the cream desktop bands around the window.
+   it, so beans only appear in the cream desktop bands around the window.
    Container fades in/out so the trigger isn't a hard pop. Each .cell has
    randomized inline `--bean-drift / --bean-rotate / --bean-scale` set
    from JS, consumed by the `bean-fall` keyframe.
@@ -281,7 +281,7 @@ body {
   box-shadow: 0.5px 0.5px 0 var(--btn-shadow);
 }
 
-/* Download-style button — thicker yellow outline, white fill, dark text.
+/* Download-style button: thicker yellow outline, white fill, dark text.
    Modeled on the "Install with AI" reference: outlined CTA that reads
    as a secondary action without competing visually with the primary
    "Get in touch" orange button. */
@@ -381,7 +381,7 @@ body {
   border-color: rgba(26, 26, 26, 0.18);
   transform: translateY(-1px);
 }
-/* Press feedback that matches the iOS bottom-tab buttons —
+/* Press feedback that matches the iOS bottom-tab buttons:
    small inward scale gives the icon a "tactile" feel. */
 .desktop-icon:active {
   transform: scale(0.96);
@@ -416,7 +416,7 @@ body {
   transform: translateY(-1px);
   filter: drop-shadow(3px 4px 0 rgba(26, 26, 26, 0.3));
 }
-/* Chunky retro-sticker labels — heavy weight, cream halo so they pop
+/* Chunky retro-sticker labels: heavy weight, cream halo so they pop
    off the patterned desktop, plus a hard offset shadow for depth.
    The halo is layered text-shadows (not text-stroke) so it renders
    identically in every browser. */
@@ -506,7 +506,7 @@ body {
   color: #6b3f5f;
 }
 
-/* Expand/collapse chip at the end of a ChipRow — chip-sized version
+/* Expand/collapse chip at the end of a ChipRow. Chip-sized version
    of the orange "Hire me" button: dark outline, hard offset shadow,
    and the same press-in feedback. */
 .chip-toggle {
@@ -547,7 +547,7 @@ body {
 }
 
 /* =====================================================================
-   Welcome hero — H1/blurb on the left, animated dev-avatar on the right.
+   Welcome hero: H1/blurb on the left, animated dev-avatar on the right.
    On md+ they sit side by side; on mobile the avatar drops above the text.
    ===================================================================== */
 .welcome-hero {
@@ -599,7 +599,7 @@ body {
   pointer-events: none;
   user-select: none;
   /* All frames are mounted; the JS hook flips data-active on the one
-     that should show. The swap is instant — both <img>s are already
+     that should show. The swap is instant because both <img>s are already
      decoded so the new one paints in the same frame as the old one
      hides, no white flash. */
 }
@@ -656,13 +656,13 @@ body {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  /* No animation — just keep frame 1 visible. */
+  /* No animation, just keep frame 1 visible. */
   .dev-avatar-frame { opacity: 0; }
   .dev-avatar-frame:nth-child(1) { opacity: 1; }
 }
 
 /* =====================================================================
-   iOS TAB BAR — replaces the underlined text-tabs with an icon+label
+   iOS TAB BAR: replaces the underlined text-tabs with an icon+label
    bottom bar. Active tab gets the PostHog orange tint; inactive tabs
    are desaturated and dimmed. Icons are PNGs from /public/icons.
    ===================================================================== */
@@ -705,12 +705,12 @@ body {
 .ios-tab-icon-wrap {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
 }
 .ios-tab-icon {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   /* Inactive: muted, gray-ish, slightly faded */
   filter: grayscale(0.7) opacity(0.55);
@@ -722,7 +722,7 @@ body {
 }
 .ios-tab-label {
   font-family: var(--font-jb), ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: #8a8580;
@@ -744,7 +744,7 @@ body {
 }
 
 /* =====================================================================
-   THEME: IDE — applied to the projects (equilibria/defi-app) tab body.
+   THEME: IDE, applied to the projects (equilibria/recall) tab body.
    Re-skins the project list as a code-editor: file tabs, breadcrumb,
    line-numbered gutter, frontmatter block, monospace prose, run pill.
    ===================================================================== */
@@ -860,7 +860,7 @@ body {
   background: #2bb673;
 }
 
-/* Per-file code frame — each line is its own row so wrapping prose
+/* Per-file code frame. Each line is its own row so wrapping prose
    doesn't desync from gutter numbers. Numbers come from a CSS counter. */
 .theme-ide .ide-file {
   background: #fffaf0;
