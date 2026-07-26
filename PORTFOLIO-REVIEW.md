@@ -27,7 +27,7 @@ _Reviewed 2026-07-25, updated 2026-07-26. Verdict: the retro-OS site is memorabl
   _Done: Facilitron dated May 2025 – Present, CSA 360 corrected to Jul 2022 – Feb 2025, TWIGOH (Aug 2020 – 2022) added, and EdCafe / Baptist Faith / Lyra grouped in an "Also shipped for" strip with bare years. Timeline now covers 2020 → present._
 - [x] **"I did X" bullets for Dash and LinkJolt.** Both entries described the product, not your contribution.
   _Done 2026-07-26: all three freelance summaries (Dash, LinkJolt, CSA 360) now open with the work done, with the product description demoted to a trailing clause. Dash reframed as an inherited release taken to App Store approval. CSA 360 gained a concrete guard-tour highlight._
-  _Still open: one concrete "I built X" highlight for TWIGOH, which remains the longest entry and the emptiest._
+  _~~Still open: one concrete "I built X" highlight for TWIGOH.~~ **Skipped 2026-07-26** by choice. TWIGOH keeps its summary-only card. Do not re-raise. If the empty card ever bothers you, the alternative is folding it into the "Also shipped for" strip, but two years sits oddly next to gigs measured in months._
 - [ ] **Numbers.** There is still not a single metric anywhere in the experience timeline. Best three slots: LinkJolt round-trips saved (before/after), Facilitron scale (users, sites, work orders), CSA 360 reach (how many guard companies ran on it).
 - [ ] **Fix the GitHub profile** ([github.com/sh1zzle](https://github.com/sh1zzle)). Recruiters click it within seconds and it currently undercuts the portfolio:
   - Pin this portfolio repo. It is the only public one, since the project repos stay private.
