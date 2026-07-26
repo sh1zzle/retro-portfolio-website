@@ -41,5 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 # local scratch / explorations (not for publishing)
+/explorations/
 /public/explorations/
 /src/app/defi-icons/
