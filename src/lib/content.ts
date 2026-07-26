@@ -224,9 +224,9 @@ export const projects: Project[] = [
     slug: "recall",
     name: "Recall",
     tagline:
-      "A spaced-repetition learning tracker that derives mastery from quiz performance, not self-reported checkboxes. Currently loaded with a DeFi curriculum.",
+      "A learning tracker that derives mastery from how you actually score, not from what you check off. Currently loaded with a DeFi curriculum.",
     description:
-      "Single-user full-stack app pairing a static curriculum with persisted progress, an Anthropic-powered glossary, and AI-generated quizzes using Claude tool_use for schema-validated output. Provider is pluggable, with Anthropic in production and LM Studio locally for offline iteration.",
+      "Single-user learning tracker over a static curriculum. Mastery is computed at read time from recorded quiz attempts (80% correct across a term's last five) rather than pre-aggregated, so changing the rule is a one-function edit with no backfill. Wrong answers get diagnosed instead of just corrected: a dedicated endpoint names the misconception a specific choice implies. Glossary definitions and schema-validated quizzes run on Claude tool_use, with a pluggable provider (Anthropic in production, LM Studio locally).",
     stack: [
       "React 18",
       "Vite",

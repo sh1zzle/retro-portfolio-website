@@ -866,9 +866,9 @@ function WelcomeTab({
             <span className="text-[#6b6b6b]">· habit-tracking health app</span>
           </li>
           <li className="flex items-center gap-3">
-            <span className="code-chip">exploring</span>
-            <strong>DeFi</strong>{" "}
-            <span className="text-[#6b6b6b]">· on-chain mechanics</span>
+            <span className="code-chip">shipping</span>
+            <strong>Recall</strong>{" "}
+            <span className="text-[#6b6b6b]">· AI-graded learning tracker</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="code-chip">working</span>
