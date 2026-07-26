@@ -170,6 +170,11 @@ export type Project = {
   stack: string[];
   status: string;
   href?: string;
+  /* Public GitHub URL. Set this only once the repo is actually public:
+     a repo link that 404s for visitors costs more credibility than a
+     missing one. As of 2026-07-26 the Atlas, Equilibria, and Recall
+     repos are all private, so none of them set it. */
+  repo?: string;
 };
 
 export const projects: Project[] = [

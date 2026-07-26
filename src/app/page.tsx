@@ -1100,6 +1100,22 @@ function ProjectsTab() {
               </span>
             </div>
           )}
+          {p.repo && (
+            <div className="ide-line">
+              <span>
+                <span className="ide-key">repo</span>
+                <span className="ide-rule">: </span>
+                <a
+                  href={p.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ide-str underline underline-offset-2 hover:text-[#1a1a1a]"
+                >
+                  &quot;{p.repo.replace(/^https?:\/\/(www\.)?github\.com\//, "")}&quot;
+                </a>
+              </span>
+            </div>
+          )}
           <div className="ide-line">
             <span className="ide-rule">---</span>
           </div>
