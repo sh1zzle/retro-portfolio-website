@@ -16,7 +16,17 @@ const bungee = Bungee({
   weight: "400",
 });
 
+/* Absolute base for the OG and Twitter card image URLs. On Vercel,
+   VERCEL_PROJECT_PRODUCTION_URL is the stable production domain and is
+   injected into every deployment, so preview builds still resolve share
+   cards against the real site rather than their own throwaway URL.
+   Falls back to the `next dev` port locally. */
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3001";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Shiezza Lauron · Full Stack Developer",
   description:
     "Full stack web and mobile developer working in React Native, Next.js, and .NET. Five years shipping production apps. Open to work.",
