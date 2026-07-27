@@ -223,7 +223,7 @@ export default function PortfolioOS() {
      padding, leaving a 36px channel; the window's 8px hard shadow eats into
      that on the right, so the channel can't be much tighter. */
   return (
-    <main className="os-desktop relative overflow-hidden min-h-dvh flex flex-col items-center justify-center gap-4 px-4 py-6 md:py-10 md:px-34 lg:px-40 xl:px-48">
+    <main className="os-desktop relative overflow-hidden min-h-dvh flex flex-col items-center justify-center gap-4 px-4 pt-6 pb-[calc(var(--np-dock-h)+1.25rem)] md:pt-10 md:px-34 lg:px-40 xl:px-48">
       {/* Decorative scattered code symbols */}
       {BG_DECORATIONS.map(({ Icon, top, bottom, left, right, size, rotate }, i) => (
         <Icon
@@ -293,7 +293,7 @@ export default function PortfolioOS() {
       </div>
 
       {/* Window: fixed height with internal scroll */}
-      <div className="ph-window relative z-0 w-full max-w-3xl xl:max-w-5xl 2xl:max-w-6xl h-[calc(88vh-var(--np-dock-h))] max-h-205 xl:max-h-287.5 min-h-140 flex flex-col overflow-hidden">
+      <div className="ph-window relative z-0 w-full max-w-3xl xl:max-w-5xl 2xl:max-w-6xl h-[calc(88vh-var(--np-win-offset))] max-h-205 xl:max-h-287.5 min-h-140 flex flex-col overflow-hidden">
           {/* Title bar: macOS traffic-light style, hand-illustrated */}
           <div className="mac-titlebar shrink-0">
             <div className="mac-traffic" aria-label="Window controls">
@@ -1091,85 +1091,70 @@ function IconRepeat() {
   );
 }
 
+/* How long each track holds before the player moves on. */
+const TRACK_MS = 12_000;
+
 function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
   const [trackIdx, setTrackIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState(false);
+  /* Always increments, unlike trackIdx. Repeat holds the same index, which
+     React bails out of re-rendering, so without this the effect below would
+     never re-run and the player would silently stop. */
+  const [cycle, setCycle] = useState(0);
 
   /* Wraps in both directions so prev on the first track lands on the last. */
   const skip = (delta: number) =>
     setTrackIdx((i) => (i + delta + NOW_PLAYING.length) % NOW_PLAYING.length);
 
-  /* What the seek head reaching the end does, as opposed to the skip
-     buttons: repeat holds the track, shuffle jumps to any other one, and
-     the offset form keeps it from picking the track already playing. */
-  const advance = () => {
-    if (repeat) {
-      setTrackIdx((i) => i);
-      return;
-    }
-    if (shuffle) {
-      setTrackIdx(
-        (i) =>
-          (i + 1 + Math.floor(Math.random() * (NOW_PLAYING.length - 1))) %
-          NOW_PLAYING.length
-      );
-      return;
-    }
-    skip(1);
-  };
+  /* Auto-advance. The seek bar used to drive this off `animationend`; with
+     it gone a single timeout per track does the same job without a
+     per-frame ticker. Repeat holds the track, shuffle jumps to any other
+     one, and the offset form keeps it from picking the track playing now. */
+  useEffect(() => {
+    if (!playing) return;
+    /* Auto-updating content is exactly what this setting asks us not to do,
+       so leave the transport as the only way to move between tracks. */
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const id = window.setTimeout(() => {
+      setCycle((c) => c + 1);
+      if (repeat) return;
+      if (shuffle) {
+        setTrackIdx(
+          (i) =>
+            (i + 1 + Math.floor(Math.random() * (NOW_PLAYING.length - 1))) %
+            NOW_PLAYING.length
+        );
+        return;
+      }
+      setTrackIdx((i) => (i + 1) % NOW_PLAYING.length);
+    }, TRACK_MS);
+    return () => window.clearTimeout(id);
+  }, [playing, trackIdx, cycle, shuffle, repeat]);
 
   return (
-    <div className="np-dock shrink-0">
-      {/* Decorative equalizer. Each bar carries its own height and a
-          negative animation delay so the row is already mid-motion on the
-          first frame instead of starting flat and in unison. */}
-      <div className="np-wave" data-playing={playing} aria-hidden>
-        {WAVEFORM.map((h, i) => (
-          <span
-            key={i}
-            className="np-wave-bar"
-            style={{ "--h": `${h}`, "--i": `${i}` } as CSSProperties}
-          />
-        ))}
-      </div>
-
+    <div className="np-dock">
       {/* All three stay in the markup and only the current one is shown, so
           the served HTML still carries the whole list for crawlers even
-          though the bar displays one at a time. */}
-      {NOW_PLAYING.map((t, i) => (
-        <button
-          key={t.title}
-          type="button"
-          className="np-track"
-          hidden={i !== trackIdx}
-          onClick={() => onSelectTab(t.tab)}
-        >
-          <span className="np-status">{t.status}</span>
-          <span className="np-track-text">
-            <strong className="np-track-title">{t.title}</strong>
-            <span className="np-track-detail"> · {t.detail}</span>
-          </span>
-        </button>
-      ))}
-
-      {/* The seek head is a CSS animation rather than a React ticker, so a
-          player left running never re-renders the tree; remounting on
-          `trackIdx` restarts it and `animationend` is what advances. Under
-          reduced motion the animation is off, which parks the head and
-          leaves the transport as the only way to move. */}
-      <div className="np-seek" aria-hidden>
-        <span
-          key={trackIdx}
-          className="np-seek-fill"
-          style={{ animationPlayState: playing ? "running" : "paused" }}
-          onAnimationEnd={(e) => {
-            if (e.target === e.currentTarget) advance();
-          }}
-        >
-          <span className="np-knob" />
-        </span>
+          though the player displays one at a time. */}
+      <div className="np-now">
+        {NOW_PLAYING.map((t, i) => (
+          <button
+            key={t.title}
+            type="button"
+            className="np-track"
+            hidden={i !== trackIdx}
+            onClick={() => onSelectTab(t.tab)}
+          >
+            <span className="np-status">{t.status}</span>
+            <span className="np-track-text">
+              <strong className="np-track-title">{t.title}</strong>
+              <span className="np-track-detail"> · {t.detail}</span>
+            </span>
+          </button>
+        ))}
       </div>
 
       <div className="np-transport">
@@ -1215,6 +1200,20 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
         >
           <IconRepeat />
         </button>
+      </div>
+
+      {/* Decorative equalizer, standing in for the removed seek bar as the
+          signal that something is playing. Each bar carries its own height
+          and a negative animation delay so the row is already mid-motion on
+          the first frame instead of starting flat and in unison. */}
+      <div className="np-wave" data-playing={playing} aria-hidden>
+        {WAVEFORM.map((h, i) => (
+          <span
+            key={i}
+            className="np-wave-bar"
+            style={{ "--h": `${h}`, "--i": `${i}` } as CSSProperties}
+          />
+        ))}
       </div>
     </div>
   );
