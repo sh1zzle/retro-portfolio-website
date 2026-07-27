@@ -406,8 +406,8 @@ export default function PortfolioOS() {
                       src={t.icon}
                       alt=""
                       aria-hidden
-                      width={30}
-                      height={30}
+                      width={28}
+                      height={28}
                       className="ios-tab-icon"
                     />
                   </span>

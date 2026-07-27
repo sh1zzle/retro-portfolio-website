@@ -1003,11 +1003,11 @@ body {
   flex: 1 1 0;
   min-width: 60px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  padding: 2px 6px 1px;
+  gap: 6px;
+  padding: 3px 6px;
   border: none;
   background: transparent;
   border-radius: 10px;
@@ -1022,12 +1022,12 @@ body {
 .ios-tab-icon-wrap {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
 }
 .ios-tab-icon {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
   /* Inactive: muted, gray-ish, slightly faded */
   filter: grayscale(0.7) opacity(0.55);
@@ -1045,7 +1045,7 @@ body {
 }
 .ios-tab-label {
   font-family: var(--font-jb), ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: #8a8580;
@@ -1055,6 +1055,25 @@ body {
 .ios-tab[data-active="true"] .ios-tab-label {
   color: #b56d1a;
 }
+/* Four 28px icons beside 13px labels need about 430px to sit in a row.
+   Below that they collide (measured: labels overlap by 7px at 320px), so
+   the label drops under the icon rather than shrinking either one. */
+@media (max-width: 429px) {
+  .ios-tab {
+    flex-direction: column;
+    gap: 1px;
+    padding: 2px 4px;
+  }
+}
+
+/* Below ~360px even the stacked label is wider than a quarter of the
+   bar ("Experience" is the constraint), so ease it down a notch. */
+@media (max-width: 360px) {
+  .ios-tab-label {
+    font-size: 11px;
+  }
+}
+
 /* Reduced motion: no transforms */
 @media (prefers-reduced-motion: reduce) {
   .ios-tab,
