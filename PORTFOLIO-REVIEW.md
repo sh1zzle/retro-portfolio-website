@@ -1,6 +1,6 @@
 # Portfolio Review: Hiring-Manager Assessment
 
-_Reviewed 2026-07-25, updated 2026-07-26. Verdict: the retro-OS site is memorable and well built, and the design itself sells the frontend skills. The gaps are in **credibility**: contact, proof, and consistency between the portfolio, resume, and GitHub._
+_Reviewed 2026-07-25, updated 2026-07-27. Verdict: the retro-OS site is memorable and well built, and the design itself sells the frontend skills. The gaps are in **credibility**: contact, proof, and consistency between the portfolio, resume, and GitHub._
 
 ---
 
@@ -22,7 +22,8 @@ _Reviewed 2026-07-25, updated 2026-07-26. Verdict: the retro-OS site is memorabl
   - [ ] TestFlight invite link for Equilibria, which is still the only project with no link at all
   - [x] `Project.href` is now used: Atlas and Recall both link to live deployments
   - [x] ~~GitHub repo link if public~~ **Declined 2026-07-26.** Atlas, Equilibria, and Recall repos stay private by choice. `Project.repo` exists and renders if ever set, but nothing populates it. Do not re-raise.
-- [ ] **Only the About tab is server-rendered.** The whole page is one `"use client"` component with tab state defaulting to `welcome`, so the prerendered HTML contains just that tab. Crawlers and link-preview scrapers never see Experience, Projects, or Contact. Verified against the deployed HTML: "Dash Notes", "How I work", and "guard-tour" return zero matches. Fix by rendering all four panels and hiding inactive ones with CSS, or by moving content to the server layer.
+- [ ] **Only the About tab is server-rendered.** The whole page is one `"use client"` component with tab state defaulting to `welcome`, so the prerendered HTML contains just that tab. Crawlers and link-preview scrapers never see Experience, Projects, or Contact. Verified against the deployed HTML: "Dash Notes", "How I work", and "guard-tour" return zero matches. The only open item here that is a code change rather than a copy edit.
+  _Full context written up in [SSR-TABS-HANDOFF.md](SSR-TABS-HANDOFF.md), including the two fix approaches and the codebase-specific traps (the IDE theme sits on the shared scroll container, there are five panels rather than four, and no `role="tabpanel"` exists yet). Handed off to a separate session._
 - [x] **Dates and the missing years.** Bio claims "five years" but the timeline showed Facilitron (no start year) + two 2025 freelance gigs.
   _Done: Facilitron dated May 2025 – Present, CSA 360 corrected to Jul 2022 – Feb 2025, TWIGOH (Aug 2020 – 2022) added, and EdCafe / Baptist Faith / Lyra grouped in an "Also shipped for" strip with bare years. Timeline now covers 2020 → present._
 - [x] **"I did X" bullets for Dash and LinkJolt.** Both entries described the product, not your contribution.
@@ -39,8 +40,9 @@ _Reviewed 2026-07-25, updated 2026-07-26. Verdict: the retro-OS site is memorabl
 
 - [x] **Version numbers in skills.txt.** Rot fast and read as padding.
   _Done: all version numbers stripped except ".NET 9" and "New Architecture"; dropped the lowest-signal chips (React Navigation, Unistyles, RN Paper, MMKV, AsyncStorage, Supabase, AWS SES, Yarn workspaces, model-name-as-skill). 58 → 47 chips._
-- [ ] **Name both audiences instead of implying one.** ~~Pick one audience.~~ **Reframed 2026-07-27:** the goal is genuinely both project work and a full-time team role, so cutting either the services grid or the job-seeker signals would be wrong. Both audiences want the same three things anyway (proof you can build, evidence you shipped, how you work), and the "How I work" strip added 2026-07-26 serves both.
-  _The real problem is ambiguity, not duality. `status` reads "open to work", which sounds like job hunting, while the About tab offers a services menu, which sounds like an agency. Each makes the other look less committed. Fix by saying both out loud: `status` to something like "open to projects and full-time", plus a matching clause in the contact intro._
+- [x] **Name both audiences instead of implying one.** ~~Pick one audience.~~ **Reframed 2026-07-27:** the goal is genuinely both project work and a full-time team role, so cutting either the services grid or the job-seeker signals would be wrong. Both audiences want the same three things anyway (proof you can build, evidence you shipped, how you work), and the "How I work" strip added 2026-07-26 serves both.
+  _The problem was ambiguity, not duality: "open to work" beside a services menu made each look less committed than it was._
+  _Done 2026-07-27: `status` is now "open to projects and full-time · responds within a day", and the contact intro opens with "Open to both project work and joining a team." The services grid stays._
 - [x] **Housekeeping.** `.DS_Store` was already gitignored; `variations.html` moved from `public/explorations/` to `/explorations/` (gitignored) so it no longer ships to production.
 
 ## ✅ Keep: it's working
