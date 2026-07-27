@@ -1033,6 +1033,12 @@ body {
   filter: grayscale(0.7) opacity(0.55);
   transition: filter 0.18s ease, transform 0.18s ease;
 }
+/* Hovering brings an icon to full colour, same as the selected tab.
+   The lift stays exclusive to the selected tab so it is still
+   identifiable while the pointer is over a different one. */
+.ios-tab:hover .ios-tab-icon {
+  filter: none;
+}
 .ios-tab[data-active="true"] .ios-tab-icon {
   filter: none;
   transform: translateY(-1px);
