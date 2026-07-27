@@ -1014,6 +1014,8 @@ const WAVEFORM = [
   0.65, 0.3, 0.75, 0.55, 0.85, 0.4, 0.6, 0.3, 0.7, 0.5,
   0.45, 0.8, 0.35, 0.6, 0.9, 0.4, 0.7, 0.3, 0.55, 0.75,
   0.5, 0.95, 0.35, 0.65, 0.4, 0.85, 0.3, 0.6,
+  0.7, 0.4, 0.9, 0.5, 0.35, 0.8, 0.45, 0.65, 0.3, 0.75,
+  0.55, 0.85,
 ];
 
 /* Transport glyphs. Drawn slightly off-square (uneven edges, no exact
@@ -1157,6 +1159,20 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
         ))}
       </div>
 
+      {/* Decorative equalizer, standing in for the removed seek bar as the
+          signal that something is playing. Each bar carries its own height
+          and a negative animation delay so the row is already mid-motion on
+          the first frame instead of starting flat and in unison. */}
+      <div className="np-wave" data-playing={playing} aria-hidden>
+        {WAVEFORM.map((h, i) => (
+          <span
+            key={i}
+            className="np-wave-bar"
+            style={{ "--h": `${h}`, "--i": `${i}` } as CSSProperties}
+          />
+        ))}
+      </div>
+
       <div className="np-transport">
         <button
           type="button"
@@ -1200,20 +1216,6 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
         >
           <IconRepeat />
         </button>
-      </div>
-
-      {/* Decorative equalizer, standing in for the removed seek bar as the
-          signal that something is playing. Each bar carries its own height
-          and a negative animation delay so the row is already mid-motion on
-          the first frame instead of starting flat and in unison. */}
-      <div className="np-wave" data-playing={playing} aria-hidden>
-        {WAVEFORM.map((h, i) => (
-          <span
-            key={i}
-            className="np-wave-bar"
-            style={{ "--h": `${h}`, "--i": `${i}` } as CSSProperties}
-          />
-        ))}
       </div>
     </div>
   );

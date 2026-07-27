@@ -18,8 +18,11 @@ body {
      with the footer's rendered height. */
   --np-dock-h: 56px;
   /* How much the window gives back on top of that padding. Only matters
-     where the desk fits one screen, which is md and up. */
-  --np-win-offset: var(--np-dock-h);
+     where the desk fits one screen, which is md and up. Written out
+     rather than `var(--np-dock-h)`: the bundler drops a custom property
+     defined from another one, which silently invalidates the calc that
+     consumes it and leaves the window unsized. */
+  --np-win-offset: 56px;
 }
 
 /* Below md the icon rows stack above and below the frame, so the desk is
@@ -536,14 +539,15 @@ body {
   right: 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  /* track | equalizer | transport. Equal outer columns so the equalizer
+     is centred in the strip, and a fractional middle so it stretches with
+     the viewport rather than sitting at its content width. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr);
   align-items: center;
   gap: 16px;
   padding: 8px clamp(12px, 3vw, 28px);
   background: #fbf5e9;
   border-top: 1.5px solid #ded0b4;
-  /* Lifts the strip off the wallpaper without turning it into a card. */
-  box-shadow: 0 -6px 18px -12px rgba(91, 58, 26, 0.45);
 }
 
 /* ---------- Current track (left) ---------- */
@@ -595,11 +599,12 @@ body {
   color: #7b6446;
 }
 
-/* ---------- Transport (centre) ---------- */
+/* ---------- Transport (right) ---------- */
 .np-transport {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  justify-self: end;
   gap: 6px;
 }
 /* Bare glyphs: only the play control gets a body, so the outer four rely
@@ -665,19 +670,26 @@ body {
   box-shadow: 0.5px 0.5px 0 var(--np-accent-deep);
 }
 
-/* ---------- Equalizer (right) ---------- */
+/* ---------- Equalizer (centre) ---------- */
 .np-wave {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   /* Roughly bar-width, so the row reads as separate ticks. */
-  gap: 3px;
+  gap: 4px;
+  width: 100%;
   min-width: 0;
   height: 22px;
+  /* Guard: at the narrowest width the bars sit exactly at their 3px floor,
+     so clip rather than spill if a rounding difference costs a pixel. */
+  overflow: hidden;
 }
+/* Bars share the row, clamped so they stay chunky when it is wide and
+   still fit when it is not. */
 .np-wave-bar {
-  flex: 0 1 4px;
-  min-width: 2px;
+  flex: 1 1 0;
+  min-width: 3px;
+  max-width: 5px;
   height: calc(var(--h) * 100%);
   border-radius: 2px;
   background: var(--np-accent);
@@ -925,7 +937,7 @@ body {
   display: flex;
   align-items: stretch;
   justify-content: space-around;
-  padding: 6px 4px 8px;
+  padding: 3px 4px 4px;
   gap: 2px;
 }
 .ios-tab {
@@ -935,8 +947,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 4px 6px 2px;
+  gap: 2px;
+  padding: 2px 6px 1px;
   border: none;
   background: transparent;
   border-radius: 10px;
@@ -954,12 +966,12 @@ body {
 .ios-tab-icon-wrap {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
 }
 .ios-tab-icon {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
   /* Inactive: muted, gray-ish, slightly faded */
   filter: grayscale(0.7) opacity(0.55);
