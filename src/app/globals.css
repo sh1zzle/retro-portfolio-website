@@ -984,40 +984,60 @@ body {
    bottom bar. Active tab gets the PostHog orange tint; inactive tabs
    are desaturated and dimmed. Icons are PNGs from /public/icons.
    ===================================================================== */
-/* Sits directly under the toolbar, so the divider goes on the bottom
-   edge to separate it from the scrolling body. */
+/* Browser-style tab strip under the toolbar. The bar itself is recessed
+   and the selected tab is painted in the body's white so it reads as
+   continuous with the content beneath it. */
 .ios-tabbar {
-  background: rgba(255, 250, 240, 0.92);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: #f2ece0;
   border-bottom: 1px solid #e8e0cf;
+  padding-top: 5px;
 }
 .ios-tabbar-nav {
   display: flex;
-  align-items: stretch;
-  justify-content: space-around;
-  padding: 3px 4px 4px;
-  gap: 2px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 6px;
+  gap: 0;
+  /* Lets the selected tab paint over the bar's bottom border. */
+  margin-bottom: -1px;
 }
 .ios-tab {
+  position: relative;
   flex: 1 1 0;
-  min-width: 60px;
+  min-width: 0;
+  max-width: 230px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 3px 6px;
-  border: none;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 9px 9px 0 0;
   background: transparent;
-  border-radius: 10px;
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.08s ease;
+  transition: background 0.14s ease;
 }
-.ios-tab:active {
-  transform: scale(0.96);
+.ios-tab[data-active="true"] {
+  background: #ffffff;
+  border-color: #e8e0cf;
+}
+.ios-tab:not([data-active="true"]):hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+/* Hairline between two adjacent unselected tabs, as browsers do. It is
+   suppressed next to the selected tab, whose border already divides. */
+.ios-tab:not([data-active="true"]) + .ios-tab:not([data-active="true"])::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 28%;
+  height: 44%;
+  width: 1px;
+  background: #d9cfbb;
 }
 .ios-tab-icon-wrap {
   display: grid;
@@ -1050,26 +1070,32 @@ body {
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #8a8580;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   line-height: 1;
   transition: color 0.18s ease;
 }
 .ios-tab[data-active="true"] .ios-tab-label {
   color: #b56d1a;
 }
-/* Four 28px icons beside 13px labels need about 430px to sit in a row.
-   Below that they collide (measured: labels overlap by 7px at 320px), so
-   the label drops under the icon rather than shrinking either one. */
-@media (max-width: 429px) {
+/* Browsers collapse crowded tabs to a favicon, but four unlabelled
+   icons are not navigable for a site this size. Stack the label under
+   the icon instead, keeping the tab chrome.
+
+   Threshold measured rather than guessed. It keys on the window width,
+   not the viewport: at 768px the md: desktop icon columns appear and
+   the window collapses from 673px to 496px, so tabs truncate from 768
+   through roughly 870 even though narrower viewports are fine. Row
+   layout therefore starts at 880px, past the squeeze. */
+@media (max-width: 879px) {
   .ios-tab {
     flex-direction: column;
-    gap: 1px;
-    padding: 2px 4px;
+    justify-content: center;
+    gap: 2px;
+    padding: 5px 4px;
+    max-width: none;
   }
-}
-
-/* Below ~360px even the stacked label is wider than a quarter of the
-   bar ("Experience" is the constraint), so ease it down a notch. */
-@media (max-width: 360px) {
   .ios-tab-label {
     font-size: 11px;
   }
