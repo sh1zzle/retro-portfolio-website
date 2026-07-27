@@ -387,6 +387,36 @@ export default function PortfolioOS() {
             </a>
           </div>
 
+          {/* Section tabs, pinned directly under the toolbar */}
+          <div className="ios-tabbar shrink-0">
+            <nav role="tablist" aria-label="Sections" className="ios-tabbar-nav">
+              {TABS.map((t) => (
+                <button
+                  key={t.key}
+                  id={`tab-${t.key}`}
+                  role="tab"
+                  aria-selected={tab === t.key}
+                  aria-controls={`panel-${t.key}`}
+                  data-active={tab === t.key}
+                  onClick={() => setTab(t.key)}
+                  className="ios-tab"
+                >
+                  <span className="ios-tab-icon-wrap">
+                    <img
+                      src={t.icon}
+                      alt=""
+                      aria-hidden
+                      width={30}
+                      height={30}
+                      className="ios-tab-icon"
+                    />
+                  </span>
+                  <span className="ios-tab-label">{t.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
           {/* Scrollable body. Zoom uses the CSS `zoom` property (now
               standardized) so it scales layout + fonts + padding all
               proportionally, because `font-size` alone doesn't as most
@@ -460,35 +490,6 @@ export default function PortfolioOS() {
             </div>
           </div>
 
-          {/* Tabs (iOS-style bottom bar, pinned) */}
-          <div className="ios-tabbar shrink-0">
-            <nav role="tablist" aria-label="Sections" className="ios-tabbar-nav">
-              {TABS.map((t) => (
-                <button
-                  key={t.key}
-                  id={`tab-${t.key}`}
-                  role="tab"
-                  aria-selected={tab === t.key}
-                  aria-controls={`panel-${t.key}`}
-                  data-active={tab === t.key}
-                  onClick={() => setTab(t.key)}
-                  className="ios-tab"
-                >
-                  <span className="ios-tab-icon-wrap">
-                    <img
-                      src={t.icon}
-                      alt=""
-                      aria-hidden
-                      width={40}
-                      height={40}
-                      className="ios-tab-icon"
-                    />
-                  </span>
-                  <span className="ios-tab-label">{t.label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
 
           {/* Status bar */}
           <div className="status-bar flex items-center justify-between px-3 py-1.5 text-xs shrink-0 gap-3">
@@ -1093,8 +1094,165 @@ function IconRepeat() {
   );
 }
 
+function IconSpeaker() {
+  return (
+    <svg viewBox="0 0 24 24" {...STROKE} aria-hidden>
+      <path d="M4.4 9.6h3.2l4.3-3.4v11.6l-4.3-3.4H4.4z" />
+      <path d="M15.4 9.5c1.1.9 1.6 1.7 1.6 2.6s-.5 1.7-1.5 2.5" />
+      <path d="M18 7.1c1.9 1.5 2.8 3.1 2.8 4.9s-.9 3.4-2.7 4.8" />
+    </svg>
+  );
+}
+
+function IconSpeakerOff() {
+  return (
+    <svg viewBox="0 0 24 24" {...STROKE} aria-hidden>
+      <path d="M4.4 9.6h3.2l4.3-3.4v11.6l-4.3-3.4H4.4z" />
+      <path d="m15.8 9.9 4.5 4.4" />
+      <path d="m20.3 9.9-4.4 4.4" />
+    </svg>
+  );
+}
+
 /* How long each track holds before the player moves on. */
 const TRACK_MS = 12_000;
+
+/* ---------------- Lo-fi ----------------
+   Synthesised in the browser rather than shipped as an audio file: there
+   is no track to license, nothing to download, and the whole thing is a
+   handful of oscillators. A slow chord pad, detuned and run through a
+   lowpass so it sits back, over a bed of vinyl crackle.
+
+   Voicings are deliberately low and close: a lofi pad is mostly sevenths
+   with no bright top, so the lowpass has something to eat. */
+const LOFI_CHORDS = [
+  [174.61, 220.0, 261.63, 329.63], // Fmaj7
+  [146.83, 174.61, 220.0, 261.63], // Dm7
+  [196.0, 233.08, 293.66, 349.23], // Gm7
+  [130.81, 164.81, 196.0, 233.08], // C7
+];
+const CHORD_SECONDS = 6;
+
+type Lofi = {
+  resume: () => Promise<void>;
+  suspend: () => void;
+  dispose: () => void;
+};
+
+function useLofi(): Lofi {
+  const ctxRef = useRef<AudioContext | null>(null);
+  const busRef = useRef<GainNode | null>(null);
+  const timerRef = useRef<number | null>(null);
+  const chordRef = useRef(0);
+
+  /* Built once. Everything inside closes over refs only, so a stable
+     identity is safe, and callers can put it in a dependency list
+     without re-running their effects on every render. */
+  return useMemo<Lofi>(() => {
+    const playChord = () => {
+      const ctx = ctxRef.current;
+      const bus = busRef.current;
+      if (!ctx || !bus) return;
+      const chord = LOFI_CHORDS[chordRef.current % LOFI_CHORDS.length];
+      chordRef.current += 1;
+      const now = ctx.currentTime;
+
+      chord.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = i === 0 ? "sine" : "triangle";
+        /* A few cents off centre so the voices beat against each other.
+           That slow wobble is most of what keeps a pad from sounding like
+           a stock synth preset. */
+        osc.frequency.value = freq * (1 + (i - 1.5) * 0.0016);
+        /* Swell, hold, then a tail that runs past the next chord's entry so
+           the two crossfade instead of gapping. The hold matters: ramping
+           straight from peak into the decay leaves the pad near silent for
+           most of its own bar. Exponential throughout, since linear ramps
+           click on a sustained voice. */
+        const peak = 0.22 / chord.length;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(peak, now + 1.5);
+        gain.gain.setValueAtTime(peak, now + 4);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + CHORD_SECONDS + 0.8);
+        osc.connect(gain).connect(bus);
+        osc.start(now);
+        osc.stop(now + CHORD_SECONDS + 1);
+      });
+    };
+
+    const resume = async () => {
+      if (!ctxRef.current) {
+        const Ctor =
+          window.AudioContext ??
+          (window as unknown as { webkitAudioContext?: typeof AudioContext })
+            .webkitAudioContext;
+        if (!Ctor) return;
+        const ctx = new Ctor();
+        ctxRef.current = ctx;
+
+        /* pad -> lowpass -> master -> out, with the crackle joining at the
+           master so it stays crisp instead of being muffled too. */
+        const master = ctx.createGain();
+        /* Tuned by measuring the graph's own output: lands the pad around
+           -20 dBFS, present enough to hear at a normal browser volume
+           without shouting over whatever else the visitor is doing. */
+        master.gain.value = 0.85;
+        master.connect(ctx.destination);
+
+        const tone = ctx.createBiquadFilter();
+        tone.type = "lowpass";
+        tone.frequency.value = 900;
+        tone.Q.value = 0.6;
+        tone.connect(master);
+
+        const bus = ctx.createGain();
+        bus.gain.value = 1;
+        bus.connect(tone);
+        busRef.current = bus;
+
+        /* Vinyl crackle: two seconds of sparse impulses looped. Sparse, not
+           steady noise, or it reads as hiss rather than dust. */
+        const frames = ctx.sampleRate * 2;
+        const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < frames; i += 1) {
+          data[i] = Math.random() < 0.0006 ? (Math.random() * 2 - 1) * 0.6 : 0;
+        }
+        const crackle = ctx.createBufferSource();
+        crackle.buffer = buffer;
+        crackle.loop = true;
+        const crackleTone = ctx.createBiquadFilter();
+        crackleTone.type = "highpass";
+        crackleTone.frequency.value = 1200;
+        const crackleGain = ctx.createGain();
+        crackleGain.gain.value = 0.05;
+        crackle.connect(crackleTone).connect(crackleGain).connect(master);
+        crackle.start();
+
+        playChord();
+        timerRef.current = window.setInterval(playChord, CHORD_SECONDS * 1000);
+      }
+      await ctxRef.current.resume();
+    };
+
+    /* Suspend rather than tear down: the graph and its schedule survive, so
+       unmuting picks the pad back up instead of restarting the progression. */
+    const suspend = () => {
+      void ctxRef.current?.suspend();
+    };
+
+    const dispose = () => {
+      if (timerRef.current !== null) window.clearInterval(timerRef.current);
+      timerRef.current = null;
+      void ctxRef.current?.close();
+      ctxRef.current = null;
+      busRef.current = null;
+    };
+
+    return { resume, suspend, dispose };
+  }, []);
+}
 
 function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
   const [trackIdx, setTrackIdx] = useState(0);
@@ -1105,6 +1263,29 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
      React bails out of re-rendering, so without this the effect below would
      never re-run and the player would silently stop. */
   const [cycle, setCycle] = useState(0);
+  /* Off by default, and not just as a courtesy: browsers refuse to start
+     audio until the user has interacted, so the first click of the
+     speaker is what makes the context legal to open. */
+  const [sound, setSound] = useState(false);
+  const lofi = useLofi();
+
+  /* Pausing the player silences the music too, so the equalizer never
+     dances to nothing. */
+  useEffect(() => {
+    if (!sound) return;
+    if (playing) void lofi.resume();
+    else lofi.suspend();
+  }, [playing, sound, lofi]);
+
+  useEffect(() => lofi.dispose, [lofi]);
+
+  const toggleSound = () => {
+    setSound((on) => {
+      if (on) lofi.suspend();
+      else void lofi.resume();
+      return !on;
+    });
+  };
 
   /* Wraps in both directions so prev on the first track lands on the last. */
   const skip = (delta: number) =>
@@ -1215,6 +1396,15 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
           onClick={() => setRepeat((r) => !r)}
         >
           <IconRepeat />
+        </button>
+        <button
+          type="button"
+          className="np-btn np-btn-sound"
+          aria-label={sound ? "Mute lo-fi" : "Play lo-fi"}
+          aria-pressed={sound}
+          onClick={toggleSound}
+        >
+          {sound ? <IconSpeaker /> : <IconSpeakerOff />}
         </button>
       </div>
     </div>

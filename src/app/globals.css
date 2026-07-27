@@ -643,6 +643,11 @@ body {
   outline: 2px solid #1a1a1a;
   outline-offset: 2px;
 }
+/* Sound is a separate concern from the transport, so it sits past a
+   small gap rather than reading as a sixth transport control. */
+.np-btn-sound {
+  margin-left: 6px;
+}
 
 /* Play is the primary button in round form: same amber, dark outline and
    hard offset, down to the press-in. */
@@ -735,6 +740,9 @@ body {
   .np-track-detail {
     display: none;
   }
+  .np-btn-sound {
+    margin-left: 2px;
+  }
   .np-transport {
     gap: 2px;
   }
@@ -753,6 +761,14 @@ body {
   .np-btn-play svg {
     width: 18px;
     height: 18px;
+  }
+}
+
+/* Six controls plus the chip do not fit on a phone: the project's name
+   earns the space over the word describing its state. */
+@media (max-width: 479px) {
+  .np-status {
+    display: none;
   }
 }
 
@@ -937,11 +953,13 @@ body {
    bottom bar. Active tab gets the PostHog orange tint; inactive tabs
    are desaturated and dimmed. Icons are PNGs from /public/icons.
    ===================================================================== */
+/* Sits directly under the toolbar, so the divider goes on the bottom
+   edge to separate it from the scrolling body. */
 .ios-tabbar {
   background: rgba(255, 250, 240, 0.92);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
-  border-top: 1px solid #e8e0cf;
+  border-bottom: 1px solid #e8e0cf;
 }
 .ios-tabbar-nav {
   display: flex;
