@@ -1048,6 +1048,7 @@ body {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: #8a8580;
   line-height: 1;
   transition: color 0.18s ease;
