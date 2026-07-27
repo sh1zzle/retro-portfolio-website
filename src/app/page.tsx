@@ -293,7 +293,7 @@ export default function PortfolioOS() {
       </div>
 
       {/* Window: fixed height with internal scroll */}
-      <div className="ph-window relative z-0 w-full max-w-3xl xl:max-w-5xl 2xl:max-w-6xl h-[88vh] max-h-205 xl:max-h-287.5 min-h-140 flex flex-col overflow-hidden">
+      <div className="ph-window relative z-0 w-full max-w-3xl xl:max-w-5xl 2xl:max-w-6xl h-[calc(88vh-var(--np-dock-h))] max-h-205 xl:max-h-287.5 min-h-140 flex flex-col overflow-hidden">
           {/* Title bar: macOS traffic-light style, hand-illustrated */}
           <div className="mac-titlebar shrink-0">
             <div className="mac-traffic" aria-label="Window controls">
@@ -413,7 +413,6 @@ export default function PortfolioOS() {
               <WelcomeTab
                 cheering={isCheering}
                 onOpenSkills={() => setTab("skills")}
-                onSelectTab={setTab}
               />
             </div>
 
@@ -516,6 +515,12 @@ export default function PortfolioOS() {
           />
         ))}
       </div>
+
+      {/* Now Playing sits on the desktop rather than in the window chrome,
+          so it is the same widget for every tab and stops competing with
+          the document for room inside the frame. The window gives back
+          exactly `--np-dock-h` of height to make space for it. */}
+      <NowPlaying onSelectTab={setTab} />
     </main>
   );
 }
@@ -826,11 +831,9 @@ const SERVICE_ICONS: Record<string, LucideLike> = {
 function WelcomeTab({
   cheering = false,
   onOpenSkills,
-  onSelectTab,
 }: {
   cheering?: boolean;
   onOpenSkills: () => void;
-  onSelectTab: (t: TabKey) => void;
 }) {
   return (
     <div>
@@ -925,10 +928,6 @@ function WelcomeTab({
         ))}
       </div>
 
-      <div className="mt-10">
-        <NowPlaying onSelectTab={onSelectTab} />
-      </div>
-
       {/* Client-facing capabilities: outcomes first, tech names demoted
           to a couple of supporting chips. The full inventory lives in
           the skills.txt view. */}
@@ -1006,19 +1005,88 @@ const NOW_PLAYING: NowPlayingTrack[] = [
   },
 ];
 
-/* Four-point sparkle from the reference art. Sized by the caller. */
-function Sparkle({ className }: { className?: string }) {
+/* Waveform bar heights as fractions of the strip. Fixed rather than
+   random: these ship in the server-rendered markup, so a random pattern
+   would differ on the client and break hydration. */
+const WAVEFORM = [
+  0.4, 0.65, 0.3, 0.85, 0.5, 0.35, 0.75, 0.45, 0.95, 0.55,
+  0.3, 0.7, 0.4, 1, 0.6, 0.35, 0.8, 0.45, 0.9, 0.5,
+  0.65, 0.3, 0.75, 0.55, 0.85, 0.4, 0.6, 0.3, 0.7, 0.5,
+  0.45, 0.8, 0.35, 0.6, 0.9, 0.4, 0.7, 0.3, 0.55, 0.75,
+  0.5, 0.95, 0.35, 0.65, 0.4, 0.85, 0.3, 0.6,
+];
+
+/* Transport glyphs. Drawn slightly off-square (uneven edges, no exact
+   symmetry) with round joins and caps, so they read as sketched rather
+   than geometric and sit alongside the hand-drawn desktop icons. */
+const STROKE = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.9,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
+const SOLID = {
+  fill: "currentColor",
+  stroke: "currentColor",
+  strokeWidth: 2.1,
+  strokeLinejoin: "round",
+} as const;
+
+function IconShuffle() {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      stroke="#1a1a1a"
-      strokeWidth={1.1}
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12C7 11 11 7 12 0Z" />
+    <svg viewBox="0 0 24 24" {...STROKE} aria-hidden>
+      <path d="M3.4 7.3c3.6-.5 5.3.9 6.8 2.9 1.6 2.2 3.1 4.6 6.5 4.2" />
+      <path d="M3.6 16.7c3.5.4 5.2-1 6.7-3 1.5-2.2 3-4.5 6.4-4.1" />
+      <path d="m15 12.4 2.4 2-2.2 2.2" />
+      <path d="m15.1 7.4 2.4 2.1-2.2 2.1" />
+    </svg>
+  );
+}
+
+function IconRewind() {
+  return (
+    <svg viewBox="0 0 24 24" {...SOLID} aria-hidden>
+      <path d="M11.6 7.4v9.3L4.9 12.1z" />
+      <path d="M20.1 7.2v9.4l-6.7-4.4z" />
+    </svg>
+  );
+}
+
+function IconForward() {
+  return (
+    <svg viewBox="0 0 24 24" {...SOLID} aria-hidden>
+      <path d="M3.9 7.2v9.4l6.7-4.5z" />
+      <path d="M12.4 7.4v9.3l6.7-4.6z" />
+    </svg>
+  );
+}
+
+function IconPlay() {
+  return (
+    <svg viewBox="0 0 24 24" {...SOLID} aria-hidden>
+      <path d="M9.3 6.8 17.5 12l-8.1 5.3z" />
+    </svg>
+  );
+}
+
+function IconPause() {
+  return (
+    <svg viewBox="0 0 24 24" {...STROKE} strokeWidth={3.2} aria-hidden>
+      <path d="M9.5 6.7v10.6" />
+      <path d="M14.7 6.8v10.5" />
+    </svg>
+  );
+}
+
+function IconRepeat() {
+  return (
+    <svg viewBox="0 0 24 24" {...STROKE} aria-hidden>
+      <path d="M5.2 10.7c.5-1.9 2.4-3.3 4.6-3.3h4.9c1.7 0 3.1.7 4 1.9" />
+      <path d="M18.8 13.3c-.5 1.9-2.4 3.3-4.6 3.3H9.3c-1.7 0-3.1-.7-4-1.9" />
+      <path d="m16.3 5.8 2.6 2.5-2.5 2.1" />
+      <path d="m7.7 18.2-2.6-2.5 2.5-2.1" />
     </svg>
   );
 }
@@ -1026,127 +1094,129 @@ function Sparkle({ className }: { className?: string }) {
 function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
   const [trackIdx, setTrackIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const [shuffle, setShuffle] = useState(false);
+  const [repeat, setRepeat] = useState(false);
 
   /* Wraps in both directions so prev on the first track lands on the last. */
   const skip = (delta: number) =>
     setTrackIdx((i) => (i + delta + NOW_PLAYING.length) % NOW_PLAYING.length);
 
-  return (
-    <section className="np-player" aria-labelledby="np-heading">
-      <Sparkle className="np-sparkle np-sparkle-a" />
-      <Sparkle className="np-sparkle np-sparkle-b" />
+  /* What the seek head reaching the end does, as opposed to the skip
+     buttons: repeat holds the track, shuffle jumps to any other one, and
+     the offset form keeps it from picking the track already playing. */
+  const advance = () => {
+    if (repeat) {
+      setTrackIdx((i) => i);
+      return;
+    }
+    if (shuffle) {
+      setTrackIdx(
+        (i) =>
+          (i + 1 + Math.floor(Math.random() * (NOW_PLAYING.length - 1))) %
+          NOW_PLAYING.length
+      );
+      return;
+    }
+    skip(1);
+  };
 
-      <div className="np-titlebar">
-        <h2 id="np-heading" className="np-title">
-          Now Playing
-        </h2>
-        {/* Window chrome is set dressing, so it stays out of the tab order
-            and the accessibility tree rather than posing as dead buttons. */}
-        <span className="np-chrome" aria-hidden>
-          <span className="np-chrome-btn">
-            <svg viewBox="0 0 12 12">
-              <path d="M2.5 6h7" />
-            </svg>
+  return (
+    <div className="np-dock shrink-0">
+      {/* Decorative equalizer. Each bar carries its own height and a
+          negative animation delay so the row is already mid-motion on the
+          first frame instead of starting flat and in unison. */}
+      <div className="np-wave" data-playing={playing} aria-hidden>
+        {WAVEFORM.map((h, i) => (
+          <span
+            key={i}
+            className="np-wave-bar"
+            style={{ "--h": `${h}`, "--i": `${i}` } as CSSProperties}
+          />
+        ))}
+      </div>
+
+      {/* All three stay in the markup and only the current one is shown, so
+          the served HTML still carries the whole list for crawlers even
+          though the bar displays one at a time. */}
+      {NOW_PLAYING.map((t, i) => (
+        <button
+          key={t.title}
+          type="button"
+          className="np-track"
+          hidden={i !== trackIdx}
+          onClick={() => onSelectTab(t.tab)}
+        >
+          <span className="np-status">{t.status}</span>
+          <span className="np-track-text">
+            <strong className="np-track-title">{t.title}</strong>
+            <span className="np-track-detail"> · {t.detail}</span>
           </span>
-          <span className="np-chrome-btn">
-            <svg viewBox="0 0 12 12">
-              <rect x="2.5" y="2.5" width="7" height="7" rx="1.2" />
-            </svg>
-          </span>
-          <span className="np-chrome-btn">
-            <svg viewBox="0 0 12 12">
-              <path d="M3 3l6 6M9 3l-6 6" />
-            </svg>
-          </span>
+        </button>
+      ))}
+
+      {/* The seek head is a CSS animation rather than a React ticker, so a
+          player left running never re-renders the tree; remounting on
+          `trackIdx` restarts it and `animationend` is what advances. Under
+          reduced motion the animation is off, which parks the head and
+          leaves the transport as the only way to move. */}
+      <div className="np-seek" aria-hidden>
+        <span
+          key={trackIdx}
+          className="np-seek-fill"
+          style={{ animationPlayState: playing ? "running" : "paused" }}
+          onAnimationEnd={(e) => {
+            if (e.target === e.currentTarget) advance();
+          }}
+        >
+          <span className="np-knob" />
         </span>
       </div>
 
-      <div className="np-body">
-        <div className="np-transport">
-          <button
-            type="button"
-            className="np-skip"
-            onClick={() => skip(-1)}
-            aria-label="Previous"
-          >
-            <svg viewBox="0 0 100 100" aria-hidden>
-              <path d="M84 12v76L14 50Z" />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            className="np-playpause"
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? "Pause" : "Play"}
-          >
-            <svg viewBox="0 0 100 100" aria-hidden>
-              <circle cx="50" cy="50" r="46" className="np-disc" />
-              {playing ? (
-                <>
-                  <rect x="33" y="30" width="12" height="40" rx="3" />
-                  <rect x="55" y="30" width="12" height="40" rx="3" />
-                </>
-              ) : (
-                <path d="M40 28l32 22-32 22Z" />
-              )}
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            className="np-skip"
-            onClick={() => skip(1)}
-            aria-label="Next"
-          >
-            <svg viewBox="0 0 100 100" aria-hidden>
-              <path d="M16 12v76l70-38Z" />
-            </svg>
-          </button>
-        </div>
-
-        {/* The seek head is a CSS animation rather than a React ticker, so a
-            player left running costs no per-frame renders. Remounting on
-            `trackIdx` restarts it, and `animationend` is what advances the
-            track. Under reduced motion the animation is off, which parks the
-            head mid-bar and leaves the transport as the only way to move. */}
-        <div className="np-progress" aria-hidden>
-          <span
-            key={trackIdx}
-            className="np-knob"
-            style={{ animationPlayState: playing ? "running" : "paused" }}
-            onAnimationEnd={(e) => {
-              if (e.target === e.currentTarget) skip(1);
-            }}
-          />
-        </div>
-
-        <ul className="np-playlist">
-          {NOW_PLAYING.map((t, i) => (
-            <li key={t.title}>
-              <button
-                type="button"
-                className="np-track"
-                data-active={i === trackIdx}
-                onClick={() => {
-                  setTrackIdx(i);
-                  onSelectTab(t.tab);
-                }}
-              >
-                <span className="np-status">{t.status}</span>
-                {/* Title and detail share one inline run so a narrow row
-                    wraps mid-sentence instead of dropping the whole detail
-                    (leading separator and all) onto its own line. */}
-                <span className="np-track-text">
-                  <strong className="np-track-title">{t.title}</strong>
-                  <span className="np-track-detail"> · {t.detail}</span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      <div className="np-transport">
+        <button
+          type="button"
+          className="np-btn"
+          aria-label="Shuffle"
+          aria-pressed={shuffle}
+          onClick={() => setShuffle((s) => !s)}
+        >
+          <IconShuffle />
+        </button>
+        <button
+          type="button"
+          className="np-btn"
+          aria-label="Previous"
+          onClick={() => skip(-1)}
+        >
+          <IconRewind />
+        </button>
+        <button
+          type="button"
+          className="np-btn np-btn-play"
+          aria-label={playing ? "Pause" : "Play"}
+          onClick={() => setPlaying((p) => !p)}
+        >
+          {playing ? <IconPause /> : <IconPlay />}
+        </button>
+        <button
+          type="button"
+          className="np-btn"
+          aria-label="Next"
+          onClick={() => skip(1)}
+        >
+          <IconForward />
+        </button>
+        <button
+          type="button"
+          className="np-btn"
+          aria-label="Repeat"
+          aria-pressed={repeat}
+          onClick={() => setRepeat((r) => !r)}
+        >
+          <IconRepeat />
+        </button>
       </div>
-    </section>
+    </div>
   );
 }
 

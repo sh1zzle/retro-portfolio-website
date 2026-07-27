@@ -13,6 +13,12 @@ body {
 
 /* ---------- Desktop wallpaper (cream + warm gradient blobs + dot grid) ---------- */
 .os-desktop {
+  /* Vertical room the Now Playing dock claims on the desk. The window's
+     height subtracts it, so the frame plus the dock still add up to one
+     screen. Keep in sync with the dock's rendered height plus the flex
+     gap above it. */
+  --np-dock-h: 172px;
+
   background-color: #f4ede4;
   background-image:
     radial-gradient(
@@ -244,13 +250,16 @@ body {
   white-space: nowrap;
 }
 
+/* Terracotta, shared with the Now Playing dock's `--np-clay`. This exact
+   tint is the lightest that still clears 4.5:1 against the near-black
+   label, so don't deepen it without switching the label too. */
 .btn-primary {
-  --btn-shadow: #b56d1a;
-  background: #f49a3a;
+  --btn-shadow: #8c3f22;
+  background: #c96a45;
   color: #1a1a1a;
 }
 .btn-primary:hover {
-  background: #f8a93a;
+  background: #d4764f;
 }
 
 .btn-secondary {
@@ -492,72 +501,150 @@ body {
 }
 
 /* =====================================================================
-   NOW PLAYING media-player card
-   Chunky retro player: blue titlebar with window chrome, lime body,
-   oversized transport controls, seek bar, then the playlist itself.
-   The palette is louder than the rest of the page on purpose, so the
-   section reads as a single accent block rather than more prose.
+   NOW PLAYING dock
+   A desktop widget rather than window chrome: it sits on the wallpaper
+   below the frame, alongside the icons, so it belongs to every tab
+   without taking room from the document. Terracotta carries the
+   transport and the meters; the browns stay for text and the frame.
    ===================================================================== */
-.np-player {
+.np-dock {
+  /* The same terracotta as .btn-primary, deepened for anything carrying
+     text or a glyph so it clears contrast on the cream. */
+  --np-clay: #c96a45;
+  --np-clay-deep: #a9502f;
+  --np-bg: #fbf5e9;
+  --np-ink: #8b6b4a;
+  --np-ink-strong: #5b3a1a;
+
   position: relative;
-  /* Capped so it keeps a player's proportions instead of stretching the
-     transport controls across the full prose column. */
-  max-width: 36rem;
-  border: 2px solid #1a1a1a;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 34rem;
+  padding: 11px 16px 13px;
+  border: 2px solid var(--np-ink-strong);
   border-radius: 14px;
-  background: #d6f0a3;
-  /* The reference's duplicate card peeking out from behind, as two
-     stacked shadows: a dark slab spread 2px wider, then the blue fill
-     painted over it. Offset down-right to match every other hard shadow
-     on the page. */
-  box-shadow:
-    6px 6px 0 #6f6bf5,
-    6px 6px 0 2px #1a1a1a;
+  background: var(--np-bg);
+  /* Same hard offset the window and desktop icons use, tinted clay so
+     the widget reads as part of the desk. */
+  box-shadow: 4px 4px 0 #b0603f;
 }
 
-.np-titlebar {
+/* ---------- Equalizer ---------- */
+.np-wave {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 7px 12px;
-  /* Bright enough to keep the black title above 4.5:1. */
-  background: #6f6bf5;
-  border-bottom: 2px solid #1a1a1a;
-  border-radius: 10px 10px 0 0;
+  justify-content: center;
+  /* Roughly bar-width, so the row reads as separate ticks. */
+  gap: 4px;
+  width: 100%;
+  max-width: 26rem;
+  height: 22px;
 }
-.np-title {
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #1a1a1a;
+/* No max-width: the bars share the row evenly so the equalizer spans
+   exactly the same width as the seek line below it. */
+.np-wave-bar {
+  flex: 1 1 0;
+  min-width: 2px;
+  height: calc(var(--h) * 100%);
+  border-radius: 2px;
+  background: var(--np-clay);
+  animation: np-wave 1.25s ease-in-out infinite alternate;
+  /* Negative delay so the row starts mid-motion, and staggered so the
+     bars never move in unison. */
+  animation-delay: calc(var(--i) * -0.13s);
 }
-.np-chrome {
-  display: flex;
-  gap: 5px;
-  flex-shrink: 0;
+.np-wave[data-playing="false"] .np-wave-bar {
+  animation-play-state: paused;
+  opacity: 0.55;
 }
-.np-chrome-btn {
-  width: 22px;
-  height: 19px;
-  display: grid;
-  place-items: center;
-  border: 2px solid #1a1a1a;
-  border-radius: 5px;
-  background: #fdfaf3;
-}
-.np-chrome-btn svg {
-  width: 12px;
-  height: 12px;
-  fill: none;
-  stroke: #1a1a1a;
-  stroke-width: 1.6;
-  stroke-linecap: round;
+@keyframes np-wave {
+  from { transform: scaleY(0.5); }
+  to   { transform: scaleY(1.15); }
 }
 
-.np-body {
-  padding: 20px 16px 16px;
+/* ---------- Current track ---------- */
+/* No box of its own: the row sits on the dock as plain text, so hover
+   underlines the title instead of drawing a border around everything. */
+.np-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 2px 4px;
+  border: none;
+  background: transparent;
+  color: var(--np-ink-strong);
+  cursor: pointer;
+}
+.np-track:hover .np-track-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.np-status {
+  flex-shrink: 0;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid #eccdbb;
+  border-radius: 4px;
+  background: #fbeadf;
+  color: var(--np-clay-deep);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+/* One line, clipped: the dock's height must not depend on the copy. */
+.np-track-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.85rem;
+}
+.np-track-title {
+  font-weight: 800;
+}
+.np-track-detail {
+  color: #7b6446;
+}
+
+/* ---------- Seek line ---------- */
+.np-seek {
+  position: relative;
+  width: 100%;
+  max-width: 26rem;
+  height: 6px;
+  border-radius: 999px;
+  background: #f0dccd;
+  border: 1px solid #e3c6b4;
+}
+.np-seek-fill {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: -1px;
+  width: 38%;
+  border-radius: 999px;
+  background: var(--np-clay);
+  animation: np-seek 12s linear forwards;
+}
+@keyframes np-seek {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+.np-knob {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fdf3e6;
+  border: 2px solid var(--np-clay);
+  transform: translate(50%, -50%);
 }
 
 /* ---------- Transport ---------- */
@@ -565,165 +652,109 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 10px;
 }
-.np-skip,
-.np-playpause {
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
+/* Bare glyphs, as in the reference: only the play control gets a body,
+   so the outer four rely on hover and press for their affordance. */
+.np-btn {
   display: grid;
   place-items: center;
-  transition: transform 0.1s ease;
-}
-.np-skip:hover,
-.np-playpause:hover {
-  transform: scale(1.07);
-}
-.np-skip:active,
-.np-playpause:active {
-  transform: scale(0.93);
-  transition-duration: 0.06s;
-}
-.np-skip:focus-visible,
-.np-playpause:focus-visible,
-.np-track:focus-visible {
-  outline: 2px solid #1a1a1a;
-  outline-offset: 3px;
-  border-radius: 8px;
-}
-.np-skip svg {
-  display: block;
-  width: 42px;
-  height: 42px;
-  fill: #e8552b;
-  stroke: #1a1a1a;
-  stroke-width: 7;
-  stroke-linejoin: round;
-}
-.np-playpause svg {
-  display: block;
-  width: 62px;
-  height: 62px;
-  fill: #e8552b;
-}
-/* Only the disc is dark; the bars/triangle inherit the orange fill. */
-.np-playpause .np-disc {
-  fill: #1a1a1a;
-  stroke: #1a1a1a;
-  stroke-width: 5;
-}
-
-/* ---------- Seek bar ---------- */
-.np-progress {
-  position: relative;
-  height: 11px;
-  margin: 20px 4px 0;
-  border-radius: 999px;
-  background: #1a1a1a;
-}
-.np-knob {
-  position: absolute;
-  top: 50%;
-  left: 38%;
-  width: 20px;
-  height: 20px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
   border-radius: 50%;
-  background: #4a46e0;
-  border: 2px solid #1a1a1a;
-  transform: translate(-50%, -50%);
-  animation: np-seek 12s linear forwards;
-}
-/* Stops short of either end so the head stays on the bar. */
-@keyframes np-seek {
-  from { left: 3%; }
-  to   { left: 97%; }
-}
-
-/* ---------- Playlist ---------- */
-.np-playlist {
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.np-track {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  width: 100%;
-  padding: 6px 9px;
-  text-align: left;
-  border: 2px solid transparent;
-  border-radius: 9px;
   background: transparent;
-  color: #1a1a1a;
+  color: var(--np-clay-deep);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+  transition: background 0.12s, color 0.12s, transform 0.08s ease;
 }
-.np-track:hover {
-  background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(26, 26, 26, 0.3);
+.np-btn svg {
+  width: 21px;
+  height: 21px;
 }
-.np-track[data-active="true"] {
-  background: #ffffff;
-  border-color: #1a1a1a;
-  box-shadow: 2px 2px 0 #1a1a1a;
+.np-btn:hover {
+  background: rgba(196, 100, 63, 0.14);
+  color: #8c3f22;
 }
-.np-status {
-  flex-shrink: 0;
-  padding: 0.1rem 0.45rem;
-  border: 1.5px solid #1a1a1a;
-  border-radius: 4px;
-  background: #fdf6e3;
-  color: #6b3f5f;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.np-btn:active {
+  transform: scale(0.92);
 }
-.np-track-text {
-  min-width: 0;
+/* Shuffle and repeat are toggles, so an engaged one stays lit. */
+.np-btn[aria-pressed="true"] {
+  background: #f6d9c9;
+  color: #8c3f22;
 }
-.np-track-title {
-  font-weight: 800;
-}
-.np-track-detail {
-  color: #4b4b4b;
-  font-size: 0.9rem;
+.np-btn:focus-visible,
+.np-track:focus-visible {
+  outline: 2px solid var(--np-ink-strong);
+  outline-offset: 2px;
 }
 
-/* ---------- Sparkles ---------- */
-.np-sparkle {
-  position: absolute;
-  z-index: 1;
-  color: #f5c542;
-  pointer-events: none;
+.np-btn-play {
+  width: 48px;
+  height: 48px;
+  background: #fbe3d3;
+  border: 2.5px solid var(--np-clay);
+  color: var(--np-clay-deep);
 }
-/* Kept inside the scroll container's padding so neither one can push a
-   horizontal scrollbar onto .ph-body. Anchored to the right so it stays in
-   the titlebar's empty middle, clear of both the title and the chrome. */
-.np-sparkle-a {
-  top: -13px;
-  right: 104px;
+.np-btn-play svg {
   width: 26px;
   height: 26px;
 }
-.np-sparkle-b {
-  bottom: -12px;
-  left: -8px;
-  width: 32px;
-  height: 32px;
+.np-btn-play:hover {
+  background: #fdece1;
+}
+
+/* Shed the optional parts as the dock gets tight, so what survives is
+   the transport plus the status and title rather than a truncated title. */
+/* Below md the icon rows stack above and below the frame, so the desk is
+   already taller than the viewport and scrolls. Reserving dock height
+   there would shrink the window without buying back a screenful. */
+@media (max-width: 767px) {
+  .os-desktop {
+    --np-dock-h: 0px;
+  }
+}
+
+@media (max-width: 479px) {
+  .np-dock {
+    gap: 7px;
+    padding: 9px 12px 11px;
+  }
+  .np-wave {
+    height: 18px;
+  }
+  .np-track-detail {
+    display: none;
+  }
+  .np-transport {
+    gap: 6px;
+  }
+  .np-btn {
+    width: 32px;
+    height: 32px;
+  }
+  .np-btn svg {
+    width: 19px;
+    height: 19px;
+  }
+  .np-btn-play {
+    width: 42px;
+    height: 42px;
+  }
+  .np-btn-play svg {
+    width: 23px;
+    height: 23px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .np-knob {
+  .np-seek-fill,
+  .np-wave-bar {
     animation: none;
   }
-  .np-skip,
-  .np-playpause,
+  .np-btn,
   .np-track {
     transition: none;
   }
@@ -747,18 +778,18 @@ body {
   cursor: pointer;
   font-weight: 700;
   color: #1a1a1a;
-  background: #f49a3a;
+  background: #c96a45;
   border: 1.5px solid #1a1a1a;
-  box-shadow: 2px 2px 0 #b56d1a;
+  box-shadow: 2px 2px 0 #8c3f22;
   transition: transform 0.06s ease, box-shadow 0.06s ease,
     background-color 0.12s ease;
 }
 .chip-toggle:hover {
-  background: #f8a93a;
+  background: #d4764f;
 }
 .chip-toggle:active {
   transform: translate(1.5px, 1.5px);
-  box-shadow: 0.5px 0.5px 0 #b56d1a;
+  box-shadow: 0.5px 0.5px 0 #8c3f22;
 }
 
 /* ---------- Status bar ---------- */
