@@ -707,9 +707,19 @@ body {
   to   { transform: scaleY(1.15); }
 }
 
-/* Below lg the equalizer gives up its column so the track copy keeps its
-   room; below sm the detail goes too, leaving status plus title. */
-@media (max-width: 1023px) {
+/* One band narrower than the cutoff the bars would still be above their
+   3px floor, but only just, so tighten the gap to buy them back some
+   width rather than let them go spindly. */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .np-wave {
+    gap: 3px;
+  }
+}
+
+/* Below xl the equalizer gives up its column: at that width it would be
+   clipped against the bars' minimum, and the track copy wants the room
+   more. Below sm the detail goes too, leaving status plus title. */
+@media (max-width: 1279px) {
   .np-dock {
     grid-template-columns: 1fr auto;
   }
