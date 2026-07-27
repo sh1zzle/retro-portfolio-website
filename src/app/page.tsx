@@ -1288,8 +1288,8 @@ function ContactTab() {
         Let&apos;s talk.
       </h1>
       <p className="mt-3 text-[#3f3f3f] max-w-2xl">
-        Best place to reach me. Pick whichever works. I usually reply
-        within a day.
+        Open to both project work and joining a team. Pick whichever
+        channel works. I usually reply within a day.
       </p>
 
       <div className="mt-8 flex flex-wrap gap-3">

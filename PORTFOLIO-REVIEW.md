@@ -39,8 +39,8 @@ _Reviewed 2026-07-25, updated 2026-07-26. Verdict: the retro-OS site is memorabl
 
 - [x] **Version numbers in skills.txt.** Rot fast and read as padding.
   _Done: all version numbers stripped except ".NET 9" and "New Architecture"; dropped the lowest-signal chips (React Navigation, Unistyles, RN Paper, MMKV, AsyncStorage, Supabase, AWS SES, Yarn workspaces, model-name-as-skill). 58 → 47 chips._
-- [ ] **Pick one audience.** "What I can build for you" outcome-cards are freelance-client copy; "open to work" + resume download is job-seeker copy. Mixed, each dilutes the other.
-  _Progressed 2026-07-26: added the "How I work" strip this item suggested, covering the planning gate, the AI-assisted build pipeline, codebase parity, and the QA gate. The services grid is still there, so the split remains. Stated goal is to stay on a team rather than take one-off projects, which points at cutting the services grid._
+- [ ] **Name both audiences instead of implying one.** ~~Pick one audience.~~ **Reframed 2026-07-27:** the goal is genuinely both project work and a full-time team role, so cutting either the services grid or the job-seeker signals would be wrong. Both audiences want the same three things anyway (proof you can build, evidence you shipped, how you work), and the "How I work" strip added 2026-07-26 serves both.
+  _The real problem is ambiguity, not duality. `status` reads "open to work", which sounds like job hunting, while the About tab offers a services menu, which sounds like an agency. Each makes the other look less committed. Fix by saying both out loud: `status` to something like "open to projects and full-time", plus a matching clause in the contact intro._
 - [x] **Housekeeping.** `.DS_Store` was already gitignored; `variations.html` moved from `public/explorations/` to `/explorations/` (gitignored) so it no longer ships to production.
 
 ## ✅ Keep: it's working

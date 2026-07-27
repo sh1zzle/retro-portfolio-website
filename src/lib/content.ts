@@ -16,7 +16,7 @@ export const profile = {
   bio:
     "Five years building web and mobile apps. Currently working at Facilitron, a facility-management platform, on React Native apps and a .NET 9 API.",
   /* Tiny availability/status line shown in the window status bar. */
-  status: "open to work · responds within a day",
+  status: "open to projects and full-time · responds within a day",
   /* Shown in the contact.dat block so someone reaching out knows which
      timezone they are writing into. `availability` is currently unused:
      the working-hours line was cut from contact.dat. */
