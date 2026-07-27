@@ -551,8 +551,37 @@ body {
 }
 
 /* ---------- Current track (left) ---------- */
+/* Stacks the project over the song. Both lines together are shorter than
+   the transport buttons beside them, so the second line costs the strip
+   no height when the music is on. */
 .np-now {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
   min-width: 0;
+  /* Both lines together have to stay under the transport's height or the
+     strip grows the moment the music starts. The inherited 1.5 line-height
+     alone was enough to push it over. */
+  line-height: 1.2;
+}
+.np-song {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding-left: 4px;
+  font-size: 0.68rem;
+  color: #94764f;
+}
+/* Block, not inline: overflow and text-overflow are ignored on an inline
+   box, so as a span this wrapped to a second line instead of ellipsing. */
+.np-song-text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 /* No box of its own: the row sits on the strip as plain text, so hover
    underlines the title instead of drawing a border around everything. */
@@ -561,7 +590,9 @@ body {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 2px 0;
+  /* No vertical padding: the status chip already sets this row's height,
+     and the song line below needs the remaining room. */
+  padding: 0;
   border: none;
   background: transparent;
   color: #3f3120;
@@ -983,10 +1014,7 @@ body {
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, transform 0.08s ease;
-}
-.ios-tab:hover {
-  background: rgba(244, 154, 58, 0.08);
+  transition: transform 0.08s ease;
 }
 .ios-tab:active {
   transform: scale(0.96);

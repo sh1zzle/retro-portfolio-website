@@ -1118,141 +1118,33 @@ function IconSpeakerOff() {
 const TRACK_MS = 12_000;
 
 /* ---------------- Lo-fi ----------------
-   Synthesised in the browser rather than shipped as an audio file: there
-   is no track to license, nothing to download, and the whole thing is a
-   handful of oscillators. A slow chord pad, detuned and run through a
-   lowpass so it sits back, over a bed of vinyl crackle.
+   Real tracks out of /public/audio. `preload="none"` keeps them off the
+   wire until someone actually asks for sound, so the page costs nothing
+   extra to load; only the current song is ever fetched. */
+type Song = { src: string; title: string; artist: string };
 
-   Voicings are deliberately low and close: a lofi pad is mostly sevenths
-   with no bright top, so the lowpass has something to eat. */
-const LOFI_CHORDS = [
-  [174.61, 220.0, 261.63, 329.63], // Fmaj7
-  [146.83, 174.61, 220.0, 261.63], // Dm7
-  [196.0, 233.08, 293.66, 349.23], // Gm7
-  [130.81, 164.81, 196.0, 233.08], // C7
+const LOFI_TRACKS: Song[] = [
+  {
+    src: "/audio/Bensky-Lu-Sunny-Side-Up.mp3",
+    title: "Sunny Side Up",
+    artist: "Bensky & Lu",
+  },
+  {
+    src: "/audio/Bensky-Lu-I-Just-Wanna-Be.mp3",
+    title: "I Just Wanna Be",
+    artist: "Bensky & Lu",
+  },
+  {
+    src: "/audio/Bensky-Lu-Right-Here-Right-Now.mp3",
+    title: "Right Here, Right Now",
+    artist: "Bensky & Lu",
+  },
+  {
+    src: "/audio/Elektra-Times-are-Changing.mp3",
+    title: "Times Are Changing",
+    artist: "Elektra",
+  },
 ];
-const CHORD_SECONDS = 6;
-
-type Lofi = {
-  resume: () => Promise<void>;
-  suspend: () => void;
-  dispose: () => void;
-};
-
-function useLofi(): Lofi {
-  const ctxRef = useRef<AudioContext | null>(null);
-  const busRef = useRef<GainNode | null>(null);
-  const timerRef = useRef<number | null>(null);
-  const chordRef = useRef(0);
-
-  /* Built once. Everything inside closes over refs only, so a stable
-     identity is safe, and callers can put it in a dependency list
-     without re-running their effects on every render. */
-  return useMemo<Lofi>(() => {
-    const playChord = () => {
-      const ctx = ctxRef.current;
-      const bus = busRef.current;
-      if (!ctx || !bus) return;
-      const chord = LOFI_CHORDS[chordRef.current % LOFI_CHORDS.length];
-      chordRef.current += 1;
-      const now = ctx.currentTime;
-
-      chord.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = i === 0 ? "sine" : "triangle";
-        /* A few cents off centre so the voices beat against each other.
-           That slow wobble is most of what keeps a pad from sounding like
-           a stock synth preset. */
-        osc.frequency.value = freq * (1 + (i - 1.5) * 0.0016);
-        /* Swell, hold, then a tail that runs past the next chord's entry so
-           the two crossfade instead of gapping. The hold matters: ramping
-           straight from peak into the decay leaves the pad near silent for
-           most of its own bar. Exponential throughout, since linear ramps
-           click on a sustained voice. */
-        const peak = 0.22 / chord.length;
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(peak, now + 1.5);
-        gain.gain.setValueAtTime(peak, now + 4);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + CHORD_SECONDS + 0.8);
-        osc.connect(gain).connect(bus);
-        osc.start(now);
-        osc.stop(now + CHORD_SECONDS + 1);
-      });
-    };
-
-    const resume = async () => {
-      if (!ctxRef.current) {
-        const Ctor =
-          window.AudioContext ??
-          (window as unknown as { webkitAudioContext?: typeof AudioContext })
-            .webkitAudioContext;
-        if (!Ctor) return;
-        const ctx = new Ctor();
-        ctxRef.current = ctx;
-
-        /* pad -> lowpass -> master -> out, with the crackle joining at the
-           master so it stays crisp instead of being muffled too. */
-        const master = ctx.createGain();
-        /* Tuned by measuring the graph's own output: lands the pad around
-           -20 dBFS, present enough to hear at a normal browser volume
-           without shouting over whatever else the visitor is doing. */
-        master.gain.value = 0.85;
-        master.connect(ctx.destination);
-
-        const tone = ctx.createBiquadFilter();
-        tone.type = "lowpass";
-        tone.frequency.value = 900;
-        tone.Q.value = 0.6;
-        tone.connect(master);
-
-        const bus = ctx.createGain();
-        bus.gain.value = 1;
-        bus.connect(tone);
-        busRef.current = bus;
-
-        /* Vinyl crackle: two seconds of sparse impulses looped. Sparse, not
-           steady noise, or it reads as hiss rather than dust. */
-        const frames = ctx.sampleRate * 2;
-        const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < frames; i += 1) {
-          data[i] = Math.random() < 0.0006 ? (Math.random() * 2 - 1) * 0.6 : 0;
-        }
-        const crackle = ctx.createBufferSource();
-        crackle.buffer = buffer;
-        crackle.loop = true;
-        const crackleTone = ctx.createBiquadFilter();
-        crackleTone.type = "highpass";
-        crackleTone.frequency.value = 1200;
-        const crackleGain = ctx.createGain();
-        crackleGain.gain.value = 0.05;
-        crackle.connect(crackleTone).connect(crackleGain).connect(master);
-        crackle.start();
-
-        playChord();
-        timerRef.current = window.setInterval(playChord, CHORD_SECONDS * 1000);
-      }
-      await ctxRef.current.resume();
-    };
-
-    /* Suspend rather than tear down: the graph and its schedule survive, so
-       unmuting picks the pad back up instead of restarting the progression. */
-    const suspend = () => {
-      void ctxRef.current?.suspend();
-    };
-
-    const dispose = () => {
-      if (timerRef.current !== null) window.clearInterval(timerRef.current);
-      timerRef.current = null;
-      void ctxRef.current?.close();
-      ctxRef.current = null;
-      busRef.current = null;
-    };
-
-    return { resume, suspend, dispose };
-  }, []);
-}
 
 function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
   const [trackIdx, setTrackIdx] = useState(0);
@@ -1263,53 +1155,42 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
      React bails out of re-rendering, so without this the effect below would
      never re-run and the player would silently stop. */
   const [cycle, setCycle] = useState(0);
+
   /* Off by default, and not just as a courtesy: browsers refuse to start
      audio until the user has interacted, so the first click of the
-     speaker is what makes the context legal to open. */
+     speaker is what makes playback legal. */
   const [sound, setSound] = useState(false);
-  const lofi = useLofi();
+  const [songIdx, setSongIdx] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const song = LOFI_TRACKS[songIdx];
 
-  /* Pausing the player silences the music too, so the equalizer never
-     dances to nothing. */
-  useEffect(() => {
-    if (!sound) return;
-    if (playing) void lofi.resume();
-    else lofi.suspend();
-  }, [playing, sound, lofi]);
+  /* Picks any entry except the one playing, so shuffle never "advances"
+     onto itself. */
+  const randomOther = (i: number, length: number) =>
+    (i + 1 + Math.floor(Math.random() * (length - 1))) % length;
 
-  useEffect(() => lofi.dispose, [lofi]);
-
-  const toggleSound = () => {
-    setSound((on) => {
-      if (on) lofi.suspend();
-      else void lofi.resume();
-      return !on;
-    });
+  /* Wraps in both directions so prev on the first item lands on the last.
+     Skipping moves the project and the song together: the transport should
+     visibly do something whether or not the sound is on. */
+  const skip = (delta: number) => {
+    setTrackIdx((i) => (i + delta + NOW_PLAYING.length) % NOW_PLAYING.length);
+    setSongIdx((i) => (i + delta + LOFI_TRACKS.length) % LOFI_TRACKS.length);
   };
 
-  /* Wraps in both directions so prev on the first track lands on the last. */
-  const skip = (delta: number) =>
-    setTrackIdx((i) => (i + delta + NOW_PLAYING.length) % NOW_PLAYING.length);
-
-  /* Auto-advance. The seek bar used to drive this off `animationend`; with
-     it gone a single timeout per track does the same job without a
-     per-frame ticker. Repeat holds the track, shuffle jumps to any other
-     one, and the offset form keeps it from picking the track playing now. */
+  /* Auto-advance for the project line only. The song runs to its own end
+     rather than being cut off every twelve seconds. Repeat holds the
+     project, shuffle jumps to any other one. */
   useEffect(() => {
     if (!playing) return;
     /* Auto-updating content is exactly what this setting asks us not to do,
-       so leave the transport as the only way to move between tracks. */
+       so leave the transport as the only way to move between projects. */
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const id = window.setTimeout(() => {
       setCycle((c) => c + 1);
       if (repeat) return;
       if (shuffle) {
-        setTrackIdx(
-          (i) =>
-            (i + 1 + Math.floor(Math.random() * (NOW_PLAYING.length - 1))) %
-            NOW_PLAYING.length
-        );
+        setTrackIdx((i) => randomOther(i, NOW_PLAYING.length));
         return;
       }
       setTrackIdx((i) => (i + 1) % NOW_PLAYING.length);
@@ -1317,8 +1198,35 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
     return () => window.clearTimeout(id);
   }, [playing, trackIdx, cycle, shuffle, repeat]);
 
+  /* Pausing the player stops the music too, so the equalizer never dances
+     to nothing. A rejected play() means the browser refused us, so drop
+     back to muted rather than leaving the speaker lit over silence. */
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    if (sound && playing) {
+      void el.play().catch(() => setSound(false));
+    } else {
+      el.pause();
+    }
+  }, [sound, playing, songIdx]);
+
+  const songEnded = () => {
+    if (shuffle) setSongIdx((i) => randomOther(i, LOFI_TRACKS.length));
+    else setSongIdx((i) => (i + 1) % LOFI_TRACKS.length);
+  };
+
   return (
     <div className="np-dock">
+      <audio
+        ref={audioRef}
+        src={song.src}
+        preload="none"
+        loop={repeat}
+        onEnded={songEnded}
+        onError={() => setSound(false)}
+      />
+
       {/* All three stay in the markup and only the current one is shown, so
           the served HTML still carries the whole list for crawlers even
           though the player displays one at a time. */}
@@ -1338,6 +1246,17 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
             </span>
           </button>
         ))}
+
+        {/* Second line only while something is playing. It fits inside the
+            height the transport already sets, so the strip does not grow. */}
+        {sound && (
+          <p className="np-song">
+            <span aria-hidden>♪</span>
+            <span className="np-song-text">
+              {song.title} · {song.artist}
+            </span>
+          </p>
+        )}
       </div>
 
       {/* Decorative equalizer, standing in for the removed seek bar as the
@@ -1400,9 +1319,9 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
         <button
           type="button"
           className="np-btn np-btn-sound"
-          aria-label={sound ? "Mute lo-fi" : "Play lo-fi"}
+          aria-label={sound ? `Mute ${song.title}` : "Play lo-fi"}
           aria-pressed={sound}
-          onClick={toggleSound}
+          onClick={() => setSound((on) => !on)}
         >
           {sound ? <IconSpeaker /> : <IconSpeakerOff />}
         </button>
