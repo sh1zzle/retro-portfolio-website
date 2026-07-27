@@ -491,6 +491,244 @@ body {
   flex-shrink: 0;
 }
 
+/* =====================================================================
+   NOW PLAYING media-player card
+   Chunky retro player: blue titlebar with window chrome, lime body,
+   oversized transport controls, seek bar, then the playlist itself.
+   The palette is louder than the rest of the page on purpose, so the
+   section reads as a single accent block rather than more prose.
+   ===================================================================== */
+.np-player {
+  position: relative;
+  /* Capped so it keeps a player's proportions instead of stretching the
+     transport controls across the full prose column. */
+  max-width: 36rem;
+  border: 2px solid #1a1a1a;
+  border-radius: 14px;
+  background: #d6f0a3;
+  /* The reference's duplicate card peeking out from behind, as two
+     stacked shadows: a dark slab spread 2px wider, then the blue fill
+     painted over it. Offset down-right to match every other hard shadow
+     on the page. */
+  box-shadow:
+    6px 6px 0 #6f6bf5,
+    6px 6px 0 2px #1a1a1a;
+}
+
+.np-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 12px;
+  /* Bright enough to keep the black title above 4.5:1. */
+  background: #6f6bf5;
+  border-bottom: 2px solid #1a1a1a;
+  border-radius: 10px 10px 0 0;
+}
+.np-title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+.np-chrome {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.np-chrome-btn {
+  width: 22px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #1a1a1a;
+  border-radius: 5px;
+  background: #fdfaf3;
+}
+.np-chrome-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: #1a1a1a;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.np-body {
+  padding: 20px 16px 16px;
+}
+
+/* ---------- Transport ---------- */
+.np-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.np-skip,
+.np-playpause {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.1s ease;
+}
+.np-skip:hover,
+.np-playpause:hover {
+  transform: scale(1.07);
+}
+.np-skip:active,
+.np-playpause:active {
+  transform: scale(0.93);
+  transition-duration: 0.06s;
+}
+.np-skip:focus-visible,
+.np-playpause:focus-visible,
+.np-track:focus-visible {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+.np-skip svg {
+  display: block;
+  width: 42px;
+  height: 42px;
+  fill: #e8552b;
+  stroke: #1a1a1a;
+  stroke-width: 7;
+  stroke-linejoin: round;
+}
+.np-playpause svg {
+  display: block;
+  width: 62px;
+  height: 62px;
+  fill: #e8552b;
+}
+/* Only the disc is dark; the bars/triangle inherit the orange fill. */
+.np-playpause .np-disc {
+  fill: #1a1a1a;
+  stroke: #1a1a1a;
+  stroke-width: 5;
+}
+
+/* ---------- Seek bar ---------- */
+.np-progress {
+  position: relative;
+  height: 11px;
+  margin: 20px 4px 0;
+  border-radius: 999px;
+  background: #1a1a1a;
+}
+.np-knob {
+  position: absolute;
+  top: 50%;
+  left: 38%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4a46e0;
+  border: 2px solid #1a1a1a;
+  transform: translate(-50%, -50%);
+  animation: np-seek 12s linear forwards;
+}
+/* Stops short of either end so the head stays on the bar. */
+@keyframes np-seek {
+  from { left: 3%; }
+  to   { left: 97%; }
+}
+
+/* ---------- Playlist ---------- */
+.np-playlist {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.np-track {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  width: 100%;
+  padding: 6px 9px;
+  text-align: left;
+  border: 2px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.np-track:hover {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(26, 26, 26, 0.3);
+}
+.np-track[data-active="true"] {
+  background: #ffffff;
+  border-color: #1a1a1a;
+  box-shadow: 2px 2px 0 #1a1a1a;
+}
+.np-status {
+  flex-shrink: 0;
+  padding: 0.1rem 0.45rem;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 4px;
+  background: #fdf6e3;
+  color: #6b3f5f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.np-track-text {
+  min-width: 0;
+}
+.np-track-title {
+  font-weight: 800;
+}
+.np-track-detail {
+  color: #4b4b4b;
+  font-size: 0.9rem;
+}
+
+/* ---------- Sparkles ---------- */
+.np-sparkle {
+  position: absolute;
+  z-index: 1;
+  color: #f5c542;
+  pointer-events: none;
+}
+/* Kept inside the scroll container's padding so neither one can push a
+   horizontal scrollbar onto .ph-body. Anchored to the right so it stays in
+   the titlebar's empty middle, clear of both the title and the chrome. */
+.np-sparkle-a {
+  top: -13px;
+  right: 104px;
+  width: 26px;
+  height: 26px;
+}
+.np-sparkle-b {
+  bottom: -12px;
+  left: -8px;
+  width: 32px;
+  height: 32px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np-knob {
+    animation: none;
+  }
+  .np-skip,
+  .np-playpause,
+  .np-track {
+    transition: none;
+  }
+}
+
 /* ---------- Code chip ---------- */
 .code-chip {
   display: inline-block;

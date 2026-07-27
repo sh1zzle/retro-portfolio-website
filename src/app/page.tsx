@@ -413,6 +413,7 @@ export default function PortfolioOS() {
               <WelcomeTab
                 cheering={isCheering}
                 onOpenSkills={() => setTab("skills")}
+                onSelectTab={setTab}
               />
             </div>
 
@@ -825,9 +826,11 @@ const SERVICE_ICONS: Record<string, LucideLike> = {
 function WelcomeTab({
   cheering = false,
   onOpenSkills,
+  onSelectTab,
 }: {
   cheering?: boolean;
   onOpenSkills: () => void;
+  onSelectTab: (t: TabKey) => void;
 }) {
   return (
     <div>
@@ -923,26 +926,7 @@ function WelcomeTab({
       </div>
 
       <div className="mt-10">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
-          Now Playing
-        </h2>
-        <ul className="space-y-2 text-[#1a1a1a]">
-          <li className="flex items-center gap-3">
-            <span className="code-chip">building</span>
-            <strong>Equilibria</strong>{" "}
-            <span className="text-[#6b6b6b]">· habit-tracking health app</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="code-chip">shipping</span>
-            <strong>Recall</strong>{" "}
-            <span className="text-[#6b6b6b]">· AI-graded learning tracker</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="code-chip">working</span>
-            <strong>Facilitron</strong>{" "}
-            <span className="text-[#6b6b6b]">· full stack</span>
-          </li>
-        </ul>
+        <NowPlaying onSelectTab={onSelectTab} />
       </div>
 
       {/* Client-facing capabilities: outcomes first, tech names demoted
@@ -986,6 +970,183 @@ function WelcomeTab({
         </button>
       </div>
     </div>
+  );
+}
+
+/* ---------------- Now Playing ----------------
+   The three current focuses, dressed as a chunky media-player window.
+   The whole playlist stays on screen (the transport only moves the
+   highlight), so the section still reads as a list for anyone who
+   never touches the controls. */
+type NowPlayingTrack = {
+  status: string;
+  title: string;
+  detail: string;
+  tab: TabKey;
+};
+
+const NOW_PLAYING: NowPlayingTrack[] = [
+  {
+    status: "building",
+    title: "Equilibria",
+    detail: "habit-tracking health app",
+    tab: "projects",
+  },
+  {
+    status: "shipping",
+    title: "Recall",
+    detail: "AI-graded learning tracker",
+    tab: "projects",
+  },
+  {
+    status: "working",
+    title: "Facilitron",
+    detail: "full stack",
+    tab: "experience",
+  },
+];
+
+/* Four-point sparkle from the reference art. Sized by the caller. */
+function Sparkle({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="#1a1a1a"
+      strokeWidth={1.1}
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12C7 11 11 7 12 0Z" />
+    </svg>
+  );
+}
+
+function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
+  const [trackIdx, setTrackIdx] = useState(0);
+  const [playing, setPlaying] = useState(true);
+
+  /* Wraps in both directions so prev on the first track lands on the last. */
+  const skip = (delta: number) =>
+    setTrackIdx((i) => (i + delta + NOW_PLAYING.length) % NOW_PLAYING.length);
+
+  return (
+    <section className="np-player" aria-labelledby="np-heading">
+      <Sparkle className="np-sparkle np-sparkle-a" />
+      <Sparkle className="np-sparkle np-sparkle-b" />
+
+      <div className="np-titlebar">
+        <h2 id="np-heading" className="np-title">
+          Now Playing
+        </h2>
+        {/* Window chrome is set dressing, so it stays out of the tab order
+            and the accessibility tree rather than posing as dead buttons. */}
+        <span className="np-chrome" aria-hidden>
+          <span className="np-chrome-btn">
+            <svg viewBox="0 0 12 12">
+              <path d="M2.5 6h7" />
+            </svg>
+          </span>
+          <span className="np-chrome-btn">
+            <svg viewBox="0 0 12 12">
+              <rect x="2.5" y="2.5" width="7" height="7" rx="1.2" />
+            </svg>
+          </span>
+          <span className="np-chrome-btn">
+            <svg viewBox="0 0 12 12">
+              <path d="M3 3l6 6M9 3l-6 6" />
+            </svg>
+          </span>
+        </span>
+      </div>
+
+      <div className="np-body">
+        <div className="np-transport">
+          <button
+            type="button"
+            className="np-skip"
+            onClick={() => skip(-1)}
+            aria-label="Previous"
+          >
+            <svg viewBox="0 0 100 100" aria-hidden>
+              <path d="M84 12v76L14 50Z" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className="np-playpause"
+            onClick={() => setPlaying((p) => !p)}
+            aria-label={playing ? "Pause" : "Play"}
+          >
+            <svg viewBox="0 0 100 100" aria-hidden>
+              <circle cx="50" cy="50" r="46" className="np-disc" />
+              {playing ? (
+                <>
+                  <rect x="33" y="30" width="12" height="40" rx="3" />
+                  <rect x="55" y="30" width="12" height="40" rx="3" />
+                </>
+              ) : (
+                <path d="M40 28l32 22-32 22Z" />
+              )}
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className="np-skip"
+            onClick={() => skip(1)}
+            aria-label="Next"
+          >
+            <svg viewBox="0 0 100 100" aria-hidden>
+              <path d="M16 12v76l70-38Z" />
+            </svg>
+          </button>
+        </div>
+
+        {/* The seek head is a CSS animation rather than a React ticker, so a
+            player left running costs no per-frame renders. Remounting on
+            `trackIdx` restarts it, and `animationend` is what advances the
+            track. Under reduced motion the animation is off, which parks the
+            head mid-bar and leaves the transport as the only way to move. */}
+        <div className="np-progress" aria-hidden>
+          <span
+            key={trackIdx}
+            className="np-knob"
+            style={{ animationPlayState: playing ? "running" : "paused" }}
+            onAnimationEnd={(e) => {
+              if (e.target === e.currentTarget) skip(1);
+            }}
+          />
+        </div>
+
+        <ul className="np-playlist">
+          {NOW_PLAYING.map((t, i) => (
+            <li key={t.title}>
+              <button
+                type="button"
+                className="np-track"
+                data-active={i === trackIdx}
+                onClick={() => {
+                  setTrackIdx(i);
+                  onSelectTab(t.tab);
+                }}
+              >
+                <span className="np-status">{t.status}</span>
+                {/* Title and detail share one inline run so a narrow row
+                    wraps mid-sentence instead of dropping the whole detail
+                    (leading separator and all) onto its own line. */}
+                <span className="np-track-text">
+                  <strong className="np-track-title">{t.title}</strong>
+                  <span className="np-track-detail"> · {t.detail}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 
