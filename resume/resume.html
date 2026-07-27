@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Shiezza Lauron · Full Stack Developer</title>
+<style>
+  /* Source of truth for public/Shiezza-Lauron-Resume.pdf.
+     Regenerate with: node resume/build.mjs
+     Content mirrors src/lib/content.ts. Update both together. */
+
+  @page { size: A4; margin: 0; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 7.9pt;
+    line-height: 1.27;
+    color: #1b1b1b;
+  }
+
+  /* Exactly one page. Chrome emits a spurious blank second page when the
+     sheet height rounds up past the page box, so pin the height and clip.
+     Verified content bottom sits ~9px inside the page, nothing is cut. */
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 62mm;
+  }
+
+  /* ---------- main column ---------- */
+  .main { padding: 9mm 7mm 6mm 12mm; }
+
+  h1 {
+    font-size: 22pt;
+    font-weight: 400;
+    letter-spacing: -0.3pt;
+    line-height: 1.05;
+  }
+
+  .role-line {
+    font-size: 7.2pt;
+    font-weight: 700;
+    letter-spacing: 2.4pt;
+    text-transform: uppercase;
+    margin-top: 2.5mm;
+    color: #1b1b1b;
+  }
+
+  h2 {
+    font-size: 10.5pt;
+    font-weight: 400;
+    color: #14304d;
+    margin-top: 2.9mm;
+    margin-bottom: 1.5mm;
+  }
+
+  .profile p + p { margin-top: 1.2mm; }
+
+  /* ---------- job entries ---------- */
+  .job { margin-bottom: 2mm; }
+
+  .job-title {
+    font-size: 8.4pt;
+    font-weight: 700;
+  }
+
+  .job-dates {
+    font-size: 6.6pt;
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    color: #6d6d6d;
+    margin: 0.5mm 0 1mm;
+  }
+
+  .job-summary { margin-bottom: 1mm; }
+
+  ul.bullets { list-style: none; }
+
+  ul.bullets li {
+    position: relative;
+    padding-left: 3.2mm;
+    margin-bottom: 0.45mm;
+  }
+
+  ul.bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.45mm;
+    width: 1.1mm;
+    height: 1.1mm;
+    background: #14304d;
+    border-radius: 50%;
+  }
+
+  .stack {
+    font-size: 7.2pt;
+    color: #5a5a5a;
+    margin-top: 1mm;
+  }
+
+  /* ---------- compact rows ---------- */
+  .row { margin-bottom: 0.85mm; }
+  .row b { font-weight: 700; }
+  .row .yr { color: #6d6d6d; }
+
+  /* ---------- sidebar ---------- */
+  .side {
+    background: #14304d;
+    color: #ffffff;
+    padding: 10mm 8mm 8mm 8mm;
+    font-size: 7.4pt;
+    line-height: 1.42;
+  }
+
+  .side h3 {
+    font-size: 9.4pt;
+    font-weight: 700;
+    margin-bottom: 1.8mm;
+  }
+
+  .side section { margin-bottom: 4.2mm; }
+  .side p, .side li { color: #e4ebf3; }
+  .side a { color: #e4ebf3; text-decoration: underline; }
+  .side ul { list-style: none; }
+
+  .skill-group { margin-bottom: 1.5mm; }
+
+  .skill-group .lbl {
+    display: block;
+    font-size: 6.5pt;
+    letter-spacing: 0.9pt;
+    text-transform: uppercase;
+    color: #8fa8c4;
+  }
+
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="main">
+    <h1>Shiezza Lauron</h1>
+    <div class="role-line">Full Stack Developer</div>
+
+    <h2>Profile</h2>
+    <div class="profile">
+      <p>Full-stack developer with five years building web and mobile products end to end: React Native apps, the .NET and Node APIs behind them, and the schemas underneath. Most recent work is offline-first, for people using the app in the field where the network is not guaranteed. I care about clean data models, UIs that survive flaky networks, and shipping things that actually work.</p>
+    </div>
+
+    <h2>Employment History</h2>
+
+    <div class="job">
+      <div class="job-title">Full Stack Developer &middot; Facilitron</div>
+      <div class="job-dates">May 2025 &ndash; Present</div>
+      <p class="job-summary">Two production React Native apps (Works and FIT) for facility-management workflows, plus the shared .NET 9 backend on Azure SQL.</p>
+      <ul class="bullets">
+        <li><b>Works:</b> five role-based navigation stacks, offline-first sync queue, real-time SignalR updates and push notifications, all from one codebase shipping to iOS, Android, and web.</li>
+        <li><b>FIT:</b> offline-first field inspections with optimistic mutations, EAS Build across dev / staging / prod, shipping to iOS, Android, web, and Windows (React Native Windows).</li>
+        <li><b>API:</b> feature-based .NET 9 backend with EF Core and Dapper, real-time via Azure SignalR, batch PDF and Excel reporting.</li>
+      </ul>
+      <div class="stack">React Native &middot; Expo &middot; TypeScript &middot; TanStack Query &middot; Zustand &middot; .NET 9 &middot; EF Core &middot; Dapper &middot; Azure SQL &middot; SignalR</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">Full Stack Developer &middot; Dash &middot; Freelance</div>
+      <div class="job-dates">2025</div>
+      <p class="job-summary">Brought in on Dash Notes 1.5 (dashnote.io) after the release stalled in App Store review, and got it approved and live. Privacy-first notes app for macOS, web, and iOS, encrypted on-device with AES-256.</p>
+      <ul class="bullets">
+        <li>Restored iOS subscriptions when the paywall hung forever and no customer could complete a purchase: the RevenueCat Capacitor plugin proxy fabricates a <i>.then</i>, so promises resolved with it never settle.</li>
+        <li>Worked the release through round after round of App Store review to approval, each one a distinct iOS-only defect root-caused and fixed in turn.</li>
+      </ul>
+      <div class="stack">Next.js &middot; React &middot; Editor.js &middot; Electron &middot; Capacitor &middot; RevenueCat &middot; Zustand</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">Full Stack Developer &middot; LinkJolt &middot; Freelance</div>
+      <div class="job-dates">2025</div>
+      <p class="job-summary">Affiliate-marketing SaaS covering link-based and coupon-based attribution, campaign invitations, Stripe and Paddle billing, and mass payouts.</p>
+      <ul class="bullets">
+        <li>Traced the platform's excessive API traffic to redundant requests firing on every dashboard view and eliminated them, cutting round-trips per page load and database work per user.</li>
+      </ul>
+      <div class="stack">Next.js &middot; TypeScript &middot; MUI &middot; Drizzle ORM &middot; TanStack Query &middot; Stripe &middot; Paddle</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">Full Stack Developer &middot; CSA 360 Software &middot; Freelance</div>
+      <div class="job-dates">Jul 2022 &ndash; Feb 2025</div>
+      <p class="job-summary">Security-operations platform for guard companies: scheduling, patrol tracking, incident reporting, visitor management, and real-time dispatch, on web plus iOS and Android.</p>
+      <ul class="bullets">
+        <li>Built the guard-tour module end to end: the GPS-verified patrol tracking that proves a guard actually walked the route, on the schedule the contract promised.</li>
+        <li>Shipped operational pages across the product, and ran the Jira-driven bug queue on a live platform for two and a half years.</li>
+      </ul>
+      <div class="stack">React &middot; React Native &middot; PHP &middot; MySQL &middot; Twilio &middot; AWS</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">Front End Developer &middot; TWIGOH &middot; Freelance</div>
+      <div class="job-dates">Aug 2020 &ndash; 2022</div>
+      <p class="job-summary">Two years of front-end work at an early-stage startup: a unified social marketplace for discovering products and services through trusted reviews.</p>
+    </div>
+
+    <h2>Also Shipped For</h2>
+    <div class="row"><b>EdCafe</b> <span class="yr">&middot; 2025</span> &mdash; Interactive web apps with AI-powered features, plus back-end architecture work.</div>
+    <div class="row"><b>Baptist Faith</b> <span class="yr">&middot; 2024</span> &mdash; Mobile app serving 10,000+ Bible-based audio and video files.</div>
+    <div class="row"><b>Lyra</b> <span class="yr">&middot; 2024</span> &mdash; Stability, UI/UX polish, and bug fixes for a caregiver-focused mobile app.</div>
+
+    <h2>Selected Projects</h2>
+    <div class="row"><b>Atlas</b> <span class="yr">&middot; Live</span> &mdash; Workout tracker with an offline mutation queue that syncs on reconnect, PWA install, and a native iOS app. Next.js 16, Neon Postgres, Drizzle, Better Auth.</div>
+    <div class="row"><b>Equilibria</b> <span class="yr">&middot; In TestFlight</span> &mdash; Habit tracker across four wellness pillars. React Native New Architecture, Fastify on Fly.io, Neon Postgres, English and Spanish.</div>
+    <div class="row"><b>Recall</b> <span class="yr">&middot; Live</span> &mdash; Learning tracker that derives mastery from quiz performance rather than checkboxes. React, Supabase, Vercel Functions, Anthropic API with tool_use.</div>
+
+    <h2>Education</h2>
+    <div class="row"><b>Central Philippine University</b> &mdash; BSc Computer Science: Software Development <span class="yr">&middot; 2015 &ndash; 2020</span>. Thesis: Integrated Amazon Promotion Reports using an Amazon MWS API connection.</div>
+  </div>
+
+  <aside class="side">
+    <section>
+      <h3>Details</h3>
+      <p>Chiang Mai, Thailand</p>
+      <p>+63 921 858 6265</p>
+      <p><a href="mailto:shiezza.devpresso@gmail.com">shiezza.devpresso@gmail.com</a></p>
+    </section>
+
+    <section>
+      <h3>Links</h3>
+      <ul>
+        <li><a href="https://portfolio-jade-six-1n5r0jkuse.vercel.app">Portfolio</a></li>
+        <li><a href="https://www.linkedin.com/in/shizzie/">LinkedIn</a></li>
+        <li><a href="https://github.com/sh1zzle">GitHub</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>Skills</h3>
+      <div class="skill-group"><span class="lbl">Languages</span>TypeScript, JavaScript, C#, SQL</div>
+      <div class="skill-group"><span class="lbl">Mobile</span>React Native, Expo, Expo Router, New Architecture (Fabric/TurboModules), EAS Build</div>
+      <div class="skill-group"><span class="lbl">Frontend</span>React, Next.js, Tailwind, Vite</div>
+      <div class="skill-group"><span class="lbl">Backend</span>ASP.NET Core (.NET 9), Node.js, Fastify</div>
+      <div class="skill-group"><span class="lbl">Data</span>PostgreSQL, Azure SQL, EF Core, Dapper, Drizzle ORM</div>
+      <div class="skill-group"><span class="lbl">State &amp; Sync</span>TanStack Query, Zustand, offline sync queues, optimistic updates</div>
+      <div class="skill-group"><span class="lbl">Real-time &amp; Auth</span>SignalR, custom JWT, Apple / Google Sign-In, push via Expo</div>
+      <div class="skill-group"><span class="lbl">Cloud</span>Azure, Vercel, Fly.io, Docker</div>
+      <div class="skill-group"><span class="lbl">AI</span>Anthropic API, tool_use / structured output</div>
+    </section>
+
+    <section>
+      <h3>Languages</h3>
+      <p>English (Professional)</p>
+      <p>Tagalog (Native)</p>
+    </section>
+
+    <section>
+      <h3>Interests</h3>
+      <p>CrossFit &middot; Chess &middot; Surfing</p>
+    </section>
+  </aside>
+
+</div>
+</body>
+</html>
