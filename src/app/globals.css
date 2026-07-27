@@ -360,8 +360,12 @@ body {
 }
 
 /* ---------- Desktop icons ---------- */
-/* Sized for the narrowest desktop tier (768–1023px); wider screens
-   scale the icons up via the media queries below the label rules. */
+/* Sized for the narrowest tiers: the wrapped mobile row (<768px) and the
+   768–1023px side rails, which share these dimensions. The rails are the
+   binding constraint there, since the desktop is only wide enough for two
+   rails plus the window if each rail stays under ~100px including its
+   inset. Wider screens scale the icons up via the media queries below the
+   label rules. */
 .desktop-icon {
   display: flex;
   flex-direction: column;
@@ -369,7 +373,7 @@ body {
   gap: 8px;
   padding: 8px 4px;
   border-radius: 10px;
-  width: 96px;
+  width: 88px;
   text-align: center;
   cursor: pointer;
   background: transparent;
@@ -406,8 +410,8 @@ body {
 }
 
 .desktop-icon-img {
-  width: 60px;
-  height: 60px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
   filter: drop-shadow(2.5px 2.5px 0 rgba(26, 26, 26, 0.22));
   transition: transform 0.12s, filter 0.12s;
@@ -420,8 +424,11 @@ body {
    off the patterned desktop, plus a hard offset shadow for depth.
    The halo is layered text-shadows (not text-stroke) so it renders
    identically in every browser. */
+/* 11px, not 12px: the longest labels ("contact.dat", "love coffee") are 11
+   monospace characters, which is just wider than the 88px icon's content box
+   at 12px and wraps to an orphaned second line. */
 .desktop-icon-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.01em;
   color: #1a1a1a;
@@ -435,19 +442,8 @@ body {
     3px 3px 0 rgba(74, 58, 46, 0.28);
 }
 
-/* Icon size steps up with the viewport */
-@media (max-width: 767px) {
-  .desktop-icon {
-    width: 88px;
-  }
-  .desktop-icon-img {
-    width: 52px;
-    height: 52px;
-  }
-  .desktop-icon-label {
-    font-size: 11px;
-  }
-}
+/* Icon size steps up with the viewport. The wrapped mobile row (<768px)
+   shares the base dimensions with the 768–1023px rails. */
 @media (min-width: 1024px) {
   .desktop-icon {
     width: 104px;

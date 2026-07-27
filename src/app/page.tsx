@@ -145,6 +145,15 @@ export default function PortfolioOS() {
   const [tab, setTab] = useState<TabKey>("welcome");
   const [time, setTime] = useState<string>("");
 
+  /* Every panel stays mounted (see the body below), so the shared scroll
+     container now keeps its offset across tab switches. Land at the top of
+     whichever section was just opened. */
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (el) el.scrollTop = 0;
+  }, [tab]);
+
   /* Coffee-bean rain trigger fired by the "love coffee" desktop icon.
      Auto-clears after 8s; clicking again restarts the timer. */
   const [isRaining, setIsRaining] = useState(false);
@@ -208,8 +217,13 @@ export default function PortfolioOS() {
     return () => clearInterval(id);
   }, []);
 
+  /* The main's horizontal padding is what reserves the desktop gutters the
+     two icon rails sit in, so it has to clear each rail's inset + width with
+     room to spare. At md that's 12 + 88 = 100px of rail against 136px of
+     padding, leaving a 36px channel; the window's 8px hard shadow eats into
+     that on the right, so the channel can't be much tighter. */
   return (
-    <main className="os-desktop relative overflow-hidden min-h-dvh flex flex-col items-center justify-center gap-4 px-4 py-6 md:py-10 md:px-30 lg:px-40 xl:px-48">
+    <main className="os-desktop relative overflow-hidden min-h-dvh flex flex-col items-center justify-center gap-4 px-4 py-6 md:py-10 md:px-34 lg:px-40 xl:px-48">
       {/* Decorative scattered code symbols */}
       {BG_DECORATIONS.map(({ Icon, top, bottom, left, right, size, rotate }, i) => (
         <Icon
@@ -235,7 +249,7 @@ export default function PortfolioOS() {
       {/* Left desktop icons */}
       <aside
         aria-label="Left side desktop"
-        className="hidden md:flex flex-col justify-evenly gap-3 absolute left-4 xl:left-6 top-8 bottom-8 z-10"
+        className="hidden md:flex flex-col justify-evenly gap-3 absolute left-3 xl:left-6 top-8 bottom-8 z-10"
       >
         {LEFT_ICONS.map((i) => (
           <DesktopIcon
@@ -251,7 +265,7 @@ export default function PortfolioOS() {
       {/* Right desktop icons */}
       <aside
         aria-label="Right side desktop"
-        className="hidden md:flex flex-col justify-evenly gap-3 absolute right-4 xl:right-6 top-8 bottom-8 z-10"
+        className="hidden md:flex flex-col justify-evenly gap-3 absolute right-3 xl:right-6 top-8 bottom-8 z-10"
       >
         {RIGHT_ICONS.map((i) => (
           <DesktopIcon
@@ -378,21 +392,72 @@ export default function PortfolioOS() {
               proportionally, because `font-size` alone doesn't as most
               children use rem-based sizes that don't cascade. */}
           <div
-            className={`ph-body flex-1 overflow-y-auto px-6 md:px-10 pt-10 pb-8 ${
-              tab === "projects" ? "theme-ide" : ""
-            }`}
+            ref={bodyRef}
+            className="ph-body flex-1 overflow-y-auto px-6 md:px-10 pt-10 pb-8"
             style={{ zoom }}
           >
-            {tab === "welcome" && (
+            {/* Every panel renders on every load, with the inactive ones
+                carrying the `hidden` attribute, so the prerendered HTML
+                holds all of the content rather than just the default tab.
+                Crawlers and link-preview bots read the served markup and
+                never click a tab, so rendering panels conditionally left
+                four fifths of the site unindexable. `hidden` beats
+                off-screen positioning here because it also drops the
+                inactive panels out of the accessibility tree. */}
+            <div
+              id="panel-welcome"
+              role="tabpanel"
+              aria-labelledby="tab-welcome"
+              hidden={tab !== "welcome"}
+            >
               <WelcomeTab
                 cheering={isCheering}
                 onOpenSkills={() => setTab("skills")}
               />
-            )}
-            {tab === "projects" && <ProjectsTab />}
-            {tab === "experience" && <ExperienceTab />}
-            {tab === "contact" && <ContactTab />}
-            {tab === "skills" && <SkillsFileTab />}
+            </div>
+
+            {/* `theme-ide` belongs on this panel rather than on the scroll
+                container: its descendant rules would otherwise restyle the
+                sibling panels now that they all share the DOM. */}
+            <div
+              id="panel-projects"
+              role="tabpanel"
+              aria-labelledby="tab-projects"
+              hidden={tab !== "projects"}
+              className="theme-ide"
+            >
+              <ProjectsTab />
+            </div>
+
+            <div
+              id="panel-experience"
+              role="tabpanel"
+              aria-labelledby="tab-experience"
+              hidden={tab !== "experience"}
+            >
+              <ExperienceTab />
+            </div>
+
+            <div
+              id="panel-contact"
+              role="tabpanel"
+              aria-labelledby="tab-contact"
+              hidden={tab !== "contact"}
+            >
+              <ContactTab />
+            </div>
+
+            {/* skills.txt has no tab-bar button, since it opens from the
+                desktop icon, so it is a labelled region instead of a
+                tabpanel with nothing to point `aria-labelledby` at. */}
+            <div
+              id="panel-skills"
+              role="region"
+              aria-label="skills.txt"
+              hidden={tab !== "skills"}
+            >
+              <SkillsFileTab />
+            </div>
           </div>
 
           {/* Tabs (iOS-style bottom bar, pinned) */}
@@ -401,8 +466,10 @@ export default function PortfolioOS() {
               {TABS.map((t) => (
                 <button
                   key={t.key}
+                  id={`tab-${t.key}`}
                   role="tab"
                   aria-selected={tab === t.key}
+                  aria-controls={`panel-${t.key}`}
                   data-active={tab === t.key}
                   onClick={() => setTab(t.key)}
                   className="ios-tab"
@@ -938,6 +1005,12 @@ function ChipRow({ items }: { items: string[] }) {
     const measure = () => {
       const chips = Array.from(el.children) as HTMLElement[];
       if (chips.length === 0) return;
+      /* skills.txt is in the DOM from first paint but stays `hidden` until
+         it is opened, and a hidden subtree gets no layout boxes: every chip
+         reports offsetTop 0, that reads as "they all fit on one row", and
+         the "+N" chip never appears. Skip until the panel is displayed. The
+         ResizeObserver below re-runs this the moment it is. */
+      if (el.offsetWidth === 0) return;
       const firstTop = chips[0].offsetTop;
       setFitCount(chips.filter((c) => c.offsetTop === firstTop).length);
     };
