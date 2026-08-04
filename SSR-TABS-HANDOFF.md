@@ -27,7 +27,7 @@ React renders only the true branch. Next prerenders this page at build time with
 Against the deployed production HTML:
 
 ```
-curl -s https://portfolio-jade-six-1n5r0jkuse.vercel.app > /tmp/live.html
+curl -s https://devpresso.dev > /tmp/live.html
 ```
 
 | String | Tab | Matches |

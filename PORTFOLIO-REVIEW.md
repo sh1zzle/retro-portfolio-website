@@ -13,7 +13,7 @@ _Reviewed 2026-07-25, updated 2026-07-27. Verdict: the retro-OS site is memorabl
 - [x] **Invisible in search and social shares.** Tab title was `portfolio.mdx`, description "Full stack developer, Web Edition", no favicon, no Open Graph tags, so a shared link showed a blank card.
   _Fixed: `layout.tsx` metadata now leads with your name + role, added `src/app/icon.png` (favicon) and `src/app/opengraph-image.tsx` (retro-window share card)._
 - [x] **Never deployed.** The repo had a GitHub remote but no Vercel project, so none of the above was reachable by anyone.
-  _Fixed 2026-07-26: Vercel project `portfolio` created and connected to the GitHub repo, so pushes auto-deploy. Live at https://portfolio-jade-six-1n5r0jkuse.vercel.app. Also set `metadataBase` from `VERCEL_PROJECT_PRODUCTION_URL`, which was silently resolving share-card images against `localhost:3000`._
+  _Fixed 2026-07-26: Vercel project `portfolio` created and connected to the GitHub repo, so pushes auto-deploy. Live at https://devpresso.dev (custom domain added 2026-08-04, registered at Porkbun). Also set `metadataBase`, which was silently resolving share-card images against `localhost:3000`._
 
 ## 🟠 Add: the highest-impact content work
 

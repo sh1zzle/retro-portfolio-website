@@ -16,14 +16,14 @@ const bungee = Bungee({
   weight: "400",
 });
 
-/* Absolute base for the OG and Twitter card image URLs. On Vercel,
-   VERCEL_PROJECT_PRODUCTION_URL is the stable production domain and is
-   injected into every deployment, so preview builds still resolve share
-   cards against the real site rather than their own throwaway URL.
-   Falls back to the `next dev` port locally. */
-const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : "http://localhost:3001";
+/* Absolute base for the OG and Twitter card image URLs. Pinned to the
+   canonical domain rather than derived from VERCEL_PROJECT_PRODUCTION_URL,
+   so preview deployments and any leftover *.vercel.app alias still point
+   share cards at the real site. Falls back to the `next dev` port. */
+const siteUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://devpresso.dev"
+    : "http://localhost:3001";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
