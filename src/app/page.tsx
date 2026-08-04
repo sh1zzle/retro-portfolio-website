@@ -351,12 +351,18 @@ export default function PortfolioOS() {
               <span>{currentTitle(tab)}</span>
               <ChevronDown size={12} className="text-[#9b9b9b]" />
             </button>
-            <div className="mac-titlebar-spacer" aria-hidden />
+            <a
+              href={`mailto:${profile.email}`}
+              className="btn-primary btn-sm hire-me-btn mac-titlebar-cta"
+              onClick={triggerCheer}
+            >
+              <span className="hire-me-dot" aria-hidden /> Hire me
+            </a>
           </div>
 
-          {/* Toolbar, trimmed to only the controls that earn their keep:
-              Undo/Redo and B/I/U are decorative editor-feel; Zoom and Font
-              are functional/expandable; Hire-me is the real CTA. */}
+          {/* Toolbar. Undo/Redo and B/I/U are decorative editor-feel;
+              Zoom is the only working control. The Hire me CTA lives in
+              the title bar. */}
           <div className="ph-toolbar flex items-center px-1.5 sm:px-2.5 py-1.5 gap-0 sm:gap-0.5 overflow-x-auto shrink-0">
             <span className="tool-btn"><Undo2 size={14} /></span>
             <span className="tool-btn"><Redo2 size={14} /></span>
@@ -377,14 +383,6 @@ export default function PortfolioOS() {
             <span className="tool-btn tool-opt">
               Font <ChevronDown size={12} />
             </span>
-            <div className="flex-1" />
-            <a
-              href={`mailto:${profile.email}`}
-              className="btn-primary btn-sm ml-1 hire-me-btn"
-              onClick={triggerCheer}
-            >
-              <span className="hire-me-dot" aria-hidden /> Hire me
-            </a>
           </div>
 
           {/* Section tabs, pinned directly under the toolbar */}
