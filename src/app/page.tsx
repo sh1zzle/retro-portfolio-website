@@ -858,24 +858,26 @@ function WelcomeTab({
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
             {profile.tagline}
           </h1>
-          <p className="mt-2 text-base md:text-lg text-[#3f3f3f] leading-snug font-medium">
+          <p className="mt-2 text-base md:text-lg text-[#3f3f3f] leading-snug font-medium text-justify hyphens-auto">
             Building from scratch to shipping, for the{" "}
             <span className="text-[#b56d1a]">fun</span> of learning.
           </p>
 
-          <p className="mt-5 text-base md:text-lg text-[#1a1a1a] font-medium leading-relaxed">
+          <p className="mt-5 text-base md:text-lg text-[#1a1a1a] font-medium leading-relaxed text-justify hyphens-auto">
             {profile.why}
           </p>
-          <p className="mt-2 text-sm md:text-base text-[#4b4b4b] leading-relaxed">
+          <p className="mt-2 text-sm md:text-base text-[#4b4b4b] leading-relaxed text-justify hyphens-auto">
             {profile.bio}
           </p>
 
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-nowrap items-stretch gap-2 sm:gap-3">
             <a href={`mailto:${profile.email}`} className="btn-primary">
               <Mail size={16} strokeWidth={2.5} /> Get in touch
             </a>
             <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
-              <FileText size={16} strokeWidth={2.5} /> Download resume
+              <FileText size={16} strokeWidth={2.5} />
+              <span className="cta-full">Download resume</span>
+              <span className="cta-short">Resume</span>
             </a>
           </div>
 

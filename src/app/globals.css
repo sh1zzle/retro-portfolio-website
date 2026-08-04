@@ -336,6 +336,30 @@ body {
   box-shadow: 1px 1px 0 #c98a1a;
 }
 
+/* The two hero CTAs share one row, so they size to the hero text column
+   rather than the viewport. That column is narrow on a phone AND at
+   around 900px, where the hero splits into text-plus-avatar and drops to
+   roughly 315px, so a viewport media query cannot express it. */
+.cta-short { display: none; }
+
+@container (max-width: 400px) {
+  .welcome-hero-text .btn-primary,
+  .welcome-hero-text .btn-download {
+    padding: 0.5rem 0.6rem;
+    gap: 0.3rem;
+    font-size: 0.8125rem;
+  }
+}
+@container (max-width: 305px) {
+  .welcome-hero-text .btn-primary,
+  .welcome-hero-text .btn-download {
+    padding: 0.45rem 0.5rem;
+    font-size: 0.78rem;
+  }
+  .cta-full { display: none; }
+  .cta-short { display: inline; }
+}
+
 /* Tiny pulsing green dot on the toolbar Hire-me button to signal
    "open to work" without taking up extra horizontal space. */
 .hire-me-btn {
@@ -918,6 +942,8 @@ body {
   }
 }
 .welcome-hero-text {
+  /* Establishes the query container for the CTA sizing above. */
+  container-type: inline-size;
   flex: 1 1 auto;
   min-width: 0;
 }
