@@ -1005,11 +1005,10 @@ body {
   position: relative;
   flex: 1 1 0;
   min-width: 0;
-  max-width: 230px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 8px;
   padding: 6px 12px;
   border: 1px solid transparent;
@@ -1094,7 +1093,6 @@ body {
     justify-content: center;
     gap: 2px;
     padding: 5px 4px;
-    max-width: none;
   }
   .ios-tab-label {
     font-size: 11px;
