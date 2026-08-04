@@ -356,8 +356,44 @@ body {
     padding: 0.45rem 0.5rem;
     font-size: 0.78rem;
   }
-  .cta-full { display: none; }
-  .cta-short { display: inline; }
+  .welcome-hero-text .cta-full { display: none; }
+  .welcome-hero-text .cta-short { display: inline; }
+}
+
+/* Contact CTAs: email and LinkedIn share a row, resume gets its own
+   centred row until there is space for all three. Queries the row's own
+   width rather than the viewport, since the window shrinks when the
+   desktop icon columns appear at 768px. */
+.contact-cta { container-type: inline-size; }
+
+.contact-cta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.contact-cta-row > :nth-child(3) {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+@container (max-width: 519px) {
+  .contact-cta-row .btn-primary,
+  .contact-cta-row .btn-secondary,
+  .contact-cta-row .btn-download {
+    padding: 0.45rem 0.55rem;
+    gap: 0.3rem;
+    font-size: 0.8125rem;
+  }
+  .contact-cta-row .cta-full { display: none; }
+  .contact-cta-row .cta-short { display: inline; }
+}
+
+@container (min-width: 620px) {
+  .contact-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 }
 
 /* Tiny pulsing green dot on the toolbar Hire-me button to signal

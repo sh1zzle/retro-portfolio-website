@@ -1708,16 +1708,28 @@ function ContactTab() {
         channel works. I usually reply within a day.
       </p>
 
-      <div className="mt-8 flex flex-wrap gap-3">
-        <a href={`mailto:${profile.email}`} className="btn-primary">
-          <Mail size={16} strokeWidth={2.5} /> Send an email
-        </a>
-        <a href={profile.linkedin} className="btn-secondary">
-          <LinkedinMark width={16} height={16} /> Connect on LinkedIn
-        </a>
-        <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
-          <FileText size={16} strokeWidth={2.5} /> Download resume
-        </a>
+      {/* Email and LinkedIn pair up, resume takes its own centred row on
+          narrow widths. Sizing keys off this container, not the viewport,
+          because the window itself narrows when the desktop icon columns
+          appear. */}
+      <div className="contact-cta mt-8">
+        <div className="contact-cta-row">
+          <a href={`mailto:${profile.email}`} className="btn-primary">
+            <Mail size={16} strokeWidth={2.5} />
+            <span className="cta-full">Send an email</span>
+            <span className="cta-short">Email</span>
+          </a>
+          <a href={profile.linkedin} className="btn-secondary">
+            <LinkedinMark width={16} height={16} />
+            <span className="cta-full">Connect on LinkedIn</span>
+            <span className="cta-short">LinkedIn</span>
+          </a>
+          <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
+            <FileText size={16} strokeWidth={2.5} />
+            <span className="cta-full">Download resume</span>
+            <span className="cta-short">Resume</span>
+          </a>
+        </div>
       </div>
 
       <div className="mt-10 rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-5 text-sm">
