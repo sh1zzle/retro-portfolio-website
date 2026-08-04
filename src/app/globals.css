@@ -372,7 +372,43 @@ body {
   color: #4b4b4b;
   font-size: 0.8rem;
   cursor: default;
+  /* "Zoom 100%" wrapped to two lines on a 320px phone and made the whole
+     toolbar taller. */
+  white-space: nowrap;
 }
+/* The toolbar has to fit the Hire me CTA on a phone. Measured at 375px
+   it wanted 440px inside a 341px bar, so trim the chrome first and drop
+   the bold/italic/underline group below 520px. Those three are purely
+   decorative editor-feel; Zoom is the only functional control and the
+   CTA is the reason the bar exists. */
+@media (max-width: 767px) {
+  .tool-btn {
+    padding: 0.25rem 0.3rem;
+    font-size: 0.72rem;
+    gap: 0.15rem;
+  }
+  .btn-primary.btn-sm,
+  .btn-secondary.btn-sm {
+    padding: 0.28rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  .hire-me-btn {
+    gap: 0.3rem;
+  }
+}
+@media (max-width: 519px) {
+  .tool-fmt {
+    display: none;
+  }
+}
+/* On the narrowest phones the decorative Font control is the last thing
+   to go, leaving undo/redo, the working Zoom control, and the CTA. */
+@media (max-width: 359px) {
+  .tool-opt {
+    display: none;
+  }
+}
+
 .tool-btn:hover {
   background: #f0f0f0;
 }

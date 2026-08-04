@@ -357,7 +357,7 @@ export default function PortfolioOS() {
           {/* Toolbar, trimmed to only the controls that earn their keep:
               Undo/Redo and B/I/U are decorative editor-feel; Zoom and Font
               are functional/expandable; Hire-me is the real CTA. */}
-          <div className="ph-toolbar flex items-center px-2.5 py-1.5 gap-0.5 overflow-x-auto shrink-0">
+          <div className="ph-toolbar flex items-center px-1.5 sm:px-2.5 py-1.5 gap-0 sm:gap-0.5 overflow-x-auto shrink-0">
             <span className="tool-btn"><Undo2 size={14} /></span>
             <span className="tool-btn"><Redo2 size={14} /></span>
             <span className="tool-divider" />
@@ -369,12 +369,12 @@ export default function PortfolioOS() {
             >
               Zoom {Math.round(zoom * 100)}% <ChevronDown size={12} />
             </button>
-            <span className="tool-divider" />
-            <span className="tool-btn"><Bold size={14} /></span>
-            <span className="tool-btn"><Italic size={14} /></span>
-            <span className="tool-btn"><Underline size={14} /></span>
-            <span className="tool-divider" />
-            <span className="tool-btn">
+            <span className="tool-divider tool-fmt" />
+            <span className="tool-btn tool-fmt"><Bold size={14} /></span>
+            <span className="tool-btn tool-fmt"><Italic size={14} /></span>
+            <span className="tool-btn tool-fmt"><Underline size={14} /></span>
+            <span className="tool-divider tool-opt" />
+            <span className="tool-btn tool-opt">
               Font <ChevronDown size={12} />
             </span>
             <div className="flex-1" />
