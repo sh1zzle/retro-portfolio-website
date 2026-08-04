@@ -504,6 +504,41 @@ body {
   border: 1.5px solid transparent;
   transition: background 0.12s, border-color 0.12s, transform 0.12s;
 }
+/* Narrow-screen icon strips above and below the window. Six icons have
+   to share one row, so they divide the width evenly and everything
+   scales down to suit. Sized for the six-icon top strip; the five-icon
+   bottom strip simply gets more room each. */
+.desktop-icon-strip {
+  flex-wrap: nowrap;
+  gap: 1px;
+}
+.desktop-icon-strip .desktop-icon {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  gap: 4px;
+  padding: 6px 0;
+}
+.desktop-icon-strip .desktop-icon-img {
+  width: 36px;
+  height: 36px;
+}
+.desktop-icon-strip .desktop-icon-tile {
+  width: 34px;
+  height: 34px;
+}
+.desktop-icon-strip .desktop-icon-label {
+  /* Scales with viewport so the longest labels ("contact.dat") stop
+     ellipsising on the narrowest phones without being oversized on
+     larger ones. */
+  font-size: clamp(7px, 2.28vw, 8.5px);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: normal;
+}
+
 .desktop-icon:hover {
   background: rgba(244, 154, 58, 0.1);
   border-color: rgba(26, 26, 26, 0.18);

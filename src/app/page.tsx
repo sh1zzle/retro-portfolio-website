@@ -280,7 +280,7 @@ export default function PortfolioOS() {
 
       {/* Top icon row, narrow screens only, where the side columns
           don't fit next to the window */}
-      <div className="flex md:hidden flex-wrap justify-evenly gap-1 w-full z-10">
+      <div className="desktop-icon-strip flex md:hidden w-full z-10">
         {LEFT_ICONS.map((i) => (
           <DesktopIcon
             key={i.key}
@@ -505,7 +505,7 @@ export default function PortfolioOS() {
         </div>
 
       {/* Bottom icon row, narrow screens only */}
-      <div className="flex md:hidden flex-wrap justify-evenly gap-1 w-full z-10">
+      <div className="desktop-icon-strip flex md:hidden w-full z-10">
         {RIGHT_ICONS.map((i) => (
           <DesktopIcon
             key={i.key}
