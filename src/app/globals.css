@@ -369,7 +369,10 @@ body {
 .contact-cta-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  /* Row gap is larger than the column gap so the resume button reads as
+     its own row rather than a third item crowding the pair. The flex
+     layout below resets gap, so this only applies while stacked. */
+  gap: 0.85rem 0.5rem;
 }
 /* Resume spans both columns and stretches, so it reads as the wide
    third element under the pair rather than a small centred chip. */
