@@ -1725,9 +1725,7 @@ function ContactTab() {
             <span className="cta-short">LinkedIn</span>
           </a>
           <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
-            <FileText size={16} strokeWidth={2.5} />
-            <span className="cta-full">Download resume</span>
-            <span className="cta-short">Resume</span>
+            <FileText size={16} strokeWidth={2.5} /> Download resume
           </a>
         </div>
       </div>
