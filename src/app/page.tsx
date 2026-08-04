@@ -364,9 +364,9 @@ export default function PortfolioOS() {
               Zoom is the only working control. The Hire me CTA lives in
               the title bar. */}
           <div className="ph-toolbar flex items-center px-1.5 sm:px-2.5 py-1.5 gap-0 sm:gap-0.5 overflow-x-auto shrink-0">
-            <span className="tool-btn"><Undo2 size={14} /></span>
-            <span className="tool-btn"><Redo2 size={14} /></span>
-            <span className="tool-divider" />
+            <span className="tool-btn tool-opt"><Undo2 size={14} /></span>
+            <span className="tool-btn tool-opt"><Redo2 size={14} /></span>
+            <span className="tool-divider tool-opt" />
             <button
               type="button"
               className="tool-btn cursor-pointer"

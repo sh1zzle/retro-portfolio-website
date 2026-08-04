@@ -476,14 +476,11 @@ body {
     gap: 0.3rem;
   }
 }
-@media (max-width: 519px) {
-  .tool-fmt {
-    display: none;
-  }
-}
-/* On the narrowest phones the decorative Font control is the last thing
-   to go, leaving undo/redo, the working Zoom control, and the CTA. */
-@media (max-width: 359px) {
+/* Below the md: breakpoint the toolbar keeps only Zoom, the one control
+   that does anything. Undo/Redo, B/I/U and Font are editor-feel chrome
+   and cost vertical room a phone does not have. */
+@media (max-width: 767px) {
+  .tool-fmt,
   .tool-opt {
     display: none;
   }
