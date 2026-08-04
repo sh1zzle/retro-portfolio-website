@@ -360,13 +360,14 @@ export default function PortfolioOS() {
             </a>
           </div>
 
-          {/* Toolbar. Undo/Redo and B/I/U are decorative editor-feel;
-              Zoom is the only working control. The Hire me CTA lives in
-              the title bar. */}
-          <div className="ph-toolbar flex items-center px-1.5 sm:px-2.5 py-1.5 gap-0 sm:gap-0.5 overflow-x-auto shrink-0">
-            <span className="tool-btn tool-opt"><Undo2 size={14} /></span>
-            <span className="tool-btn tool-opt"><Redo2 size={14} /></span>
-            <span className="tool-divider tool-opt" />
+          {/* Toolbar: editor-feel chrome, md: and up only. Zoom is the
+              only control with behaviour; the rest sell the conceit. On a
+              phone none of it earns its 40px, so the whole bar is hidden
+              and the Hire me CTA lives in the title bar instead. */}
+          <div className="ph-toolbar hidden md:flex items-center px-2.5 py-1.5 gap-0.5 overflow-x-auto shrink-0">
+            <span className="tool-btn"><Undo2 size={14} /></span>
+            <span className="tool-btn"><Redo2 size={14} /></span>
+            <span className="tool-divider" />
             <button
               type="button"
               className="tool-btn cursor-pointer"
@@ -375,12 +376,12 @@ export default function PortfolioOS() {
             >
               Zoom {Math.round(zoom * 100)}% <ChevronDown size={12} />
             </button>
-            <span className="tool-divider tool-fmt" />
-            <span className="tool-btn tool-fmt"><Bold size={14} /></span>
-            <span className="tool-btn tool-fmt"><Italic size={14} /></span>
-            <span className="tool-btn tool-fmt"><Underline size={14} /></span>
-            <span className="tool-divider tool-opt" />
-            <span className="tool-btn tool-opt">
+            <span className="tool-divider" />
+            <span className="tool-btn"><Bold size={14} /></span>
+            <span className="tool-btn"><Italic size={14} /></span>
+            <span className="tool-btn"><Underline size={14} /></span>
+            <span className="tool-divider" />
+            <span className="tool-btn">
               Font <ChevronDown size={12} />
             </span>
           </div>
