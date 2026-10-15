@@ -490,8 +490,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 8px 4px;
+  gap: 4px;
+  padding: 4px;
   border-radius: 10px;
   width: 88px;
   text-align: center;
@@ -502,8 +502,8 @@ body {
 }
 /* Narrow-screen icon strips above and below the window. Six icons have
    to share one row, so they divide the width evenly and everything
-   scales down to suit. Sized for the six-icon top strip; the five-icon
-   bottom strip simply gets more room each. */
+   scales down to suit. Sized for the six-icon top strip; the eight-icon
+   bottom strip wraps into two rows instead (below). */
 .desktop-icon-strip {
   flex-wrap: nowrap;
   gap: 1px;
@@ -533,6 +533,16 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   word-break: normal;
+}
+/* Eight in one row leaves ~42px per icon on a 375px phone, which cuts
+   most labels off, so this strip runs as two rows of four. The 3px is the
+   three 1px gaps in each row. */
+.desktop-icon-strip-wrap {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.desktop-icon-strip-wrap .desktop-icon {
+  flex: 0 0 calc((100% - 3px) / 4);
 }
 
 .desktop-icon:hover {
@@ -570,6 +580,15 @@ body {
   object-fit: contain;
   filter: drop-shadow(2.5px 2.5px 0 rgba(26, 26, 26, 0.22));
   transition: transform 0.12s, filter 0.12s;
+}
+/* Each rail holds seven icons, so on shorter screens the art shrinks with
+   the viewport height rather than running under the Now Playing dock.
+   Each icon is its art plus ~32px of label, gap, padding and border, and
+   the rail loses ~120px to its insets, the dock and the gaps between
+   icons. */
+.desktop-rail .desktop-icon-img {
+  max-width: calc((100dvh - 120px) / 7 - 32px);
+  max-height: calc((100dvh - 120px) / 7 - 32px);
 }
 .desktop-icon:hover .desktop-icon-img {
   transform: translateY(-1px);

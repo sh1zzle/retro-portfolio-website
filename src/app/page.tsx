@@ -84,25 +84,48 @@ type DesktopIconDef = {
   fg?: string;
   href?: string;
   tab?: TabKey;
+  /** Element id of one entry inside `tab` to scroll to. Several icons
+      share a tab, so this is what tells them apart. */
+  anchor?: string;
   external?: boolean;
 };
 
-const LEFT_ICONS: DesktopIconDef[] = [
-  { key: "about", imageScale: 1.3, imageSrc: "/icons/about-me.png", label: "about-me", tab: "welcome" },
-  { key: "equilibria", imageSrc: "/icons/equilibria.png", imageScale: 1.5, label: "equilibria", tab: "projects" },
-  { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "recall", tab: "projects" },
-  { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "facilitron", tab: "experience" },
-  { key: "resume", imageSrc: "/icons/resume.png", imageScale: 1.7, label: "resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", external: true },
-  { key: "contact", imageScale: 1.1, imageSrc: "/icons/contact.png", label: "contact.dat", tab: "contact" },
+function projectAnchor(slug: string) {
+  return `project-${slug}`;
+}
+
+function jobAnchor(company: string) {
+  return `job-${company.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+}
+
+const ABOUT_ICON: DesktopIconDef = { key: "about", imageScale: 1.3, imageSrc: "/icons/about-me.png", label: "about-me", tab: "welcome" };
+
+const WORK_ICONS: DesktopIconDef[] = [
+  { key: "atlas", imageSrc: "/icons/atlas.png", imageScale: 1.7, label: "atlas", tab: "projects", anchor: projectAnchor("atlas") },
+  { key: "equilibria", imageSrc: "/icons/equilibria.png", imageScale: 1.5, label: "equilibria", tab: "projects", anchor: projectAnchor("equilibria") },
+  { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "recall", tab: "projects", anchor: projectAnchor("recall") },
+  { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "facilitron", tab: "experience", anchor: jobAnchor("Facilitron") },
+  { key: "dash", imageSrc: "/icons/dash.png", label: "dash", tab: "experience", anchor: jobAnchor("Dash") },
+  { key: "linkjolt", imageSrc: "/icons/linkjolt.png", label: "linkjolt", tab: "experience", anchor: jobAnchor("LinkJolt") },
 ];
 
+const LEFT_ICONS: DesktopIconDef[] = [ABOUT_ICON, ...WORK_ICONS];
+
 const RIGHT_ICONS: DesktopIconDef[] = [
+  { key: "resume", imageSrc: "/icons/resume.png", imageScale: 1.7, label: "resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", external: true },
+  { key: "contact", imageScale: 1.1, imageSrc: "/icons/contact.png", label: "contact.dat", tab: "contact" },
   { key: "github",imageScale: 1.2, imageSrc: "/icons/github.png", label: "github", href: profile.github, external: true },
   { key: "linkedin", imageScale: 1.2,imageSrc: "/icons/linkedin.png", label: "linkedin", href: profile.linkedin, external: true },
   { key: "skills",imageScale: 1.2, imageSrc: "/icons/skills.png", label: "skills.txt", tab: "skills" },
   { key: "coffee", imageSrc: "/icons/coffee.png", label: "love coffee", imageScale: 1.2, href: `mailto:${profile.email}` },
   { key: "trash", imageScale: 1.2, imageSrc: "/icons/trash.png", label: "Bin" },
 ];
+
+/* Phones split the icons differently from the desktop's seven a side:
+   seven in the top strip's single row would cut most labels off, so
+   about-me joins the bottom strip, which wraps into two rows of four. */
+const TOP_STRIP_ICONS = WORK_ICONS;
+const BOTTOM_STRIP_ICONS: DesktopIconDef[] = [ABOUT_ICON, ...RIGHT_ICONS];
 
 /* ---------------- Background decorations ----------------
    Positioned in the horizontal-center bands (top + bottom) so they
@@ -143,16 +166,36 @@ const BG_DECORATIONS: BgDecoration[] = [
 
 export default function PortfolioOS() {
   const [tab, setTab] = useState<TabKey>("welcome");
+  /* Set together with `tab` so that opening a tab any other way clears an
+     anchor left over from a desktop icon. */
+  const [anchor, setAnchor] = useState<string | null>(null);
+  const openTab = (t: TabKey, a: string | null = null) => {
+    setTab(t);
+    setAnchor(a);
+  };
   const [time, setTime] = useState<string>("");
 
   /* Every panel stays mounted (see the body below), so the shared scroll
-     container now keeps its offset across tab switches. Land at the top of
-     whichever section was just opened. */
+     container now keeps its offset across tab switches. Land on the entry
+     an icon asked for, otherwise at the top of the section just opened.
+     The container is scrolled directly rather than via scrollIntoView,
+     which would also scroll the page on phones, where the desk is taller
+     than the screen. The measured distance is on-screen pixels, but the
+     body's own Zoom scales its scrollTop, so it is divided back out. */
   const bodyRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = bodyRef.current;
-    if (el) el.scrollTop = 0;
-  }, [tab]);
+    if (!el) return;
+    const target = anchor ? document.getElementById(anchor) : null;
+    if (!target) {
+      el.scrollTop = 0;
+      return;
+    }
+    const bodyZoom = parseFloat(getComputedStyle(el).zoom) || 1;
+    const distance =
+      target.getBoundingClientRect().top - el.getBoundingClientRect().top;
+    el.scrollTop += distance / bodyZoom - 16;
+  }, [tab, anchor]);
 
   /* Coffee-bean rain trigger fired by the "love coffee" desktop icon.
      Auto-clears after 8s; clicking again restarts the timer. */
@@ -249,14 +292,15 @@ export default function PortfolioOS() {
       {/* Left desktop icons */}
       <aside
         aria-label="Left side desktop"
-        className="hidden md:flex flex-col justify-evenly gap-3 absolute left-3 xl:left-6 top-8 bottom-8 z-10"
+        className="desktop-rail hidden md:flex flex-col justify-evenly gap-1 absolute left-3 xl:left-6 top-8 bottom-[calc(var(--np-dock-h)+0.5rem)] z-10"
       >
         {LEFT_ICONS.map((i) => (
           <DesktopIcon
             key={i.key}
             icon={i}
             activeTab={tab}
-            onSelectTab={setTab}
+            activeAnchor={anchor}
+            onSelectTab={openTab}
             onAction={i.key === "coffee" ? triggerRain : undefined}
           />
         ))}
@@ -265,14 +309,15 @@ export default function PortfolioOS() {
       {/* Right desktop icons */}
       <aside
         aria-label="Right side desktop"
-        className="hidden md:flex flex-col justify-evenly gap-3 absolute right-3 xl:right-6 top-8 bottom-8 z-10"
+        className="desktop-rail hidden md:flex flex-col justify-evenly gap-1 absolute right-3 xl:right-6 top-8 bottom-[calc(var(--np-dock-h)+0.5rem)] z-10"
       >
         {RIGHT_ICONS.map((i) => (
           <DesktopIcon
             key={i.key}
             icon={i}
             activeTab={tab}
-            onSelectTab={setTab}
+            activeAnchor={anchor}
+            onSelectTab={openTab}
             onAction={i.key === "coffee" ? triggerRain : undefined}
           />
         ))}
@@ -281,12 +326,13 @@ export default function PortfolioOS() {
       {/* Top icon row, narrow screens only, where the side columns
           don't fit next to the window */}
       <div className="desktop-icon-strip flex md:hidden w-full z-10">
-        {LEFT_ICONS.map((i) => (
+        {TOP_STRIP_ICONS.map((i) => (
           <DesktopIcon
             key={i.key}
             icon={i}
             activeTab={tab}
-            onSelectTab={setTab}
+            activeAnchor={anchor}
+            onSelectTab={openTab}
             onAction={i.key === "coffee" ? triggerRain : undefined}
           />
         ))}
@@ -397,7 +443,7 @@ export default function PortfolioOS() {
                   aria-selected={tab === t.key}
                   aria-controls={`panel-${t.key}`}
                   data-active={tab === t.key}
-                  onClick={() => setTab(t.key)}
+                  onClick={() => openTab(t.key)}
                   className="ios-tab"
                 >
                   <span className="ios-tab-icon-wrap">
@@ -441,7 +487,7 @@ export default function PortfolioOS() {
             >
               <WelcomeTab
                 cheering={isCheering}
-                onOpenSkills={() => setTab("skills")}
+                onOpenSkills={() => openTab("skills")}
               />
             </div>
 
@@ -455,7 +501,12 @@ export default function PortfolioOS() {
               hidden={tab !== "projects"}
               className="theme-ide"
             >
-              <ProjectsTab />
+              <ProjectsTab
+                activeSlug={
+                  projects.find((p) => projectAnchor(p.slug) === anchor)?.slug ??
+                  projects[0].slug
+                }
+              />
             </div>
 
             <div
@@ -503,14 +554,15 @@ export default function PortfolioOS() {
           </div>
         </div>
 
-      {/* Bottom icon row, narrow screens only */}
-      <div className="desktop-icon-strip flex md:hidden w-full z-10">
-        {RIGHT_ICONS.map((i) => (
+      {/* Bottom icon rows, narrow screens only */}
+      <div className="desktop-icon-strip desktop-icon-strip-wrap flex md:hidden w-full z-10">
+        {BOTTOM_STRIP_ICONS.map((i) => (
           <DesktopIcon
             key={i.key}
             icon={i}
             activeTab={tab}
-            onSelectTab={setTab}
+            activeAnchor={anchor}
+            onSelectTab={openTab}
             onAction={i.key === "coffee" ? triggerRain : undefined}
           />
         ))}
@@ -520,7 +572,7 @@ export default function PortfolioOS() {
           so it is the same widget for every tab and stops competing with
           the document for room inside the frame. The window gives back
           exactly `--np-dock-h` of height to make space for it. */}
-      <NowPlaying onSelectTab={setTab} />
+      <NowPlaying onSelectTab={openTab} />
     </main>
   );
 }
@@ -544,18 +596,24 @@ function currentTitle(tab: TabKey) {
 function DesktopIcon({
   icon,
   activeTab,
+  activeAnchor,
   onSelectTab,
   onAction,
 }: {
   icon: DesktopIconDef;
   activeTab: TabKey;
-  onSelectTab: (t: TabKey) => void;
+  activeAnchor: string | null;
+  onSelectTab: (t: TabKey, anchor: string | null) => void;
   /** Side-effect run alongside the icon's normal click behaviour
       (href navigation or tab switch). Used by the coffee icon to fire
       the bean-rain easter egg. */
   onAction?: () => void;
 }) {
-  const isActive = !!icon.tab && icon.tab === activeTab;
+  /* An icon with an anchor shares its tab with others, so the tab alone
+     would light them all up at once. */
+  const isActive = icon.anchor
+    ? icon.tab === activeTab && icon.anchor === activeAnchor
+    : !!icon.tab && icon.tab === activeTab;
 
   let Visual: React.ReactNode;
   if (icon.imageSrc) {
@@ -601,7 +659,7 @@ function DesktopIcon({
     <button
       onClick={() => {
         onAction?.();
-        if (icon.tab) onSelectTab(icon.tab);
+        if (icon.tab) onSelectTab(icon.tab, icon.anchor ?? null);
       }}
       className="desktop-icon"
       data-active={isActive}
@@ -984,6 +1042,7 @@ type NowPlayingTrack = {
   title: string;
   detail: string;
   tab: TabKey;
+  anchor: string;
 };
 
 const NOW_PLAYING: NowPlayingTrack[] = [
@@ -992,18 +1051,21 @@ const NOW_PLAYING: NowPlayingTrack[] = [
     title: "Equilibria",
     detail: "habit-tracking health app",
     tab: "projects",
+    anchor: projectAnchor("equilibria"),
   },
   {
     status: "shipping",
     title: "Recall",
     detail: "AI-graded learning tracker",
     tab: "projects",
+    anchor: projectAnchor("recall"),
   },
   {
     status: "working",
     title: "Facilitron",
     detail: "full stack",
     tab: "experience",
+    anchor: jobAnchor("Facilitron"),
   },
 ];
 
@@ -1147,7 +1209,11 @@ const LOFI_TRACKS: Song[] = [
   },
 ];
 
-function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
+function NowPlaying({
+  onSelectTab,
+}: {
+  onSelectTab: (t: TabKey, anchor: string | null) => void;
+}) {
   const [trackIdx, setTrackIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [shuffle, setShuffle] = useState(false);
@@ -1238,7 +1304,7 @@ function NowPlaying({ onSelectTab }: { onSelectTab: (t: TabKey) => void }) {
             type="button"
             className="np-track"
             hidden={i !== trackIdx}
-            onClick={() => onSelectTab(t.tab)}
+            onClick={() => onSelectTab(t.tab, t.anchor)}
           >
             <span className="np-status">{t.status}</span>
             <span className="np-track-text">
@@ -1439,7 +1505,7 @@ function SkillsFileTab() {
   );
 }
 
-function ProjectsTab() {
+function ProjectsTab({ activeSlug }: { activeSlug: string }) {
   return (
     <div>
       {/* IDE-style breadcrumb + branch + run pill */}
@@ -1448,7 +1514,7 @@ function ProjectsTab() {
         <span>›</span>
         <span>projects</span>
         <span>›</span>
-        <b>{projects[0].slug}.mdx</b>
+        <b>{activeSlug}.mdx</b>
         <span className="branch">main · clean</span>
         <button type="button" className="ide-runbtn ml-2" aria-label="Run">
           ▶ Run
@@ -1462,11 +1528,11 @@ function ProjectsTab() {
 
       {/* File-tab strip: one tab per project file */}
       <div className="ide-tabbar mt-2">
-        {projects.map((p, i) => (
+        {projects.map((p) => (
           <span
             key={p.slug}
             className="ide-tab"
-            data-active={i === 0 ? "true" : "false"}
+            data-active={p.slug === activeSlug ? "true" : "false"}
           >
             <span className="dot" /> {p.slug}.mdx
           </span>
@@ -1474,7 +1540,7 @@ function ProjectsTab() {
       </div>
 
       {projects.map((p) => (
-        <div key={p.slug} className="ide-file">
+        <div key={p.slug} id={projectAnchor(p.slug)} className="ide-file">
           <div className="ide-line">
             <span className="ide-rule">---</span>
           </div>
@@ -1611,7 +1677,11 @@ function ExperienceTab() {
 
       <ul className="mt-10 space-y-6">
         {experience.map((job) => (
-          <li key={job.company} className="rounded-lg border border-[#e5e5e5] p-5">
+          <li
+            key={job.company}
+            id={jobAnchor(job.company)}
+            className="rounded-lg border border-[#e5e5e5] p-5"
+          >
             <div className="flex items-start gap-4">
               <div
                 className="h-12 w-12 rounded-md border-[1.5px] border-[#1a1a1a] flex items-center justify-center bg-[#b8c4d6] shrink-0"
