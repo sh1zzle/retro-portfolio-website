@@ -10,6 +10,7 @@ import {
   type CSSProperties,
   type SVGProps,
 } from "react";
+import Link from "next/link";
 import {
   Building2,
   FileText,
@@ -28,6 +29,10 @@ import {
   Globe,
   Server,
   Sparkles,
+  ArrowRight,
+  CalendarDays,
+  CreditCard,
+  WifiOff,
 } from "lucide-react";
 import {
   profile,
@@ -36,6 +41,11 @@ import {
   skills,
   heroStack,
   services,
+  offers,
+  caseStudies,
+  testimonials,
+  hireMailto,
+  hireHint,
   shortGigs,
   howIWork,
 } from "@/lib/content";
@@ -98,6 +108,15 @@ function jobAnchor(company: string) {
   return `job-${company.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
 
+function caseAnchor(slug: string) {
+  return `case-${slug}`;
+}
+
+/** Slug of the company's /work page, if it has one. */
+function casePageSlug(company: string) {
+  return caseStudies.find((c) => c.client === company && c.page)?.slug;
+}
+
 const ABOUT_ICON: DesktopIconDef = { key: "about", imageScale: 1.3, imageSrc: "/icons/about-me.png", label: "about-me", tab: "welcome" };
 
 const WORK_ICONS: DesktopIconDef[] = [
@@ -105,8 +124,8 @@ const WORK_ICONS: DesktopIconDef[] = [
   { key: "equilibria", imageSrc: "/icons/equilibria.png", imageScale: 1.5, label: "equilibria", tab: "projects", anchor: projectAnchor("equilibria") },
   { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "recall", tab: "projects", anchor: projectAnchor("recall") },
   { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "facilitron", tab: "experience", anchor: jobAnchor("Facilitron") },
-  { key: "dash", imageSrc: "/icons/dash.png", label: "dash", tab: "experience", anchor: jobAnchor("Dash") },
-  { key: "linkjolt", imageSrc: "/icons/linkjolt.png", label: "linkjolt", tab: "experience", anchor: jobAnchor("LinkJolt") },
+  { key: "dash", imageSrc: "/icons/dash.png", label: "dash", tab: "projects", anchor: caseAnchor("dash") },
+  { key: "linkjolt", imageSrc: "/icons/linkjolt.png", label: "linkjolt", tab: "projects", anchor: caseAnchor("linkjolt") },
 ];
 
 const LEFT_ICONS: DesktopIconDef[] = [ABOUT_ICON, ...WORK_ICONS];
@@ -398,7 +417,7 @@ export default function PortfolioOS() {
               <ChevronDown size={12} className="text-[#9b9b9b]" />
             </button>
             <a
-              href={`mailto:${profile.email}`}
+              href={hireMailto}
               className="btn-primary btn-sm hire-me-btn mac-titlebar-cta"
               onClick={triggerCheer}
             >
@@ -485,10 +504,7 @@ export default function PortfolioOS() {
               aria-labelledby="tab-welcome"
               hidden={tab !== "welcome"}
             >
-              <WelcomeTab
-                cheering={isCheering}
-                onOpenSkills={() => openTab("skills")}
-              />
+              <WelcomeTab cheering={isCheering} onOpen={openTab} />
             </div>
 
             {/* `theme-ide` belongs on this panel rather than on the scroll
@@ -886,18 +902,31 @@ const SERVICE_ICONS: Record<string, LucideLike> = {
   ai: Sparkles,
 };
 
+const OFFER_ICONS: Record<string, LucideLike> = {
+  "app-store": Smartphone,
+  paywall: CreditCard,
+  offline: WifiOff,
+};
+
+/* An offer's proof is either a case study card or, for work without one,
+   that company's Experience entry. */
+function proofTarget(slug: string, label: string): [TabKey, string] {
+  return caseStudies.some((c) => c.slug === slug)
+    ? ["projects", caseAnchor(slug)]
+    : ["experience", jobAnchor(label)];
+}
+
 function WelcomeTab({
   cheering = false,
-  onOpenSkills,
+  onOpen,
 }: {
   cheering?: boolean;
-  onOpenSkills: () => void;
+  onOpen: (t: TabKey, anchor: string | null) => void;
 }) {
   return (
     <div>
-      {/* Hero: tagline + why + bio on the left, animated avatar on the
-          right. CTAs sit inside the hero column so they're visible above
-          the scroll line on desktop. */}
+      {/* Hero: the problem I fix, then the CTA straight under it, with the
+          animated avatar on the right. */}
       <div className="welcome-hero">
         <div className="welcome-hero-text">
           <p className="text-xs uppercase tracking-[0.18em] text-[#8a7457] mb-2 flex items-center gap-1.5">
@@ -915,28 +944,34 @@ function WelcomeTab({
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
             {profile.tagline}
           </h1>
-          <p className="mt-2 text-base md:text-lg text-[#3f3f3f] leading-snug font-medium text-justify hyphens-auto">
-            Building from scratch to shipping, for the{" "}
-            <span className="text-[#b56d1a]">fun</span> of learning.
+          <p className="mt-2 text-base md:text-lg text-[#3f3f3f] leading-snug font-medium">
+            {profile.taglineSub}
           </p>
 
-          <p className="mt-5 text-base md:text-lg text-[#1a1a1a] font-medium leading-relaxed text-justify hyphens-auto">
+          <div className="mt-5 flex flex-nowrap items-stretch gap-2 sm:gap-3">
+            <a href={hireMailto} className="btn-primary">
+              <Mail size={16} strokeWidth={2.5} />
+              <span className="cta-full">Tell me about your app</span>
+              <span className="cta-short">Email me</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => onOpen("projects", "case-studies")}
+              className="btn-download cursor-pointer"
+            >
+              <span className="cta-full">See case studies</span>
+              <span className="cta-short">Case studies</span>
+              <ArrowRight size={16} strokeWidth={2.5} />
+            </button>
+          </div>
+          <HireHint />
+
+          <p className="mt-5 text-base text-[#1a1a1a] font-medium leading-relaxed text-justify hyphens-auto">
             {profile.why}
           </p>
           <p className="mt-2 text-sm md:text-base text-[#4b4b4b] leading-relaxed text-justify hyphens-auto">
             {profile.bio}
           </p>
-
-          <div className="mt-5 flex flex-nowrap items-stretch gap-2 sm:gap-3">
-            <a href={`mailto:${profile.email}`} className="btn-primary">
-              <Mail size={16} strokeWidth={2.5} /> Get in touch
-            </a>
-            <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
-              <FileText size={16} strokeWidth={2.5} />
-              <span className="cta-full">Download resume</span>
-              <span className="cta-short">Resume</span>
-            </a>
-          </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#4b4b4b]">
             <a
@@ -958,10 +993,11 @@ function WelcomeTab({
             </a>
             <span className="text-[#c8c0b0]">·</span>
             <a
-              href={`mailto:${profile.email}`}
+              href="/Shiezza-Lauron-Resume.pdf"
+              download
               className="flex items-center gap-1.5 hover:text-[#1a1a1a] underline-offset-2 hover:underline"
             >
-              <Mail size={14} /> email
+              <FileText size={14} /> resume
             </a>
           </div>
         </div>
@@ -969,31 +1005,56 @@ function WelcomeTab({
         <DevAvatar cheering={cheering} />
       </div>
 
-      {/* Compact stack: three rows of chips so the framework names are
-          present without dominating the prose. */}
-      <div className="mt-8 space-y-2">
-        {heroStack.map((g) => (
-          <div key={g.label} className="flex items-baseline gap-2 flex-wrap">
-            <span className="text-xs uppercase tracking-[0.14em] text-[#9b8a6f] w-14 shrink-0">
-              {g.label}
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {g.items.map((s) => (
-                <span key={s} className="code-chip">
-                  {s}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Client-facing capabilities: outcomes first, tech names demoted
-          to a couple of supporting chips. The full inventory lives in
-          the skills.txt view. */}
+      {/* The specific jobs I am hired for, each pointing at the work that
+          proves it. */}
       <div className="mt-10">
         <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
-          What I can build for you
+          What I fix
+        </h2>
+        {/* Columns follow the window's width, not the viewport's: the
+            window narrows when the desktop icon rails appear. */}
+        <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(15rem,1fr))]">
+          {offers.map((o) => {
+            const Icon = OFFER_ICONS[o.key] ?? Code2;
+            const [tab, anchor] = proofTarget(o.proof.slug, o.proof.label);
+            return (
+              <div key={o.key} className="service-card flex flex-col">
+                <div className="flex items-center gap-2.5">
+                  <span className="service-card-icon">
+                    <Icon size={18} strokeWidth={2.25} />
+                  </span>
+                  <h3 className="font-bold leading-tight">{o.title}</h3>
+                </div>
+                <p className="mt-2 text-sm text-[#3f3f3f] leading-relaxed flex-1">
+                  {o.blurb}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {o.chips.map((c) => (
+                    <span key={c} className="code-chip">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onOpen(tab, anchor)}
+                  className="mt-3 self-start text-sm font-semibold text-[#8a5210] underline underline-offset-2 hover:text-[#1a1a1a] cursor-pointer"
+                >
+                  done for {o.proof.label} →
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <Testimonials />
+
+      {/* General capabilities: outcomes first, tech names demoted to a
+          couple of supporting chips. */}
+      <div className="mt-10">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
+          Also build
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {services.map((s) => {
@@ -1020,13 +1081,75 @@ function WelcomeTab({
             );
           })}
         </div>
-        <button
-          type="button"
-          onClick={onOpenSkills}
-          className="mt-4 text-sm text-[#6b6b6b] underline underline-offset-2 hover:text-[#1a1a1a] cursor-pointer"
-        >
-          fellow developer? the full stack is in skills.txt →
-        </button>
+      </div>
+
+      {/* Compact stack: three rows of chips so the framework names are
+          present without dominating the prose. */}
+      <div className="mt-8 space-y-2">
+        {heroStack.map((g) => (
+          <div key={g.label} className="flex items-baseline gap-2 flex-wrap">
+            <span className="text-xs uppercase tracking-[0.14em] text-[#9b8a6f] w-14 shrink-0">
+              {g.label}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {g.items.map((s) => (
+                <span key={s} className="code-chip">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => onOpen("skills", null)}
+        className="mt-4 text-sm text-[#6b6b6b] underline underline-offset-2 hover:text-[#1a1a1a] cursor-pointer"
+      >
+        fellow developer? the full stack is in skills.txt →
+      </button>
+    </div>
+  );
+}
+
+/* Sits under every "email me" CTA: what to put in the email, plus the
+   booking link for anyone who would rather talk. */
+function HireHint() {
+  return (
+    <p className="mt-2 text-sm text-[#6b5a44] leading-snug">
+      {hireHint}{" "}
+      <a
+        href={profile.booking}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 font-semibold text-[#8a5210] underline underline-offset-2 hover:text-[#1a1a1a]"
+      >
+        <CalendarDays size={13} strokeWidth={2.5} /> Or book a call
+      </a>
+    </p>
+  );
+}
+
+/* Hidden until `testimonials` in content.ts has entries. */
+function Testimonials() {
+  if (testimonials.length === 0) return null;
+  return (
+    <div className="mt-10">
+      <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
+        What clients say
+      </h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {testimonials.map((t) => (
+          <figure key={`${t.name}-${t.company}`} className="service-card">
+            <blockquote className="text-sm text-[#1a1a1a] leading-relaxed">
+              &ldquo;{t.quote}&rdquo;
+            </blockquote>
+            <figcaption className="mt-3 text-xs text-[#6b6b6b]">
+              <span className="font-bold text-[#1a1a1a]">{t.name}</span> ·{" "}
+              {t.role}, {t.company}
+            </figcaption>
+          </figure>
+        ))}
       </div>
     </div>
   );
@@ -1508,6 +1631,52 @@ function SkillsFileTab() {
 function ProjectsTab({ activeSlug }: { activeSlug: string }) {
   return (
     <div>
+      {/* Client work leads: what was broken, what caused it, what changed.
+          Side projects follow under their own heading. */}
+      <section id="case-studies" className="mb-12">
+        <h1 className="ide-h1">Case studies</h1>
+        <p className="ide-sub">
+          Client apps I was brought in to unstick, and what changed.
+        </p>
+        <div className="grid gap-4">
+          {caseStudies.map((c) => (
+            <article key={c.slug} id={caseAnchor(c.slug)} className="case-card">
+              <header className="case-card-head">
+                <h2 className="text-lg font-extrabold">{c.client}</h2>
+                <span className="case-card-kind">{c.kind}</span>
+                <span className="ml-auto text-xs text-[#8a7457]">{c.period}</span>
+              </header>
+              <dl className="case-card-steps">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>{c.problem}</dd>
+                </div>
+                <div>
+                  <dt>{c.page ? "What I found" : "What I built"}</dt>
+                  <dd>{c.found}</dd>
+                </div>
+                <div>
+                  <dt>Result</dt>
+                  <dd>{c.result}</dd>
+                </div>
+              </dl>
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {c.stack.map((s) => (
+                  <span key={s} className="code-chip">
+                    {s}
+                  </span>
+                ))}
+                {c.page && (
+                  <Link href={`/work/${c.slug}`} className="case-card-link">
+                    work/{c.slug}.md <ArrowRight size={14} strokeWidth={2.5} />
+                  </Link>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
       {/* IDE-style breadcrumb + branch + run pill */}
       <div className="ide-breadcrumb">
         <span>src</span>
@@ -1521,9 +1690,9 @@ function ProjectsTab({ activeSlug }: { activeSlug: string }) {
         </button>
       </div>
 
-      <h1 className="ide-h1">Selected work</h1>
+      <h2 className="ide-h1">Side projects</h2>
       <p className="ide-sub">
-        A handful of things I&apos;ve built lately. Each one taught me something.
+        Things I build on my own time. Each one taught me something.
       </p>
 
       {/* File-tab strip: one tab per project file */}
@@ -1696,6 +1865,14 @@ function ExperienceTab() {
                 </div>
                 <p className="text-sm text-[#6b6b6b] mt-0.5">{job.role}</p>
                 <p className="mt-3 text-[#3f3f3f] leading-relaxed">{job.summary}</p>
+                {casePageSlug(job.company) && (
+                  <Link
+                    href={`/work/${casePageSlug(job.company)}`}
+                    className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[#8a5210] underline underline-offset-2 hover:text-[#1a1a1a]"
+                  >
+                    Read the case study <ArrowRight size={14} strokeWidth={2.5} />
+                  </Link>
+                )}
 
                 {job.highlights && job.highlights.length > 0 && (
                   <ul className="mt-4 space-y-2 text-sm text-[#3f3f3f] leading-relaxed">
@@ -1761,7 +1938,8 @@ function ContactTab() {
     Icon: LucideLike;
   };
   const lines: ContactLine[] = [
-    { label: "email", value: profile.email, href: `mailto:${profile.email}`, Icon: Mail },
+    { label: "email", value: profile.email, href: hireMailto, Icon: Mail },
+    { label: "book", value: profile.booking.replace(/^https:\/\//, ""), href: profile.booking, Icon: CalendarDays },
     { label: "github", value: profile.github, href: profile.github, Icon: GithubMark },
     { label: "linkedin", value: profile.linkedin, href: profile.linkedin, Icon: LinkedinMark },
     { label: "resume", value: "/Shiezza-Lauron-Resume.pdf", href: "/Shiezza-Lauron-Resume.pdf", Icon: FileText },
@@ -1773,8 +1951,8 @@ function ContactTab() {
         Let&apos;s talk.
       </h1>
       <p className="mt-3 text-[#3f3f3f] max-w-2xl">
-        Open to both project work and joining a team. Pick whichever
-        channel works. I usually reply within a day.
+        Taking on 1–2 projects at a time. Tell me about your app and
+        I&apos;ll usually reply within a day.
       </p>
 
       {/* Email and LinkedIn pair up, resume takes its own centred row on
@@ -1783,20 +1961,26 @@ function ContactTab() {
           appear. */}
       <div className="contact-cta mt-8">
         <div className="contact-cta-row">
-          <a href={`mailto:${profile.email}`} className="btn-primary">
+          <a href={hireMailto} className="btn-primary">
             <Mail size={16} strokeWidth={2.5} />
             <span className="cta-full">Send an email</span>
             <span className="cta-short">Email</span>
           </a>
-          <a href={profile.linkedin} className="btn-secondary">
-            <LinkedinMark width={16} height={16} />
-            <span className="cta-full">Connect on LinkedIn</span>
-            <span className="cta-short">LinkedIn</span>
+          <a
+            href={profile.booking}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary"
+          >
+            <CalendarDays size={16} strokeWidth={2.5} />
+            <span className="cta-full">Book a call</span>
+            <span className="cta-short">Book</span>
           </a>
           <a href="/Shiezza-Lauron-Resume.pdf" download className="btn-download">
             <FileText size={16} strokeWidth={2.5} /> Download resume
           </a>
         </div>
+        <p className="mt-3 text-sm text-[#6b5a44]">{hireHint}</p>
       </div>
 
       <div className="mt-10 rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-5 text-sm">

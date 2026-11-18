@@ -25,22 +25,24 @@ const siteUrl =
     ? "https://devpresso.dev"
     : "http://localhost:3001";
 
+/* Matches the hero: the problem I fix, then who it is for. Shared by the
+   page and both share cards so they never drift apart. */
+const description =
+  "React Native and Expo developer who fixes stuck apps: App Store rejections, broken subscriptions, offline sync. Open to projects.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Shiezza Lauron · Full Stack Developer",
-  description:
-    "Full stack web and mobile developer working in React Native, Next.js, and .NET. Five years shipping production apps. Open to work.",
+  description,
   openGraph: {
     title: "Shiezza Lauron · Full Stack Developer",
-    description:
-      "Full stack web and mobile developer working in React Native, Next.js, and .NET. Open to work.",
+    description,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Shiezza Lauron · Full Stack Developer",
-    description:
-      "Full stack web and mobile developer working in React Native, Next.js, and .NET. Open to work.",
+    description,
   },
 };
 

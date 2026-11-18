@@ -1505,6 +1505,71 @@ body {
   color: #b8a890;
 }
 
+/* Case study cards: the client work that leads the Projects tab. Same
+   hard-edged sticker look as the service cards, laid out as three
+   labelled steps so the problem → cause → result arc reads at a glance. */
+.case-card {
+  border: 1.5px solid #1a1a1a;
+  border-radius: 10px;
+  background: #fffaf0;
+  padding: 1rem 1.1rem;
+  box-shadow: 3px 3px 0 rgba(26, 26, 26, 0.18);
+}
+.case-card-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+}
+.case-card-kind {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a5210;
+}
+.case-card-steps {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.6rem;
+}
+.case-card-steps > div {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.75rem;
+}
+.case-card-steps dt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #b56d1a;
+  padding-top: 0.15rem;
+}
+.case-card-steps dd {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #2f2f2f;
+}
+@media (max-width: 639px) {
+  .case-card-steps > div {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}
+.case-card-link {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #8a5210;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.case-card-link:hover {
+  color: #1a1a1a;
+}
 
 
 
@@ -1525,3 +1590,134 @@ body {
 
 
 
+
+
+/* =====================================================================
+   Standalone document pages (/work/*, /notes/*)
+   One window on the desktop, sized for reading: a single column of prose
+   in the site's monospace, with the same amber accents as the homepage.
+   ===================================================================== */
+.doc-body {
+  font-family: var(--font-jb), ui-monospace, monospace;
+}
+.doc-back {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-size: 0.8rem;
+  color: #8a7457;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.doc-back:hover {
+  color: #1a1a1a;
+}
+.doc-prose {
+  color: #2f2f2f;
+  line-height: 1.65;
+}
+.doc-prose h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+  margin: 0.25rem 0 1rem;
+}
+.doc-prose h2 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 1.75rem 0 0.5rem;
+}
+.doc-prose h2::before {
+  content: "## ";
+  color: #b56d1a;
+}
+.doc-prose p {
+  margin: 0.6rem 0;
+}
+.doc-prose ul {
+  margin: 0.6rem 0;
+  padding-left: 1.2rem;
+  list-style: "▸ ";
+}
+.doc-prose li {
+  margin: 0.35rem 0;
+}
+.doc-prose li::marker {
+  color: #f49a3a;
+}
+.doc-prose a:not(.btn-primary) {
+  color: #8a5210;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.doc-prose a:not(.btn-primary):hover {
+  color: #1a1a1a;
+}
+.doc-prose code {
+  font-size: 0.85em;
+  background: #f5efdf;
+  border: 1px solid #e8dcc4;
+  border-radius: 4px;
+  padding: 0 0.3em;
+}
+.doc-prose pre {
+  margin: 0.9rem 0;
+  padding: 0.9rem 1rem;
+  background: #fffaf0;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 rgba(26, 26, 26, 0.18);
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+.doc-prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+.doc-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a7457;
+}
+/* The one technical detail on a case study, set apart like a code note. */
+.doc-detail {
+  border-left: 3px solid #f49a3a;
+  background: #fffaf0;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+}
+.doc-cta {
+  margin-top: 2rem;
+  padding: 1rem 1.1rem;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 10px;
+  background: #fbe3c8;
+  box-shadow: 3px 3px 0 rgba(26, 26, 26, 0.18);
+}
+.doc-cta .btn-primary {
+  display: inline-flex;
+}
+.doc-tags {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.doc-list {
+  list-style: none !important;
+  padding-left: 0 !important;
+}
+.doc-list li {
+  margin: 1rem 0;
+}
+.doc-list p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+}

@@ -2,21 +2,19 @@ export const profile = {
   name: "Shiezza Lauron",
   role: "Full Stack Web and Mobile Developer",
   location: "Chiang Mai, Thailand",
-  /* Headline statement. Leads with personality, not job title.
-     Split into two lines so the H1 can be a single punchy sentence
-     and the subhead carries the rest as supporting copy. */
-  tagline: "Curious by default.",
+  /* Headline statement. Names the problem a client is paying to make go
+     away, so the page reads as a service rather than a hobby. */
+  tagline: "I fix React Native and iOS apps that are stuck.",
   taglineSub:
-    "Building from scratch to shipping, for the fun of learning.",
-  /* The "why" lands first in the bio so visitors get a point of view
-     before the tech-stack name-soup. */
+    "App Store rejections, broken subscriptions, slow dashboards, apps that fail offline. Five years shipping production mobile and web apps.",
   why:
     "I care about clean data models, UIs that survive flaky networks, and shipping things that actually work.",
-  /* The "what". Short, punchy. Tech details live in the stack chips below. */
   bio:
-    "Five years building web and mobile apps. Currently working at Facilitron, a facility-management platform, on React Native apps and a .NET 9 API.",
-  /* Tiny availability/status line shown in the window status bar. */
-  status: "open to projects and full-time · responds within a day",
+    "Currently at Facilitron, building two offline-first React Native apps and the .NET 10 API behind them.",
+  /* Shown in the window status bar and the share image. Project work
+     only: "and full-time" read as a mixed signal to clients. */
+  status: "Taking on 1–2 projects · responds within a day",
+  booking: "https://cal.com/shiezza-lauron",
   /* Shown in the contact.dat block so someone reaching out knows which
      timezone they are writing into. `availability` is currently unused:
      the working-hours line was cut from contact.dat. */
@@ -27,6 +25,14 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/shizzie/",
 };
 
+/* Every "email me" button opens a draft that already asks for the three
+   things needed to quote a job, so the first reply can be an answer. */
+export const hireMailto = `mailto:${profile.email}?subject=${encodeURIComponent(
+  "Project enquiry",
+)}&body=${encodeURIComponent("What's broken:\n\nYour stack:\n\nDeadline:\n")}`;
+
+export const hireHint = "Include what's broken, your stack, and your deadline.";
+
 /* Compact stack for the welcome tab: three category chip rows.
    The full per-discipline list still lives in `skills` below. */
 export const heroStack: { label: string; items: string[] }[] = [
@@ -34,7 +40,7 @@ export const heroStack: { label: string; items: string[] }[] = [
   { label: "Mobile", items: ["React Native", "Expo", "Offline-first"] },
   {
     label: "Server",
-    items: ["Fastify", "Drizzle", "Postgres", ".NET 9", "Azure SQL"],
+    items: ["Fastify", "Drizzle", "Postgres", ".NET 10", "Azure SQL"],
   },
 ];
 
@@ -48,6 +54,43 @@ export type Service = {
   blurb: string;
   chips: string[];
 };
+
+/* The specific jobs I am hired for, shown above the general services.
+   `proof` points at the case study that shows it done. */
+export type Offer = {
+  key: string;
+  title: string;
+  blurb: string;
+  chips: string[];
+  proof: { label: string; slug: string };
+};
+
+export const offers: Offer[] = [
+  {
+    key: "app-store",
+    title: "App Store rejection fix",
+    blurb:
+      "Release stuck in review? I find the iOS-only defect behind each rejection, fix it, and get the build approved.",
+    chips: ["App Store review", "iOS"],
+    proof: { label: "Dash", slug: "dash" },
+  },
+  {
+    key: "paywall",
+    title: "Subscription / paywall audit",
+    blurb:
+      "Paywall hangs, purchases don't unlock, restores fail. I trace the purchase flow end to end and fix what's broken.",
+    chips: ["RevenueCat", "StoreKit"],
+    proof: { label: "Dash", slug: "dash" },
+  },
+  {
+    key: "offline",
+    title: "Offline-first sync for field apps",
+    blurb:
+      "Apps that keep working with no signal: a local queue, optimistic updates, and sync that catches up when the network returns.",
+    chips: ["React Native", "TanStack Query", "MMKV"],
+    proof: { label: "Facilitron", slug: "facilitron" },
+  },
+];
 
 export const services: Service[] = [
   {
@@ -83,7 +126,7 @@ export const services: Service[] = [
 export type SkillGroup = { label: string; items: string[] };
 
 /* Version numbers are deliberately omitted because they rot fast and read as
-   padding. Exceptions: ".NET 9" and "New Architecture", which signal
+   padding. Exceptions: ".NET 10" and "New Architecture", which signal
    current-generation work. */
 export const skills: SkillGroup[] = [
   { label: "Languages", items: ["TypeScript", "JavaScript", "C# (.NET)", "SQL"] },
@@ -104,7 +147,7 @@ export const skills: SkillGroup[] = [
   },
   {
     label: "Backend",
-    items: ["Fastify", "ASP.NET Core (.NET 9)", "Vercel Functions", "Node.js"],
+    items: ["Fastify", "ASP.NET Core (.NET 10)", "Vercel Functions", "Node.js"],
   },
   {
     label: "Data",
@@ -112,7 +155,6 @@ export const skills: SkillGroup[] = [
       "PostgreSQL",
       "Azure SQL",
       "Drizzle ORM",
-      "EF Core",
       "Dapper",
       "Zod",
     ],
@@ -247,6 +289,144 @@ export const projects: Project[] = [
   },
 ];
 
+/* Client work, shown before the side projects. The homepage card uses the
+   short fields; studies with `page: true` also get their own /work/[slug]
+   page built from the long ones. */
+export type CaseStudy = {
+  slug: string;
+  client: string;
+  /** e.g. "iOS app (Capacitor)": the kind of app, so the card is honest
+      about what it was. */
+  kind: string;
+  period: string;
+  problem: string;
+  found: string;
+  result: string;
+  stack: string[];
+  page?: {
+    title: string;
+    description: string;
+    problem: string[];
+    found: string[];
+    /** The one technical detail, set as code-flavoured text. */
+    detail: string;
+    result: string[];
+    note?: { label: string; href: string };
+  };
+};
+
+export const caseStudies: CaseStudy[] = [
+  {
+    slug: "dash",
+    client: "Dash",
+    kind: "iOS app (Capacitor)",
+    period: "2025",
+    problem:
+      "The Dash Notes 1.5 release was stuck in App Store review, and the iOS paywall hung forever, so no one could subscribe.",
+    found:
+      "A separate iOS-only defect behind each rejection, and a RevenueCat plugin quirk that left the paywall waiting on a promise that never settles.",
+    result:
+      "Approved and live on the App Store. The paywall loads plans and purchases go through again.",
+    stack: ["Next.js", "Capacitor", "RevenueCat", "Electron", "Zustand"],
+    page: {
+      title: "Getting Dash Notes through App Store review",
+      description:
+        "How a stuck iOS release with a paywall that hung forever got approved and live, with purchases working again.",
+      problem: [
+        "Dash Notes is a privacy-first notes app for macOS, web and iOS, encrypted on-device. Version 1.5 was ready, but the iOS build kept coming back from App Store review rejected.",
+        "Behind the rejections was a worse problem: on iOS the paywall spun forever. No customer could see a price, let alone subscribe, so the release that was meant to start earning could not take a single payment.",
+      ],
+      found: [
+        "Each rejection turned out to be its own iOS-only defect, so they had to be root-caused and fixed one at a time. One was the app terminating silently on launch because a camera usage description was missing.",
+        "The paywall hang came from the RevenueCat Capacitor plugin. The code handed back the plugin object from an async function, and JavaScript quietly waited on it as if it were a promise. That wait never ends, so the paywall never got its plans.",
+      ],
+      detail:
+        "Capacitor's plugin proxy answers every property name with a function, including .then, so a promise resolved with it never settles.",
+      result: [
+        "Got the release approved and live after round after round of App Store rejections, each one a separate iOS-only defect found and fixed.",
+        "Restored iOS subscriptions: the paywall that hung forever now loads plans, and customers can complete a purchase again.",
+      ],
+      note: {
+        label: "Why your RevenueCat paywall hangs forever in Capacitor",
+        href: "/notes/revenuecat-paywall-hangs-capacitor",
+      },
+    },
+  },
+  {
+    slug: "linkjolt",
+    client: "LinkJolt",
+    kind: "SaaS dashboard (Next.js)",
+    period: "2025",
+    problem:
+      "The affiliate dashboards customers live in all day were sending far more API traffic than the screens needed.",
+    found:
+      "Redundant and duplicate requests firing on every dashboard view.",
+    result:
+      "Eliminated the duplicate requests, cutting round-trips per page load and database work per user.",
+    stack: ["Next.js", "TypeScript", "TanStack Query", "Drizzle ORM", "MUI"],
+    page: {
+      title: "Cutting the request load on LinkJolt's dashboards",
+      description:
+        "How redundant requests on every dashboard view were found and removed, cutting round-trips and database work per user.",
+      problem: [
+        "LinkJolt is an affiliate-marketing SaaS: link and coupon attribution, campaign invitations, Stripe and Paddle billing, and mass payouts. Its customers spend their day in the dashboards.",
+        "Those dashboards were generating far more API traffic than the data on screen called for. Every extra request is load on the API and the database, paid for on every view, by every customer.",
+      ],
+      found: [
+        "The traffic traced back to redundant and duplicated requests firing on every dashboard view: the same data fetched more than once for a single screen, and one widget that never stopped asking.",
+      ],
+      detail:
+        "Components that mounted twice each fired their own fetch, and one useEffect re-requested subscription data in a loop instead of reading it from the shared hook.",
+      result: [
+        "Eliminated the redundant and duplicate requests that fired on every dashboard view.",
+        "Fewer round-trips per page load and less database work per user.",
+      ],
+    },
+  },
+  {
+    slug: "csa360",
+    client: "CSA 360",
+    kind: "Web + mobile platform",
+    period: "2022 – 2025",
+    problem:
+      "Guard companies needed proof that patrols actually happened on the route and schedule their contracts promised.",
+    found:
+      "Built the guard-tour module end to end: GPS-verified patrol tracking across web, iOS and Android.",
+    result:
+      "Patrols that prove a guard walked the route on schedule, kept running in production for two and a half years.",
+    stack: ["React", "React Native", "PHP", "MySQL", "AWS"],
+  },
+];
+
+/* Technical write-ups under /notes. Each post's body lives in its own
+   route file; this list feeds the /notes index and the page metadata. */
+export type Note = {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+};
+
+export const notes: Note[] = [
+  {
+    slug: "revenuecat-paywall-hangs-capacitor",
+    title: "Why your RevenueCat paywall hangs forever in Capacitor",
+    description:
+      "The paywall spins, nothing errors, and await never returns. Capacitor's plugin proxy looks like a promise, and a promise resolved with it never settles.",
+    date: "2026-11-18",
+  },
+];
+
+/* Client quotes. The section stays hidden until this has entries. */
+export type Testimonial = {
+  quote: string;
+  name: string;
+  role: string;
+  company: string;
+};
+
+export const testimonials: Testimonial[] = [];
+
 export type Job = {
   company: string;
   role: string;
@@ -262,11 +442,11 @@ export const experience: Job[] = [
     role: "Full Stack Developer",
     period: "May 2025 – Present",
     summary:
-      "Building two production React Native apps (Works and FIT) for facility-management workflows, plus the shared .NET 9 backend on Azure SQL.",
+      "Building two production React Native apps (Works and FIT) for facility-management workflows, plus the shared .NET 10 backend on Azure SQL.",
     highlights: [
       "Works app: five role-based navigation stacks, offline-first sync queue, real-time SignalR updates, and push notifications, all from one codebase shipping to iOS, Android, and web.",
       "FIT app: offline-first field inspections with optimistic mutations, EAS Build across dev / staging / prod, shipping to iOS, Android, web, and Windows (React Native Windows).",
-      "API: feature-based .NET 9 backend with EF Core + Dapper, real-time via Azure SignalR, batch PDF and Excel reporting.",
+      "API: feature-based .NET 10 backend with Dapper, real-time via Azure SignalR, batch PDF and Excel reporting.",
     ],
     stack: [
       "React Native",
@@ -276,8 +456,7 @@ export const experience: Job[] = [
       "TypeScript",
       "TanStack Query",
       "Zustand",
-      ".NET 9",
-      "EF Core",
+      ".NET 10",
       "Dapper",
       "Azure SQL",
       "SignalR",
