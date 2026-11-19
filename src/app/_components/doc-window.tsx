@@ -72,9 +72,9 @@ export default function DocWindow({
             <img src="/icons/portfolio.svg" alt="" aria-hidden width={16} height={16} />
             <span>{file}</span>
           </span>
-          <a href={hireMailto} className="btn-primary btn-sm hire-me-btn mac-titlebar-cta">
+          <Link href="/#contact" className="btn-primary btn-sm hire-me-btn mac-titlebar-cta">
             <span className="hire-me-dot" aria-hidden /> Hire me
-          </a>
+          </Link>
         </div>
 
         <div className="doc-body px-6 md:px-10 pt-6 pb-10">

@@ -194,6 +194,17 @@ export default function PortfolioOS() {
   };
   const [time, setTime] = useState<string>("");
 
+  /* The standalone pages' Hire me links to /#contact; the tabs are not
+     routes, so the hash is how they ask for the Contact tab. */
+  useEffect(() => {
+    const openFromHash = () => {
+      if (window.location.hash === "#contact") setTab("contact");
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, []);
+
   /* Every panel stays mounted (see the body below), so the shared scroll
      container now keeps its offset across tab switches. Land on the entry
      an icon asked for, otherwise at the top of the section just opened.
@@ -416,13 +427,18 @@ export default function PortfolioOS() {
               <span>{currentTitle(tab)}</span>
               <ChevronDown size={12} className="text-[#9b9b9b]" />
             </button>
-            <a
-              href={hireMailto}
+            {/* Opens Contact rather than a mailto: visitors without a mail
+                app still get the address, the booking link and the rest. */}
+            <button
+              type="button"
               className="btn-primary btn-sm hire-me-btn mac-titlebar-cta"
-              onClick={triggerCheer}
+              onClick={() => {
+                triggerCheer();
+                openTab("contact");
+              }}
             >
               <span className="hire-me-dot" aria-hidden /> Hire me
-            </a>
+            </button>
           </div>
 
           {/* Toolbar: editor-feel chrome, md: and up only. Zoom is the
