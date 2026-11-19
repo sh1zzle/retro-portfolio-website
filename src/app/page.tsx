@@ -27,12 +27,11 @@ import {
   ChevronDown,
   Smartphone,
   Globe,
-  Server,
   Sparkles,
   ArrowRight,
   CalendarDays,
-  CreditCard,
-  WifiOff,
+  Rocket,
+  Wrench,
 } from "lucide-react";
 import {
   profile,
@@ -41,7 +40,7 @@ import {
   skills,
   heroStack,
   services,
-  offers,
+  rescue,
   caseStudies,
   testimonials,
   hireMailto,
@@ -912,25 +911,11 @@ function DevAvatar({ cheering = false }: { cheering?: boolean }) {
 
 /* Icon per service-card key; content.ts stays free of React imports. */
 const SERVICE_ICONS: Record<string, LucideLike> = {
+  mvp: Rocket,
   mobile: Smartphone,
   web: Globe,
-  backend: Server,
   ai: Sparkles,
 };
-
-const OFFER_ICONS: Record<string, LucideLike> = {
-  "app-store": Smartphone,
-  paywall: CreditCard,
-  offline: WifiOff,
-};
-
-/* An offer's proof is either a case study card or, for work without one,
-   that company's Experience entry. */
-function proofTarget(slug: string, label: string): [TabKey, string] {
-  return caseStudies.some((c) => c.slug === slug)
-    ? ["projects", caseAnchor(slug)]
-    : ["experience", jobAnchor(label)];
-}
 
 function WelcomeTab({
   cheering = false,
@@ -941,7 +926,7 @@ function WelcomeTab({
 }) {
   return (
     <div>
-      {/* Hero: the problem I fix, then the CTA straight under it, with the
+      {/* Hero: what I build, then the CTA straight under it, with the
           animated avatar on the right. */}
       <div className="welcome-hero">
         <div className="welcome-hero-text">
@@ -967,7 +952,7 @@ function WelcomeTab({
           <div className="mt-5 flex flex-nowrap items-stretch gap-2 sm:gap-3">
             <a href={hireMailto} className="btn-primary">
               <Mail size={16} strokeWidth={2.5} />
-              <span className="cta-full">Tell me about your app</span>
+              <span className="cta-full">Tell me what you&apos;re building</span>
               <span className="cta-short">Email me</span>
             </a>
             <button
@@ -975,8 +960,8 @@ function WelcomeTab({
               onClick={() => onOpen("projects", "case-studies")}
               className="btn-download cursor-pointer"
             >
-              <span className="cta-full">See case studies</span>
-              <span className="cta-short">Case studies</span>
+              <span className="cta-full">See my work</span>
+              <span className="cta-short">My work</span>
               <ArrowRight size={16} strokeWidth={2.5} />
             </button>
           </div>
@@ -1021,69 +1006,25 @@ function WelcomeTab({
         <DevAvatar cheering={cheering} />
       </div>
 
-      {/* The specific jobs I am hired for, each pointing at the work that
-          proves it. */}
+      {/* What I am hired to build. Columns follow the window's width, not
+          the viewport's: the window narrows when the desktop icon rails
+          appear. */}
       <div className="mt-10">
         <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
-          What I fix
+          What I build
         </h2>
-        {/* Columns follow the window's width, not the viewport's: the
-            window narrows when the desktop icon rails appear. */}
         <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(15rem,1fr))]">
-          {offers.map((o) => {
-            const Icon = OFFER_ICONS[o.key] ?? Code2;
-            const [tab, anchor] = proofTarget(o.proof.slug, o.proof.label);
-            return (
-              <div key={o.key} className="service-card flex flex-col">
-                <div className="flex items-center gap-2.5">
-                  <span className="service-card-icon">
-                    <Icon size={18} strokeWidth={2.25} />
-                  </span>
-                  <h3 className="font-bold leading-tight">{o.title}</h3>
-                </div>
-                <p className="mt-2 text-sm text-[#3f3f3f] leading-relaxed flex-1">
-                  {o.blurb}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {o.chips.map((c) => (
-                    <span key={c} className="code-chip">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onOpen(tab, anchor)}
-                  className="mt-3 self-start text-sm font-semibold text-[#8a5210] underline underline-offset-2 hover:text-[#1a1a1a] cursor-pointer"
-                >
-                  done for {o.proof.label} →
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <Testimonials />
-
-      {/* General capabilities: outcomes first, tech names demoted to a
-          couple of supporting chips. */}
-      <div className="mt-10">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-[#6b6b6b] mb-3">
-          Also build
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-2">
           {services.map((s) => {
             const Icon = SERVICE_ICONS[s.key] ?? Code2;
             return (
-              <div key={s.key} className="service-card">
+              <div key={s.key} className="service-card flex flex-col">
                 <div className="flex items-center gap-2.5">
                   <span className="service-card-icon">
                     <Icon size={18} strokeWidth={2.25} />
                   </span>
-                  <h3 className="font-bold">{s.title}</h3>
+                  <h3 className="font-bold leading-tight">{s.title}</h3>
                 </div>
-                <p className="mt-2 text-sm text-[#3f3f3f] leading-relaxed">
+                <p className="mt-2 text-sm text-[#3f3f3f] leading-relaxed flex-1">
                   {s.blurb}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -1097,7 +1038,37 @@ function WelcomeTab({
             );
           })}
         </div>
+
+        {/* The smaller starting job, kept last so it reads as a way in
+            rather than the offer. */}
+        <div className="rescue-card mt-3">
+          <span className="service-card-icon">
+            <Wrench size={16} strokeWidth={2.25} />
+          </span>
+          <div>
+            <h3 className="font-bold leading-tight">{rescue.title}</h3>
+            <p className="mt-1 text-sm text-[#3f3f3f] leading-relaxed">
+              {rescue.blurb}
+            </p>
+            <p className="mt-2 text-sm">
+              {rescue.proof.map((p, i) => (
+                <span key={p.slug}>
+                  {i > 0 && <span className="text-[#c8c0b0]"> · </span>}
+                  <button
+                    type="button"
+                    onClick={() => onOpen("projects", caseAnchor(p.slug))}
+                    className="font-semibold text-[#8a5210] underline underline-offset-2 hover:text-[#1a1a1a] cursor-pointer"
+                  >
+                    done for {p.label} →
+                  </button>
+                </span>
+              ))}
+            </p>
+          </div>
+        </div>
       </div>
+
+      <Testimonials />
 
       {/* Compact stack: three rows of chips so the framework names are
           present without dominating the prose. */}
@@ -1650,9 +1621,9 @@ function ProjectsTab({ activeSlug }: { activeSlug: string }) {
       {/* Client work leads: what was broken, what caused it, what changed.
           Side projects follow under their own heading. */}
       <section id="case-studies" className="mb-12">
-        <h1 className="ide-h1">Case studies</h1>
+        <h1 className="ide-h1">Getting apps over the line</h1>
         <p className="ide-sub">
-          Client apps I was brought in to unstick, and what changed.
+          Client work that shipped: the last mile, and what it took.
         </p>
         <div className="grid gap-4">
           {caseStudies.map((c) => (
@@ -1967,7 +1938,7 @@ function ContactTab() {
         Let&apos;s talk.
       </h1>
       <p className="mt-3 text-[#3f3f3f] max-w-2xl">
-        Taking on 1–2 projects at a time. Tell me about your app and
+        Taking on 1–2 projects at a time. Tell me what you&apos;re building and
         I&apos;ll usually reply within a day.
       </p>
 

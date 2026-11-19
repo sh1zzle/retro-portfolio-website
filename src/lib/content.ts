@@ -2,11 +2,11 @@ export const profile = {
   name: "Shiezza Lauron",
   role: "Full Stack Web and Mobile Developer",
   location: "Chiang Mai, Thailand",
-  /* Headline statement. Names the problem a client is paying to make go
-     away, so the page reads as a service rather than a hobby. */
-  tagline: "I fix React Native and iOS apps that are stuck.",
+  /* Headline statement. The offer is building products end to end; the
+     subtext names the last mile, which is where the rescue work proves it. */
+  tagline: "I build web and mobile apps, from idea to production.",
   taglineSub:
-    "App Store rejections, broken subscriptions, slow dashboards, apps that fail offline. Five years shipping production mobile and web apps.",
+    "React Native, Next.js, .NET and Node, plus the last mile most projects stall on: App Store review, payments, offline sync.",
   why:
     "I care about clean data models, UIs that survive flaky networks, and shipping things that actually work.",
   bio:
@@ -29,9 +29,9 @@ export const profile = {
    things needed to quote a job, so the first reply can be an answer. */
 export const hireMailto = `mailto:${profile.email}?subject=${encodeURIComponent(
   "Project enquiry",
-)}&body=${encodeURIComponent("What's broken:\n\nYour stack:\n\nDeadline:\n")}`;
+)}&body=${encodeURIComponent("What you're building:\n\nYour stack:\n\nDeadline:\n")}`;
 
-export const hireHint = "Include what's broken, your stack, and your deadline.";
+export const hireHint = "Include what you're building, your stack, and your deadline.";
 
 /* Compact stack for the welcome tab: three category chip rows.
    The full per-discipline list still lives in `skills` below. */
@@ -44,10 +44,11 @@ export const heroStack: { label: string; items: string[] }[] = [
   },
 ];
 
-/* Client-facing capability cards for the About tab. Written for a
-   non-technical reader. Each card sells an outcome, with only a couple
-   of recognizable tech names as supporting chips. The full technical
-   inventory stays in `skills` below and renders under skills.txt. */
+/* What I am hired to build, in the order the About tab leads with them.
+   Written for a non-technical reader: each card sells an outcome, with a
+   couple of recognizable tech names as supporting chips. The full
+   technical inventory stays in `skills` below and renders under
+   skills.txt. */
 export type Service = {
   key: string;
   title: string;
@@ -55,73 +56,48 @@ export type Service = {
   chips: string[];
 };
 
-/* The specific jobs I am hired for, shown above the general services.
-   `proof` points at the case study that shows it done. */
-export type Offer = {
-  key: string;
-  title: string;
-  blurb: string;
-  chips: string[];
-  proof: { label: string; slug: string };
-};
-
-export const offers: Offer[] = [
-  {
-    key: "app-store",
-    title: "App Store rejection fix",
-    blurb:
-      "Release stuck in review? I find the iOS-only defect behind each rejection, fix it, and get the build approved.",
-    chips: ["App Store review", "iOS"],
-    proof: { label: "Dash", slug: "dash" },
-  },
-  {
-    key: "paywall",
-    title: "Subscription / paywall audit",
-    blurb:
-      "Paywall hangs, purchases don't unlock, restores fail. I trace the purchase flow end to end and fix what's broken.",
-    chips: ["RevenueCat", "StoreKit"],
-    proof: { label: "Dash", slug: "dash" },
-  },
-  {
-    key: "offline",
-    title: "Offline-first sync for field apps",
-    blurb:
-      "Apps that keep working with no signal: a local queue, optimistic updates, and sync that catches up when the network returns.",
-    chips: ["React Native", "TanStack Query", "MMKV"],
-    proof: { label: "Facilitron", slug: "facilitron" },
-  },
-];
-
 export const services: Service[] = [
   {
-    key: "mobile",
-    title: "Mobile apps",
+    key: "mvp",
+    title: "MVP build",
     blurb:
-      "iPhone and Android from one codebase, idea to App Store, including apps that keep working offline in the field.",
+      "From idea to a first version real users can sign up for: the app, the backend behind it, accounts and payments, shipped and in production.",
+    chips: ["Next.js", "React Native", "Node.js", ".NET"],
+  },
+  {
+    key: "mobile",
+    title: "Mobile app (iOS + Android)",
+    blurb:
+      "One codebase for iPhone and Android, taken all the way through App Store review, with subscriptions and offline sync that hold up in the real world.",
     chips: ["React Native", "Expo"],
   },
   {
     key: "web",
-    title: "Web apps & sites",
+    title: "Web app / SaaS / website",
     blurb:
-      "Fast, modern websites and dashboards, from a landing page to a full product your customers log into.",
-    chips: ["Next.js", "React"],
-  },
-  {
-    key: "backend",
-    title: "Backends & APIs",
-    blurb:
-      "The engine behind the app: accounts, payments, notifications, and real-time updates that stay up.",
-    chips: [".NET", "Node.js", "Postgres"],
+      "From a fast marketing site to a full product your customers log into, with the APIs and database behind it.",
+    chips: ["Next.js", "React", "Postgres"],
   },
   {
     key: "ai",
     title: "AI features",
     blurb:
-      "Practical AI inside your product: chat, summaries, and smart automation that saves your team hours.",
-    chips: ["Claude", "Anthropic API"],
+      "Practical AI inside your product: chat, summaries, structured extraction and automation that saves your team hours.",
+    chips: ["LLM APIs", "Structured output"],
   },
 ];
+
+/* The smaller starting job, shown last. `proof` lists the case studies
+   that show it done. */
+export const rescue = {
+  title: "Fix & rescue",
+  blurb:
+    "Already built but stuck? App Store rejections, a paywall that hangs, slow dashboards, an app that breaks offline. A short job to get it over the line.",
+  proof: [
+    { label: "Dash", slug: "dash" },
+    { label: "LinkJolt", slug: "linkjolt" },
+  ],
+};
 
 export type SkillGroup = { label: string; items: string[] };
 

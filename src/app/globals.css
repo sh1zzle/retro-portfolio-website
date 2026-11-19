@@ -1505,6 +1505,18 @@ body {
   color: #b8a890;
 }
 
+/* Fix & rescue: a smaller, flatter card under the main services so it
+   reads as a starting job rather than a fifth headline offer. */
+.rescue-card {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  border: 1.5px dashed rgba(26, 26, 26, 0.45);
+  border-radius: 10px;
+  background: #fffaf0;
+  padding: 0.85rem 1rem;
+}
+
 /* Case study cards: the client work that leads the Projects tab. Same
    hard-edged sticker look as the service cards, laid out as three
    labelled steps so the problem → cause → result arc reads at a glance. */

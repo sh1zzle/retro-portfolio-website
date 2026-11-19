@@ -25,10 +25,10 @@ const siteUrl =
     ? "https://devpresso.dev"
     : "http://localhost:3001";
 
-/* Matches the hero: the problem I fix, then who it is for. Shared by the
+/* Matches the hero: what I build and what with. Shared by the
    page and both share cards so they never drift apart. */
 const description =
-  "React Native and Expo developer who fixes stuck apps: App Store rejections, broken subscriptions, offline sync. Open to projects.";
+  "Full-stack developer building web and mobile apps from idea to production: React Native, Next.js, .NET, Node and AI features. Open to projects.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

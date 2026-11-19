@@ -34,7 +34,7 @@ export function HireCta({ heading }: { heading: string }) {
         .
       </p>
       <a href={hireMailto} className="btn-primary mt-3">
-        Tell me about your app
+        Tell me what you&apos;re building
       </a>
     </div>
   );
