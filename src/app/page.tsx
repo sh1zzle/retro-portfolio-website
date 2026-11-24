@@ -122,7 +122,7 @@ const WORK_ICONS: DesktopIconDef[] = [
   { key: "atlas", imageSrc: "/icons/atlas.png", imageScale: 1.7, label: "atlas", tab: "projects", anchor: projectAnchor("atlas") },
   { key: "equilibria", imageSrc: "/icons/equilibria.png", imageScale: 1.5, label: "equilibria", tab: "projects", anchor: projectAnchor("equilibria") },
   { key: "defi", imageSrc: "/icons/defi.png", imageScale: 2, label: "recall", tab: "projects", anchor: projectAnchor("recall") },
-  { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "facilitron", tab: "experience", anchor: jobAnchor("Facilitron") },
+  { key: "facilitron", imageSrc: "/icons/facilitron.png", imageScale: 1.3, label: "faithful-dev", tab: "experience", anchor: jobAnchor("Faithful Development") },
   { key: "dash", imageSrc: "/icons/dash.png", label: "dash", tab: "projects", anchor: caseAnchor("dash") },
   { key: "linkjolt", imageSrc: "/icons/linkjolt.png", label: "linkjolt", tab: "projects", anchor: caseAnchor("linkjolt") },
 ];
@@ -1172,10 +1172,10 @@ const NOW_PLAYING: NowPlayingTrack[] = [
   },
   {
     status: "working",
-    title: "Facilitron",
-    detail: "full stack",
+    title: "Faithful Development",
+    detail: "full stack · contract",
     tab: "experience",
-    anchor: jobAnchor("Facilitron"),
+    anchor: jobAnchor("Faithful Development"),
   },
 ];
 

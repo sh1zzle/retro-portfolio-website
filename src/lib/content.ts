@@ -10,7 +10,7 @@ export const profile = {
   why:
     "I care about clean data models, UIs that survive flaky networks, and shipping things that actually work.",
   bio:
-    "Currently at Facilitron, building two offline-first React Native apps and the .NET 10 API behind them, on a multi-tenant platform serving many customer organizations.",
+    "Currently contracting through Faithful Development, building two offline-first React Native apps and the .NET 10 API behind them, on a multi-tenant platform serving many customer organizations.",
   /* Shown in the window status bar and the share image. Project work
      only: "and full-time" read as a mixed signal to clients. */
   status: "Taking on 1–2 projects · responds within a day",
@@ -420,16 +420,16 @@ export type Job = {
 
 export const experience: Job[] = [
   {
-    company: "Facilitron",
-    role: "Full Stack Developer",
+    company: "Faithful Development",
+    role: "Full Stack Developer (contract) · Client: Facilitron",
     period: "May 2025 – Present",
     summary:
-      "Building two production React Native apps (Works and FIT) for facility-management workflows, plus the shared .NET 10 backend on Azure SQL.",
+      "Building Facilitron's two production React Native apps (Works and FIT) for facility-management workflows, plus their shared .NET 10 backend on Azure SQL.",
     highlights: [
       "Works app: five role-based navigation stacks, offline-first sync queue, real-time SignalR updates, and push notifications, all from one codebase shipping to iOS, Android, and web.",
       "FIT app: offline-first field inspections with optimistic mutations, EAS Build across dev / staging / prod, shipping to iOS, Android, web, and Windows (React Native Windows).",
       "API: feature-based .NET 10 backend with Dapper, real-time via Azure SignalR, batch PDF and Excel reporting.",
-      "Multi-tenant SaaS: shipped tenant-scoped features on a shared Azure SQL database serving many customer organizations, with isolation enforced in the API and queries (customer-scoped endpoints, tenant foreign keys, tenant-scoped report storage).",
+      "Multi-tenant SaaS: shipped tenant-scoped features for a platform serving many customer organizations, keeping each customer's data isolated.",
     ],
     stack: [
       "React Native",

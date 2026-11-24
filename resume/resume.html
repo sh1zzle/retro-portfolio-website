@@ -81,19 +81,23 @@
 
   ul.bullets { list-style: none; }
 
+  /* The dot floats instead of being absolutely positioned. A positioned li
+     is painted after all in-flow text, so Chrome writes every bullet's text
+     at the end of the PDF, after the sidebar, and ATS parsers read the
+     bullets detached from their jobs. A radial-gradient background avoids
+     that too, but PDF viewers draw it as a jagged square. */
   ul.bullets li {
-    position: relative;
     padding-left: 3.2mm;
     margin-bottom: 0.45mm;
   }
 
+  /* Horizontal margins sum the float to zero width, so it never moves text. */
   ul.bullets li::before {
     content: "";
-    position: absolute;
-    left: 0;
-    top: 1.45mm;
+    float: left;
     width: 1.1mm;
     height: 1.1mm;
+    margin: 1.45mm 2.1mm 0 -3.2mm;
     background: #14304d;
     border-radius: 50%;
   }
@@ -154,20 +158,20 @@
 
     <h2>Profile</h2>
     <div class="profile">
-      <p>Full-stack developer with five years building web and mobile products end to end: React Native apps, the .NET and Node APIs behind them, and the schemas underneath. Most recent work is offline-first, for people using the app in the field where the network is not guaranteed. I care about clean data models, UIs that survive flaky networks, and shipping things that actually work.</p>
+      <p>Full-stack developer with six years building web and mobile products end to end: React Native apps, the .NET and Node APIs behind them, and the schemas underneath. Most recent work is offline-first, for people using the app in the field where the network is not guaranteed. I care about clean data models, UIs that survive flaky networks, and shipping things that actually work.</p>
     </div>
 
     <h2>Employment History</h2>
 
     <div class="job">
-      <div class="job-title">Full Stack Developer &middot; Facilitron</div>
+      <div class="job-title">Full Stack Developer &middot; Faithful Development (contract) &middot; Client: Facilitron</div>
       <div class="job-dates">May 2025 &ndash; Present</div>
-      <p class="job-summary">Two production React Native apps (Works and FIT) for facility-management workflows, plus the shared .NET 10 backend on Azure SQL.</p>
+      <p class="job-summary">Facilitron&rsquo;s two production React Native apps (Works and FIT) for facility-management workflows, plus their shared .NET 10 backend on Azure SQL.</p>
       <ul class="bullets">
         <li><b>Works:</b> five role-based navigation stacks, offline-first sync queue, real-time SignalR updates and push notifications, all from one codebase shipping to iOS, Android, and web.</li>
         <li><b>FIT:</b> offline-first field inspections with optimistic mutations, EAS Build across dev / staging / prod, shipping to iOS, Android, web, and Windows (React Native Windows).</li>
         <li><b>API:</b> feature-based .NET 10 backend with Dapper, real-time via Azure SignalR, batch PDF and Excel reporting.</li>
-        <li><b>Multi-tenant SaaS:</b> shipped tenant-scoped features on a shared Azure SQL database serving many customer organizations, with isolation enforced in the API and queries (customer-scoped endpoints, tenant foreign keys, tenant-scoped report storage).</li>
+        <li><b>Multi-tenant SaaS:</b> shipped tenant-scoped features for a platform serving many customer organizations, keeping each customer&rsquo;s data isolated.</li>
       </ul>
       <div class="stack">React Native &middot; Expo &middot; Expo Router &middot; TypeScript &middot; TanStack Query &middot; Zustand &middot; MMKV &middot; .NET 10 &middot; Dapper &middot; Azure SQL &middot; SignalR &middot; Azure Functions</div>
     </div>
