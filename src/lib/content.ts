@@ -450,7 +450,7 @@ export const experience: Job[] = [
     role: "Freelance Full Stack Developer",
     period: "2025",
     summary:
-      "Brought in on Dash Notes 1.5 (dashnote.io) after the release stalled in App Store review, and got it approved and live by root-causing the iOS-only defects blocking it, from a paywall nobody could pay through to silent crashes on launch. Dash is a privacy-first notes app for macOS, web, and iOS: everything encrypted on-device with AES-256, no accounts, no cloud sync, no telemetry.",
+      "Helped build a privacy-first notes app from scratch: Stripe payments on its site, iOS releases through App Store review, and its Mac build. Fixed bugs and helped make the app and its features stable.",
     highlights: [
       "Worked the release through round after round of App Store review to approval, each one a distinct iOS-only defect root-caused and fixed in turn, plus one App Store Connect submission-mechanics trap.",
       "Restored iOS subscriptions when the paywall hung forever and no customer could complete a purchase: the RevenueCat Capacitor plugin proxy fabricates a .then, so promises resolved with it never settle. Boxed the proxy and gated SDK init.",
@@ -473,7 +473,7 @@ export const experience: Job[] = [
     role: "Freelance Full Stack Developer",
     period: "2025",
     summary:
-      "Cut the request load behind LinkJolt's affiliate dashboards, the screens its customers live in all day. LinkJolt is an affiliate-marketing SaaS covering link-based and coupon-based attribution, campaign invitations, Stripe and Paddle billing, and mass payouts.",
+      "Helped build a SaaS affiliate platform from scratch: its notification system, and dashboards that load faster with fewer API requests. Fixed bugs and helped make the app and its features stable.",
     highlights: [
       "Traced the platform's excessive API traffic to redundant and duplicated requests firing on every dashboard view, then eliminated them, cutting round-trips per page load and database work per user.",
     ],
