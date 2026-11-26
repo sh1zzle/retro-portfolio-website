@@ -1733,3 +1733,283 @@ body {
   margin: 0.25rem 0 0;
   font-size: 0.9rem;
 }
+
+/* ---------- Contact: time-difference strip ----------
+   Day/night bars are a halftone dither: dense ink dots at night thinning
+   to a clear warm band at midday. */
+.tz-card {
+  border: 1.5px solid #1a1a1a;
+  border-radius: 8px;
+  background: #fffdf8;
+  box-shadow: 3px 3px 0 #d9cfc0;
+  padding: 1rem 1.1rem 1.1rem;
+}
+.tz-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6b5a44;
+}
+.tz-rows {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.85rem;
+}
+.tz-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+  font-size: 0.875rem;
+}
+.tz-who {
+  color: #3f3f3f;
+}
+.tz-who b {
+  color: #1a1a1a;
+}
+.tz-clock {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-variant-numeric: tabular-nums;
+}
+.tz-date {
+  font-size: 0.75rem;
+  color: #6b6b6b;
+}
+.tz-clock > :last-child {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.roll {
+  display: inline-flex;
+}
+.roll-digit {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+}
+.roll-track {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.roll-track > span {
+  height: 1em;
+  line-height: 1;
+}
+
+.tz-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(48, 1fr);
+  height: 18px;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #fffaf2;
+}
+.tz-cell {
+  background-image: radial-gradient(#3a342c 0.75px, transparent 0.95px);
+}
+.tz-cell[data-level="0"] { background-size: 3px 3px; background-color: #ddd4c6; }
+.tz-cell[data-level="1"] { background-size: 4px 4px; background-color: #ebe4d8; }
+.tz-cell[data-level="2"] { background-size: 5.5px 5.5px; }
+.tz-cell[data-level="3"] { background-size: 8px 8px; background-color: #fdf0dc; }
+.tz-cell[data-level="4"] { background-image: none; background-color: #fbd7a3; }
+.tz-now {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  margin-left: -1.5px;
+  background: #f49a3a;
+  border-left: 1px solid #1a1a1a;
+  border-right: 1px solid #1a1a1a;
+  transition: left 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tz-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -0.45rem;
+  font-size: 0.6875rem;
+  color: #8a8478;
+  font-variant-numeric: tabular-nums;
+}
+.tz-notes {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.875rem;
+  color: #3f3f3f;
+}
+.tz-reply {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) {
+  .roll-track,
+  .tz-now {
+    transition: none;
+  }
+}
+
+/* ---------- About: GitHub activity card ----------
+   Outer shell carries the label and the caption; the white inner card
+   holds the numbers, the calendar and the range chips. */
+.gh-shell {
+  background: #efe8dc;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 14px;
+  padding: 0.35rem;
+  box-shadow: 3px 3px 0 #d9cfc0;
+}
+.gh-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0.75rem 0.6rem;
+  font-size: 0.875rem;
+}
+.gh-handle {
+  font-weight: 700;
+}
+.gh-inner {
+  container-type: inline-size;
+  background: #fffdf8;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 10px;
+  padding: 1rem 1.1rem 1.1rem;
+}
+.gh-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.gh-total {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.gh-total-unit {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #8a8478;
+}
+.gh-side {
+  display: grid;
+  text-align: right;
+  font-size: 0.875rem;
+  color: #6b6b6b;
+}
+.gh-side b {
+  color: #1a1a1a;
+}
+.gh-grid {
+  margin-top: 1.1rem;
+  display: flex;
+  gap: 2px;
+}
+.gh-week {
+  flex: 1;
+  display: grid;
+  grid-template-rows: repeat(7, auto);
+  align-content: start;
+  gap: 2px;
+}
+.gh-cell {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: #efe8dc;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+.gh-cell[data-level="1"] { background: #fbd9a8; }
+.gh-cell[data-level="2"] { background: #f7b866; }
+.gh-cell[data-level="3"] { background: #f49a3a; }
+.gh-cell[data-level="4"] { background: #b56d1a; }
+.gh-cell[data-out] { opacity: 0.18; }
+/* Below ~520px a full year makes the squares too small to read, so the
+   calendar shows the most recent half year. */
+@container (max-width: 519px) {
+  .gh-week:nth-last-child(n + 27) { display: none; }
+  .gh-side { text-align: left; }
+}
+.gh-legend {
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  color: #8a8478;
+}
+.gh-legend .gh-cell {
+  width: 10px;
+}
+.gh-legend > span:first-child { margin-right: 0.3rem; }
+.gh-legend > span:last-child { margin-left: 0.3rem; }
+.gh-ranges {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.gh-range {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  color: #3f3f3f;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.gh-range:hover:not(:disabled) {
+  background: #f5efe5;
+}
+.gh-range[aria-pressed="true"] {
+  background: #1a1a1a;
+  color: #fffdf8;
+}
+.gh-range:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.gh-foot {
+  padding: 0.6rem 0.75rem 0.35rem;
+  font-size: 0.8125rem;
+  color: #6b6b6b;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-cell,
+  .gh-range {
+    transition: none;
+  }
+}
+
+/* ---------- Animated wallpaper (Micro Slats) ----------
+   Sits behind every desktop element. While it is mounted the slats are
+   the texture, so the CSS dot grid (the fourth background layer) is
+   sized away; without the slats (phones, no WebGL2) the dots stay. */
+.os-desktop:has(> .desktop-slats) {
+  isolation: isolate;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 0 0;
+}
+.desktop-slats {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}

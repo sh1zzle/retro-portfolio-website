@@ -16,10 +16,12 @@ export const profile = {
   status: "Taking on 1–2 projects · responds within a day",
   booking: "https://cal.com/shiezza-lauron",
   /* Shown in the contact.dat block so someone reaching out knows which
-     timezone they are writing into. `availability` is currently unused:
-     the working-hours line was cut from contact.dat. */
+     timezone they are writing into. */
   timezone: "Asia/Bangkok (UTC+7)",
-  availability: "Mon–Fri · 09:00–18:00 ICT",
+  /* Drive the Contact tab's time-difference strip. No working hours on
+     purpose: it shows the gap and when a reply arrives, not availability. */
+  homeZone: "Asia/Bangkok",
+  homeCity: "Chiang Mai",
   email: "shiezza.devpresso@gmail.com",
   github: "https://github.com/sh1zzle",
   linkedin: "https://www.linkedin.com/in/shizzie/",

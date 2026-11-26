@@ -11,6 +11,9 @@ import {
   type SVGProps,
 } from "react";
 import Link from "next/link";
+import TimeDifference from "@/app/_components/time-difference";
+import GithubActivity from "@/app/_components/github-activity";
+import DesktopSlats from "@/app/_components/desktop-slats";
 import {
   Building2,
   FileText,
@@ -296,6 +299,7 @@ export default function PortfolioOS() {
      that on the right, so the channel can't be much tighter. */
   return (
     <main className="os-desktop relative overflow-hidden min-h-dvh flex flex-col items-center justify-center gap-4 px-4 pt-6 pb-[calc(var(--np-dock-h)+1.25rem)] md:pt-10 md:px-34 lg:px-40 xl:px-48">
+      <DesktopSlats />
       {/* Decorative scattered code symbols */}
       {BG_DECORATIONS.map(({ Icon, top, bottom, left, right, size, rotate }, i) => (
         <Icon
@@ -1067,6 +1071,8 @@ function WelcomeTab({
           </div>
         </div>
       </div>
+
+      <GithubActivity profileUrl={profile.github} />
 
       <Testimonials />
 
@@ -1970,7 +1976,9 @@ function ContactTab() {
         <p className="mt-3 text-sm text-[#6b5a44]">{hireHint}</p>
       </div>
 
-      <div className="mt-10 rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-5 text-sm">
+      <TimeDifference homeZone={profile.homeZone} homeCity={profile.homeCity} />
+
+      <div className="mt-8 rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-5 text-sm">
         <p className="text-[#6b6b6b] flex items-center gap-2">
           <Terminal size={14} /> $ cat contact.dat
         </p>
