@@ -39,6 +39,7 @@ export default function DesktopSlats() {
     <div className="desktop-slats" aria-hidden>
       <MicroSlats
         preset="tide"
+        speed={0}
         color="#b3a285"
         fog={0.15}
         perspective={0}
@@ -48,6 +49,8 @@ export default function DesktopSlats() {
         slatHeight={5}
         gap={7}
         roundness={1}
+        hoverScale={1}
+        hoverRadius={70}
       />
     </div>
   );

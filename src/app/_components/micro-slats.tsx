@@ -1,8 +1,9 @@
 'use client';
 
 /* Micro Slats background from React Bits (https://reactbits.dev/backgrounds/micro-slats),
-   copied unmodified apart from this note. (c) 2026 David Haz, MIT + Commons Clause:
-   free to use inside this site; the component itself may not be sold or redistributed. */
+   (c) 2026 David Haz, MIT + Commons Clause: free to use inside this site; the component
+   itself may not be sold or redistributed. One local change, marked "hover swell": slats
+   near the pointer grow and darken (`hoverScale`, `hoverRadius`), then ease back. */
 
 import { useEffect, useMemo, useRef } from 'react';
 import type { CSSProperties } from 'react';
@@ -38,6 +39,8 @@ export interface MicroSlatsProps extends Partial<WaveValues> {
   swirl?: number;
   trail?: number;
   lean?: number;
+  hoverScale?: number;
+  hoverRadius?: number;
   intro?: boolean;
   introDuration?: number;
   paused?: boolean;
@@ -59,6 +62,8 @@ interface Settings extends WaveValues {
   swirl: number;
   trail: number;
   lean: number;
+  hoverScale: number;
+  hoverRadius: number;
   intro: boolean;
   introDuration: number;
   paused: boolean;
@@ -401,6 +406,8 @@ uniform float uTilt;
 uniform vec3 uColor;
 uniform vec3 uGlintColor;
 uniform vec4 uBackground;
+uniform vec3 uHover; // hover swell: pointer x, y in CSS px, strength 0-1
+uniform vec2 uHoverShape; // hover swell: growth factor, radius in CSS px
 out vec4 fragColor;
 
 float pill(vec2 p, vec2 b, float r) {
@@ -414,10 +421,13 @@ void main() {
   vec2 cell = floor(local / uGrid.zw);
   vec4 background = vec4(uBackground.rgb * uBackground.a, uBackground.a);
   vec4 slat = vec4(0.0);
-  int reach = uTilt > 0.0 ? 1 : 0;
+  int reach = uTilt > 0.0 || uHover.z > 0.0 ? 1 : 0;
+  // hover swell: a swollen dot spills into the cells above and to the left, so look there too
+  int reachY = uHover.z > 0.0 ? 1 : 0;
+  for (int dy = -1; dy <= 1; dy++)
   for (int dx = -1; dx <= 1; dx++) {
-    if (abs(dx) > reach) continue;
-    vec2 neighbour = cell + vec2(float(dx), 0.0);
+    if (abs(dx) > reach || abs(dy) > reachY) continue;
+    vec2 neighbour = cell + vec2(float(dx), float(dy));
     if (neighbour.x < 0.0 || neighbour.y < 0.0 || neighbour.x >= uGrid.x || neighbour.y >= uGrid.y) continue;
     vec4 field = texelFetch(tField, ivec2(int(neighbour.x), int(uGrid.y - 1.0 - neighbour.y)), 0);
     vec2 offset = local - neighbour * uGrid.zw - uSlat * 0.5;
@@ -426,8 +436,12 @@ void main() {
     float s = sin(angle);
     vec2 turned = vec2(c * offset.x + s * offset.y, c * offset.y - s * offset.x);
     vec2 halfSize = vec2(uSlat.x * 0.5, uSlat.y * 0.5 * field.g);
+    vec2 home = uOrigin + neighbour * uGrid.zw + uSlat * 0.5;
+    float d = distance(home, uHover.xy) / max(uHoverShape.y, 1.0);
+    float swell = uHover.z * exp(-d * d);
+    halfSize = min(halfSize * (1.0 + uHoverShape.x * swell), uGrid.zw * 0.5);
     float radius = uRound * min(halfSize.x, halfSize.y);
-    float alpha = clamp(0.5 - pill(turned, halfSize, radius) * uDpr, 0.0, 1.0) * field.r;
+    float alpha = clamp(0.5 - pill(turned, halfSize, radius) * uDpr, 0.0, 1.0) * mix(field.r, 1.0, swell * 0.85);
     if (alpha > slat.a) slat = vec4(mix(uColor, uGlintColor, field.b) * alpha, alpha);
   }
   fragColor = slat + background * (1.0 - slat.a);
@@ -458,6 +472,8 @@ const MicroSlats = ({
   swirl = 0,
   trail = 1.4,
   lean = 0,
+  hoverScale = 0,
+  hoverRadius = 60,
   intro = true,
   introDuration = 1.5,
   paused = false,
@@ -503,6 +519,8 @@ const MicroSlats = ({
       swirl,
       trail,
       lean,
+      hoverScale,
+      hoverRadius,
       intro,
       introDuration,
       paused
@@ -591,7 +609,9 @@ const MicroSlats = ({
       uTilt: { value: 0 },
       uColor: { value: [1, 1, 1] },
       uGlintColor: { value: [1, 1, 1] },
-      uBackground: { value: [0, 0, 0, 1] }
+      uBackground: { value: [0, 0, 0, 1] },
+      uHover: { value: [0, 0, 0] },
+      uHoverShape: { value: [0, 60] }
     };
     const slatMesh = new Mesh(gl, {
       geometry,
@@ -657,6 +677,7 @@ const MicroSlats = ({
     let splashTurn = 0;
     const splats: Splat[] = [];
     const pointer = { x: 0, y: 0, tracked: false };
+    const hover = { x: 0, y: 0, strength: 0, target: 0 };
 
     const run = (mesh: Mesh, target?: RenderTarget) => renderer.render({ scene: mesh, target, clear: false });
 
@@ -908,10 +929,14 @@ const MicroSlats = ({
       slatUniforms.uColor.value = s.color.slice(0, 3);
       slatUniforms.uGlintColor.value = s.glintColor.slice(0, 3);
       slatUniforms.uBackground.value = s.backgroundColor;
+      hover.strength += (hover.target - hover.strength) * (reducedMotion ? 1 : 1 - Math.exp(-dt * 9));
+      slatUniforms.uHover.value = [hover.x, hover.y, hover.strength];
+      slatUniforms.uHoverShape.value = [Math.max(0, s.hoverScale), Math.max(1, s.hoverRadius)];
       renderer.render({ scene: slatMesh });
 
       const moving = (!s.paused && !reducedMotion && s.speed !== 0) || introClock < 1;
-      if (visible && (moving || fluidActive || fluidDirty)) raf = requestAnimationFrame(frame);
+      const easing = Math.abs(hover.target - hover.strength) > 0.002;
+      if (visible && (moving || fluidActive || fluidDirty || easing)) raf = requestAnimationFrame(frame);
     };
 
     const start = () => {
@@ -940,6 +965,12 @@ const MicroSlats = ({
     const onPointerMove = (e: PointerEvent) => {
       const s = settingsRef.current;
       const spot = locate(e);
+      if (s && s.hoverScale > 0) {
+        hover.x = spot.x;
+        hover.y = spot.y;
+        hover.target = spot.inside ? 1 : 0;
+        start();
+      }
       if (!fluid || !s || !s.interactive || reducedMotion || !spot.inside) {
         pointer.tracked = false;
         return;
@@ -962,6 +993,8 @@ const MicroSlats = ({
 
     const onPointerLeave = () => {
       pointer.tracked = false;
+      hover.target = 0;
+      start();
     };
 
     const onPointerOut = (e: PointerEvent) => {
